@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTFS 102 viewer - Transurb Galati</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+  #map { position: absolute; inset: 0; }
+  #panel {
+    position: absolute; top: 10px; left: 10px; z-index: 1000; background: #fff;
+    border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,.3); padding: 10px 12px;
+    font-size: 13px; max-width: 240px; max-height: calc(100% - 40px); overflow: auto;
+  }
+  #panel h1 { font-size: 15px; margin: 0 0 6px; }
+  #panel label { display: block; margin: 3px 0; }
+  #panel select { width: 100%; margin-top: 4px; }
+  .badge { display:inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+  .t-green { background:#2e7d32; } .t-red { background:#c62828; }
+  #status { color:#666; margin-top: 6px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="panel">
+  <h1>Transurb Galati - route 102</h1>
+  <label><input type="checkbox" id="cStops" checked> Show stops</label>
+  <label><input type="checkbox" id="cTur" checked> Show TUR (Micro 19 &rarr; Bariera Traian)</label>
+  <label><input type="checkbox" id="cRetur" checked> Show RETUR (Bariera Traian &rarr; Micro 19)</label>
+  <label>Highlight trip:
+    <select id="tripSelect"></select>
+  </label>
+  <div id="status">loading&hellip;</div>
+</div>
+<div id="map"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<script>
+const map = L.map('map').setView([45.442, 28.042], 13);
+window.addEventListener('resize', () => map.invalidateSize());
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+}).addTo(map);
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const header = lines[0].split(',');
+  return lines.slice(1).filter(l => l.trim()).map(l => {
+    const c = l.split(',');
+    const o = {};
+    header.forEach((h, i) => o[h.trim()] = (c[i] ?? '').trim());
+    return o;
+  });
+}
+
+const dirColor = { TUR: '#2e7d32', RETUR: '#c62828' };
+let stopsById = {}, stopsLayer, tripLayers = [], tripFeatures = [];
+
+async function init() {
+  const [stops, trips, stimes] = await Promise.all([
+    fetch('stops.txt').then(r => r.text()).then(parseCSV),
+    fetch('trips.txt').then(r => r.text()).then(parseCSV),
+    fetch('stop_times.txt').then(r => r.text()).then(parseCSV),
+  ]);
+
+  stops.forEach(s => stopsById[s.stop_id] = s);
+
+  // stop markers
+  stopsLayer = L.layerGroup();
+  stops.forEach(s => {
+    const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: '#058B8C', fillOpacity: 0.9 });
+    m.bindTooltip(s.stop_name);
+    stopsLayer.addLayer(m);
+  });
+  stopsLayer.addTo(map);
+
+  // trips: group stop_times by trip, order by stop_sequence
+  const stByTrip = {};
+  stimes.forEach(st => {
+    (stByTrip[st.trip_id] = stByTrip[st.trip_id] || []).push(st);
+  });
+  Object.values(stByTrip).forEach(arr => arr.sort((a, b) => +a.stop_sequence - +b.stop_sequence));
+
+  const sel = document.getElementById('tripSelect');
+  trips.forEach(t => {
+    const seq = stByTrip[t.trip_id] || [];
+    if (seq.length < 2) return;
+    const latlngs = seq.map(st => {
+      const s = stopsById[st.stop_id];
+      return s ? [+s.stop_lat, +s.stop_lon] : null;
+    }).filter(Boolean);
+    if (latlngs.length < 2) return;
+
+    const color = dirColor[t.direction_id == 0 ? 'TUR' : 'RETUR'];
+    const line = L.polyline(latlngs, { color, weight: 2, opacity: 0.7 }).bindTooltip(
+      `${t.trip_headsign} ${t.service_id} <br>${seq[0].departure_time} &rarr; ${seq[seq.length-1].departure_time}`
+    );
+    tripFeatures.push({ trip: t, line, seq });
+    const opt = document.createElement('option');
+    opt.value = t.trip_id;
+    opt.textContent = `${t.trip_id}  ${t.trip_headsign}  ${t.service_id}  ${seq[0].departure_time}`;
+    sel.appendChild(opt);
+  });
+
+  const dirs = { TUR: [], RETUR: [] };
+  tripFeatures.forEach(f => {
+    const dir = f.trip.direction_id == 0 ? 'TUR' : 'RETUR';
+    dirs[dir].push(f);
+  });
+
+  function redraw() {
+    // avoid 400+ lines on screen: draw up to N per direction
+    const MAX = 200;
+    const show = { TUR: document.getElementById('cTur').checked, RETUR: document.getElementById('cRetur').checked };
+    tripLayers.forEach(l => l.remove());
+    tripLayers = [];
+    Object.entries(dirs).forEach(([d, feats]) => {
+      if (!show[d]) return;
+      feats.slice(0, MAX).forEach(f => { f.line.addTo(map); tripLayers.push(f.line); });
+    });
+  }
+
+  function highlight() {
+    const id = document.getElementById('tripSelect').value;
+    if (window._hl) { window._hl.remove(); window._hl = null; }
+    if (!id) return;
+    const f = tripFeatures.find(x => x.trip.trip_id === id);
+    if (!f) return;
+    const hl = L.polyline(f.seq.map(st => { const s = stopsById[st.stop_id]; return [s.stop_lat, s.stop_lon]; }),
+      { color: '#ff9800', weight: 5, opacity: 0.95 }).addTo(map).bindTooltip(`${f.trip.trip_id}: ${f.trip.trip_headsign} ${f.trip.service_id}`, { permanent: true });
+    window._hl = hl;
+    map.fitBounds(hl.getBounds());
+    const st = document.getElementById('status');
+    st.innerHTML = 'Trip <b>' + id + '</b>: ' + f.seq.map(x => x.departure_time).join(' &rarr; ');
+  }
+
+  document.getElementById('cStops').addEventListener('change', e => {
+    e.target.checked ? stopsLayer.addTo(map) : map.removeLayer(stopsLayer);
+  });
+  document.getElementById('cTur').addEventListener('change', redraw);
+  document.getElementById('cRetur').addEventListener('change', redraw);
+  document.getElementById('tripSelect').addEventListener('change', highlight);
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && window._hl) { window._hl.remove(); window._hl = null; } });
+
+  redraw();
+
+  // fit bounds to all stops
+  const ll = stops.map(s => [+s.stop_lat, +s.stop_lon]);
+  map.fitBounds(ll);
+
+  const info = document.getElementById('status');
+  info.innerHTML = `${stops.length} stops, ${tripFeatures.length} trips drawn (TUR ${dirs.TUR.length}, RETUR ${dirs.RETUR.length})`;
+}
+
+init().catch(err => {
+  document.getElementById('status').textContent = 'Error: ' + err.message;
+});
+</script>
+</body>
+</html>
