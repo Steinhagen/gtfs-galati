@@ -1,3 +1,6 @@
 # Generated artifacts
 cache/
 gtfs_transurb.zip
+
+# Python
+__pycache__/

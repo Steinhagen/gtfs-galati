@@ -59,17 +59,13 @@ jobs:
           TAG="gtfs-latest"
           ASSET="gtfs-transurb.zip"
           mv gtfs_transurb.zip "$ASSET"
-          # Replace the previous release that uses the same fixed tag.
-          OLD_ID="$(gh api "repos/$REPO/releases/tags/$TAG" -q .id 2>/dev/null || true)"
-          if [ -n "$OLD_ID" ]; then
-            gh api -X DELETE "repos/$REPO/releases/$OLD_ID" >/dev/null
-            gh api -X DELETE "repos/$REPO/git/refs/tags/$TAG" >/dev/null || true
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ASSET" --repo "$REPO" --clobber
+            gh release edit "$TAG" --repo "$REPO" \
+              --title "Galati GTFS feed" \
+              --notes "Regenerated GTFS feed for TRANSURB S.A. Galati."
+          else
+            gh release create "$TAG" "$ASSET" --repo "$REPO" \
+              --title "Galati GTFS feed" \
+              --notes "Regenerated GTFS feed for TRANSURB S.A. Galati."
           fi
-          gh release create "$TAG" "$ASSET" --repo "$REPO" \
-            --target "${{ github.sha }}" \
-            --title "GTFS feed (latest)" \
-            --notes "Regenerated GTFS feed for TRANSURB S.A. Galati.
-
-          Static download URLs (never change):
-          - https://github.com/$REPO/releases/latest/download/$ASSET
-          - https://github.com/$REPO/releases/download/$TAG/$ASSET"
