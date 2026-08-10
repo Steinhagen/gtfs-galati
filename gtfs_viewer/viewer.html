@@ -3,31 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GTFS 102 viewer - Transurb Galati</title>
+<title>Transurb Galati - GTFS viewer</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
   html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
   #map { position: absolute; inset: 0; }
   #panel {
-    position: absolute; top: 10px; left: 10px; z-index: 1000; background: #fff;
+    position: absolute; top: 10px; left: 10px; z-index: 1200; background: #fff;
     border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,.3); padding: 10px 12px;
-    font-size: 13px; max-width: 240px; max-height: calc(100% - 40px); overflow: auto;
+    font-size: 13px; max-width: 250px; max-height: calc(100% - 40px); overflow: auto;
   }
   #panel h1 { font-size: 15px; margin: 0 0 6px; }
   #panel label { display: block; margin: 3px 0; }
   #panel select { width: 100%; margin-top: 4px; }
-  .badge { display:inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
-  .t-green { background:#2e7d32; } .t-red { background:#c62828; }
-  #status { color:#666; margin-top: 6px; font-size: 12px; }
+  .swatch { display:inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mode { color: #777; font-size: 11px; }
+  #status { color: #666; margin-top: 6px; font-size: 12px; }
 </style>
 </head>
 <body>
 <div id="panel">
-  <h1>Transurb Galati - route 102</h1>
+  <h1>Transurb Galați &mdash; GTFS</h1>
   <label><input type="checkbox" id="cStops" checked> Show stops</label>
-  <label><input type="checkbox" id="cTur" checked> Show TUR (Micro 19 &rarr; Bariera Traian)</label>
-  <label><input type="checkbox" id="cRetur" checked> Show RETUR (Bariera Traian &rarr; Micro 19)</label>
+  <div id="routeToggles"></div>
   <label>Highlight trip:
+    <select id="routeSelect"></select>
     <select id="tripSelect"></select>
   </label>
   <div id="status">loading&hellip;</div>
@@ -36,7 +36,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
-const map = L.map('map').setView([45.442, 28.042], 13);
+const map = L.map('map', { zoomControl: false }).setView([45.442, 28.042], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
 window.addEventListener('resize', () => map.invalidateSize());
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
@@ -53,103 +54,181 @@ function parseCSV(text) {
   });
 }
 
-const dirColor = { TUR: '#2e7d32', RETUR: '#c62828' };
-let stopsById = {}, stopsLayer, tripLayers = [], tripFeatures = [];
+const MODE = { '3': 'bus', '11': 'trolleybus', '0': 'tram', '1': 'subway', '4': 'ferry' };
+
+let stopsById = {}, stopsLayer, routesById = {}, routeList = [];
+let routeLayers = {};      // route_id -> array of polyline layers
+let tripFeatures = [];     // {route, trip, seq}
 
 async function init() {
-  const [stops, trips, stimes] = await Promise.all([
+  const [stops, routes, trips, stimes, shapes] = await Promise.all([
     fetch('stops.txt').then(r => r.text()).then(parseCSV),
+    fetch('routes.txt').then(r => r.text()).then(parseCSV),
     fetch('trips.txt').then(r => r.text()).then(parseCSV),
     fetch('stop_times.txt').then(r => r.text()).then(parseCSV),
+    fetch('shapes.txt').then(r => r.text()).then(parseCSV),
   ]);
 
   stops.forEach(s => stopsById[s.stop_id] = s);
+  routes.forEach(r => { routesById[r.route_id] = r; routeList.push(r); });
+  routeList.sort((a, b) => a.route_id.localeCompare(b.route_id));
 
-  // stop markers
-  stopsLayer = L.layerGroup();
-  stops.forEach(s => {
-    const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: '#058B8C', fillOpacity: 0.9 });
-    m.bindTooltip(s.stop_name);
-    stopsLayer.addLayer(m);
-  });
+  // stop markers (filtered to the selected route by renderStops)
+  stopsLayer = L.featureGroup();
   stopsLayer.addTo(map);
 
-  // trips: group stop_times by trip, order by stop_sequence
+  // group stop_times by trip, order by stop_sequence
   const stByTrip = {};
-  stimes.forEach(st => {
-    (stByTrip[st.trip_id] = stByTrip[st.trip_id] || []).push(st);
-  });
+  stimes.forEach(st => (stByTrip[st.trip_id] = stByTrip[st.trip_id] || []).push(st));
   Object.values(stByTrip).forEach(arr => arr.sort((a, b) => +a.stop_sequence - +b.stop_sequence));
 
-  const sel = document.getElementById('tripSelect');
-  trips.forEach(t => {
-    const seq = stByTrip[t.trip_id] || [];
-    if (seq.length < 2) return;
-    const latlngs = seq.map(st => {
-      const s = stopsById[st.stop_id];
-      return s ? [+s.stop_lat, +s.stop_lon] : null;
-    }).filter(Boolean);
-    if (latlngs.length < 2) return;
-
-    const color = dirColor[t.direction_id == 0 ? 'TUR' : 'RETUR'];
-    const line = L.polyline(latlngs, { color, weight: 2, opacity: 0.7 }).bindTooltip(
-      `${t.trip_headsign} ${t.service_id} <br>${seq[0].departure_time} &rarr; ${seq[seq.length-1].departure_time}`
-    );
-    tripFeatures.push({ trip: t, line, seq });
-    const opt = document.createElement('option');
-    opt.value = t.trip_id;
-    opt.textContent = `${t.trip_id}  ${t.trip_headsign}  ${t.service_id}  ${seq[0].departure_time}`;
-    sel.appendChild(opt);
+  // which stops belong to each route
+  const tripRoute = {};
+  trips.forEach(t => tripRoute[t.trip_id] = t.route_id);
+  const routeStopIds = {};
+  stimes.forEach(st => {
+    const rid = tripRoute[st.trip_id];
+    if (rid) (routeStopIds[rid] = routeStopIds[rid] || new Set()).add(st.stop_id);
   });
 
-  const dirs = { TUR: [], RETUR: [] };
-  tripFeatures.forEach(f => {
-    const dir = f.trip.direction_id == 0 ? 'TUR' : 'RETUR';
-    dirs[dir].push(f);
+  // shapes: shape_id -> ordered [lat, lon] points
+  const shapePoints = {};
+  shapes.forEach(sh => (shapePoints[sh.shape_id] = shapePoints[sh.shape_id] || []));
+  shapes.forEach(sh => shapePoints[sh.shape_id][+sh.shape_pt_sequence - 1] = [+sh.shape_pt_lat, +sh.shape_pt_lon]);
+
+  // one polyline per unique shape (all trips of a direction share it)
+  const seenShapes = {};
+  trips.forEach(t => {
+    const r = routesById[t.route_id];
+    if (!r || seenShapes[t.shape_id]) return;
+    seenShapes[t.shape_id] = true;
+    let latlngs = shapePoints[t.shape_id] || [];
+    if (!latlngs.length) {
+      const seq = stByTrip[t.trip_id] || [];
+      latlngs = seq.map(st => {
+        const s = stopsById[st.stop_id];
+        return s ? [+s.stop_lat, +s.stop_lon] : null;
+      }).filter(Boolean);
+    }
+    if (latlngs.length < 2) return;
+    const line = L.polyline(latlngs, {
+      color: r.route_color || '#333', weight: 2.5, opacity: 0.85
+    }).bindTooltip(`${r.route_short_name} · ${t.direction_id == 0 ? 'TUR' : 'RETUR'} (shape)`);
+    (routeLayers[r.route_id] = routeLayers[r.route_id] || []).push(line);
+  });
+
+  // all trips (for the dropdown), no lines
+  trips.forEach(t => {
+    const r = routesById[t.route_id];
+    if (!r) return;
+    const seq = stByTrip[t.trip_id] || [];
+    if (seq.length < 2) return;
+    tripFeatures.push({ route: r, trip: t, seq });
+  });
+
+  // route toggles + selects
+  const toggles = document.getElementById('routeToggles');
+  const routeSel = document.getElementById('routeSelect');
+  routeList.forEach(r => {
+    const sw = document.createElement('span');
+    sw.className = 'swatch'; sw.style.background = r.route_color || '#333';
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" class="rtoggle" data-route="${r.route_id}" checked>
+                       ${sw.outerHTML}<b>${r.route_short_name}</b> ${r.route_long_name}
+                       <span class="mode">(${MODE[r.route_type] || 'transit'})</span>`;
+    toggles.appendChild(label);
+    const opt = document.createElement('option');
+    opt.value = r.route_id;
+    opt.textContent = `${r.route_short_name} ${r.route_long_name}`;
+    routeSel.appendChild(opt);
   });
 
   function redraw() {
-    // avoid 400+ lines on screen: draw up to N per direction
-    const MAX = 200;
-    const show = { TUR: document.getElementById('cTur').checked, RETUR: document.getElementById('cRetur').checked };
-    tripLayers.forEach(l => l.remove());
-    tripLayers = [];
-    Object.entries(dirs).forEach(([d, feats]) => {
-      if (!show[d]) return;
-      feats.slice(0, MAX).forEach(f => { f.line.addTo(map); tripLayers.push(f.line); });
+    const state = {};
+    document.querySelectorAll('.rtoggle').forEach(cb => state[cb.dataset.route] = cb.checked);
+    Object.entries(routeLayers).forEach(([rid, layers]) => {
+      layers.forEach(l => state[rid] ? l.addTo(map) : map.removeLayer(l));
+    });
+  }
+
+  function renderStops() {
+    stopsLayer.clearLayers();
+    const ids = routeStopIds[document.getElementById('routeSelect').value] || new Set();
+    stops.forEach(s => {
+      if (!ids.has(s.stop_id)) return;
+      const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: '#058B8C', fillOpacity: 0.9 });
+      m.bindTooltip(s.stop_name);
+      stopsLayer.addLayer(m);
+    });
+  }
+
+  function populateTrips() {
+    const rid = document.getElementById('routeSelect').value;
+    const sel = document.getElementById('tripSelect');
+    sel.innerHTML = '';
+    tripFeatures.filter(f => f.route.route_id === rid).forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.trip.trip_id;
+      opt.textContent = `${f.trip.trip_id}  ${f.trip.trip_headsign}  ${f.trip.service_id}  ${f.seq[0].departure_time}`;
+      sel.appendChild(opt);
     });
   }
 
   function highlight() {
-    const id = document.getElementById('tripSelect').value;
     if (window._hl) { window._hl.remove(); window._hl = null; }
+    const id = document.getElementById('tripSelect').value;
     if (!id) return;
     const f = tripFeatures.find(x => x.trip.trip_id === id);
     if (!f) return;
-    const hl = L.polyline(f.seq.map(st => { const s = stopsById[st.stop_id]; return [s.stop_lat, s.stop_lon]; }),
-      { color: '#ff9800', weight: 5, opacity: 0.95 }).addTo(map).bindTooltip(`${f.trip.trip_id}: ${f.trip.trip_headsign} ${f.trip.service_id}`, { permanent: true });
+    let latlngs = shapePoints[f.trip.shape_id] || [];
+    if (!latlngs.length) {
+      latlngs = f.seq.map(st => {
+        const s = stopsById[st.stop_id];
+        return s ? [+s.stop_lat, +s.stop_lon] : null;
+      }).filter(Boolean);
+    }
+    const hl = L.polyline(latlngs, { color: '#ff9800', weight: 5, opacity: 0.95 }).addTo(map)
+      .bindTooltip(`${f.route.route_short_name} ${f.trip.trip_id}: ${f.trip.trip_headsign} ${f.trip.service_id}`, { permanent: true });
     window._hl = hl;
     map.fitBounds(hl.getBounds());
-    const st = document.getElementById('status');
-    st.innerHTML = 'Trip <b>' + id + '</b>: ' + f.seq.map(x => x.departure_time).join(' &rarr; ');
+    document.getElementById('status').innerHTML =
+      'Trip <b>' + id + '</b>: ' + f.seq.map(x => x.departure_time).join(' &rarr; ');
   }
 
   document.getElementById('cStops').addEventListener('change', e => {
-    e.target.checked ? stopsLayer.addTo(map) : map.removeLayer(stopsLayer);
+    if (e.target.checked) {
+      renderStops();
+      stopsLayer.addTo(map);
+      stopsLayer.bringToFront();
+    } else {
+      map.removeLayer(stopsLayer);
+    }
   });
-  document.getElementById('cTur').addEventListener('change', redraw);
-  document.getElementById('cRetur').addEventListener('change', redraw);
+  toggles.addEventListener('change', redraw);
+  routeSel.addEventListener('change', () => {
+    renderStops();
+    if (document.getElementById('cStops').checked) {
+      stopsLayer.addTo(map);
+      stopsLayer.bringToFront();
+    }
+    populateTrips();
+    highlight();
+  });
   document.getElementById('tripSelect').addEventListener('change', highlight);
   window.addEventListener('keydown', e => { if (e.key === 'Escape' && window._hl) { window._hl.remove(); window._hl = null; } });
 
   redraw();
+  populateTrips();
+  renderStops();
+  stopsLayer.bringToFront();
 
-  // fit bounds to all stops
   const ll = stops.map(s => [+s.stop_lat, +s.stop_lon]);
   map.fitBounds(ll);
 
-  const info = document.getElementById('status');
-  info.innerHTML = `${stops.length} stops, ${tripFeatures.length} trips drawn (TUR ${dirs.TUR.length}, RETUR ${dirs.RETUR.length})`;
+  const byRoute = {};
+  tripFeatures.forEach(f => byRoute[f.route.route_id] = (byRoute[f.route.route_id] || 0) + 1);
+  const parts = Object.entries(byRoute).map(([rid, n]) => `${rid}: ${n} trips`);
+  document.getElementById('status').innerHTML = `${stops.length} stops · ${parts.join(' · ')}`;
 }
 
 init().catch(err => {

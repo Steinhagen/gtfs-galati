@@ -11,6 +11,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -25,7 +26,7 @@ HERE = Path(__file__).resolve().parent
 CACHE_DIR = HERE / "cache"
 OUT_DIR = HERE / "gtfs_transurb"
 ZIP_PATH = HERE / "gtfs_transurb.zip"
-UA = "Mozilla/5.0 (X11; Linux x86_64) gtfs-galati/1.0"
+UA = "gtfs-galati/1.0"  # Overpass rejects Mozilla-prefixed custom UAs
 
 FEED_START, FEED_END = "20260101", "20261231"
 # Romanian legal holidays in 2026 that follow the weekend schedule.
@@ -33,17 +34,74 @@ HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
                  "20260501", "20260601", "20261130", "20261201", "20261225"]
 
 # ---------------------------------------------------------------------------
+# Stop catalog: canonical code -> (display name, lat, lon).
+# One entry per physical stop, shared by every route.
+# ---------------------------------------------------------------------------
+STOPS = {
+    "MICRO 19": ("Micro 19", 45.4133153, 28.0124752),
+    "NEACSU": ("Neacșu", 45.4169588, 28.0130412),
+    "SPITALUL JUDETEAN": ("Spitalul Județean", 45.4193509, 28.0177710),
+    "PRIVILEGE": ("Privilege", 45.4261475, 28.0233600),
+    "TIGLINA I": ("Țiglina I", 45.4276057, 28.0281282),
+    "ROMTELECOM": ("Romtelecom", 45.4286741, 28.0396232),
+    "MAZEPA": ("Mazepa", 45.4305181, 28.0462169),
+    "POTCOAVA DE AUR": ("Potcoava de Aur", 45.4327326, 28.0504231),
+    "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046),
+    "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444),
+    "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478),
+    "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4461186, 28.0541986),
+    "BLOC IALOMITA": ("Bloc Ialomița", 45.4495658, 28.0524493),
+    "CAMINE STUDENTESTI": ("Cămine Studențești", 45.4539921, 28.0497540),
+    "CAMINUL DE BATRANI": ("Căminul de Bătrâni", 45.4580487, 28.0473113),
+    "PARC C.F.R.": ("Parc C.F.R.", 45.4623733, 28.0447250),
+    "STR. PRUNDULUI": ("Str. Prundului", 45.4630597, 28.0369371),
+    "BARIERA TRAIAN": ("Bariera Traian", 45.4653144, 28.0362148),
+    "STR. RADU NEGRU": ("Str. Radu Negru", 45.4589088, 28.0465985),
+    "A.J.O.F.M.": ("A.J.O.F.M.", 45.4569492, 28.0477278),
+    "MUZEUL DE ARTA": ("Muzeul de Artă", 45.4506850, 28.0515363),
+    "STR. VULTUR": ("Str. Vultur", 45.4483643, 28.0529454),
+    "LICEUL DE ARTA": ("Liceul de Artă", 45.4450969, 28.0548432),
+    "TEATRUL DRAMATIC": ("Teatrul Dramatic", 45.4413412, 28.0561051),
+    "PARC EMINESCU": ("Parc Eminescu", 45.4361285, 28.0557148),
+    "CENTRU": ("Centru", 45.4342165, 28.0539635),
+    "AGENTIA C.F.R.": ("Agenția C.F.R.", 45.4310705, 28.0466092),
+    "PARCARE BANCI": ("Parcare Bănci", 45.4292945, 28.0414140),
+    "CEC TIGLINA II": ("CEC Țiglina II", 45.4285875, 28.0355499),
+    "TIGLINA II": ("Țiglina II", 45.4279325, 28.0280075),
+    "FARMACIA HYGEIA": ("Farmacia Hygeia", 45.4191133, 28.0168623),
+    "SERVICE VECHI": ("Service Vechi", 45.4168495, 28.0124289),
+    "BLD. GALATI": ("Bld. Galați", 45.4108853, 28.0147926),
+    "ZENNER": ("Zenner", 45.4093346, 28.0111119),
+    "BLOC A8": ("Bloc A8", 45.4113856, 28.0083163),
+    "CIMITIR CATUSA": ("Cimitir Cătușa", 45.4130442, 28.0063495),
+    "GRADINITA PRICHINDEL": ("Grădinița Prichindel", 45.4139447, 28.0070235),
+    "GARA CFR": ("Gara C.F.R.", 45.4444747, 28.0598390),
+    "AUTOGARA": ("Autogară", 45.4432060, 28.0586207),
+    "STR. GARII": ("Str. Gării", 45.4438402, 28.0537161),
+    "F.E.E.A": ("Facultatea de Științe Economice", 45.4432509, 28.0517570),
+    "C.N.V.A.": ("Colegiul Național Vasile Alecsandri", 45.4406250, 28.0521298),
+    "ALBATROS": ("Albatros", 45.4369171, 28.0526448),
+    "IATSA": ("IATSA", 45.4142302, 28.0072252),
+    "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235),
+    "FAC. DE MEDICINA": ("Fac. de Medicină", 45.4106737, 28.0149120),
+    "GRADINA PUBLICA": ("Grădina Publică", 45.4513651, 28.0510709),
+}
+
+# ---------------------------------------------------------------------------
 # Route configuration.
 #
-# Add a new route here: station order per direction (exactly as shown on the
-# "veziTraseu" page) plus one entry in `stops` for every stop appearing in
-# either direction:  code -> (display name, lat, lon).
+# Add a new route here: `stops` lists the stop codes in the order shown on
+# the "veziTraseu" page (TUR and RETUR). Codes must exist in STOPS above.
+#
+# If the site spells a stop differently for this route than in STOPS (e.g.
+# extra spaces, abbreviations), map it to the canonical code under `aliases`.
 # ---------------------------------------------------------------------------
 ROUTES = {
     "102": {
         "route_long_name": "Micro 19 - Bariera Traian",
         "route_type": 11,  # trolleybus
         "route_color": "058B8C",
+        "aliases": {},
         "directions": {
             "TUR": {
                 "headsign": "Bariera Traian",
@@ -65,46 +123,17 @@ ROUTES = {
                           "MICRO 19"],
             },
         },
-        # code: (name, lat, lon)
-        "stops": {
-            "MICRO 19": ("Micro 19", 45.4133153, 28.0124752),
-            "NEACSU": ("Neacșu", 45.4169588, 28.0130412),
-            "SPITALUL JUDETEAN": ("Spitalul Județean", 45.4193509, 28.0177710),
-            "PRIVILEGE": ("Privilege", 45.4261475, 28.0233600),
-            "TIGLINA I": ("Țiglina I", 45.4276057, 28.0281282),
-            "ROMTELECOM": ("Romtelecom", 45.4286741, 28.0396232),
-            "MAZEPA": ("Mazepa", 45.4305181, 28.0462169),
-            "POTCOAVA DE AUR": ("Potcoava de Aur", 45.4327326, 28.0504231),
-            "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046),
-            "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444),
-            "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478),
-            "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4461186, 28.0541986),
-            "BLOC IALOMITA": ("Bloc Ialomița", 45.4495658, 28.0524493),
-            "CAMINE STUDENTESTI": ("Cămine Studențești", 45.4539921, 28.0497540),
-            "CAMINUL DE BATRANI": ("Căminul de Bătrâni", 45.4580487, 28.0473113),
-            "PARC C.F.R.": ("Parc C.F.R.", 45.4623733, 28.0447250),
-            "STR. PRUNDULUI": ("Str. Prundului", 45.4630597, 28.0369371),
-            "BARIERA TRAIAN": ("Bariera Traian", 45.4653144, 28.0362148),
-            "STR. RADU NEGRU": ("Str. Radu Negru", 45.4589088, 28.0465985),
-            "A.J.O.F.M.": ("A.J.O.F.M.", 45.4569492, 28.0477278),
-            "MUZEUL DE ARTA": ("Muzeul de Artă", 45.4511782, 28.0513497),
-            "STR. VULTUR": ("Str. Vultur", 45.4483643, 28.0529454),
-            "LICEUL DE ARTA": ("Liceul de Artă", 45.4450969, 28.0548432),
-            "TEATRUL DRAMATIC": ("Teatrul Dramatic", 45.4413412, 28.0561051),
-            "PARC EMINESCU": ("Parc Eminescu", 45.4361285, 28.0557148),
-            "CENTRU": ("Centru", 45.4342165, 28.0539635),
-            "AGENTIA C.F.R.": ("Agenția C.F.R.", 45.4310705, 28.0466092),
-            "PARCARE BANCI": ("Parcare Bănci", 45.4292945, 28.0414140),
-            "CEC TIGLINA II": ("CEC Țiglina II", 45.4285875, 28.0355499),
-            "TIGLINA II": ("Țiglina II", 45.4279325, 28.0280075),
-            "FARMACIA HYGEIA": ("Farmacia Hygeia", 45.4191133, 28.0168623),
-            "SERVICE VECHI": ("Service Vechi", 45.4168495, 28.0124289),
-        },
     },
     "106": {
         "route_long_name": "Micro 19 - Gara CFR",
         "route_type": 3,  # bus
         "route_color": "7B1FA2",
+        "aliases": {
+            "GARA  CFR": "GARA CFR",
+            "SERVICE  VECHI": "SERVICE VECHI",
+            "STR.GARII": "STR. GARII",
+            "C.E.C. TIGLINA II": "CEC TIGLINA II",
+        },
         "directions": {
             "TUR": {
                 "headsign": "Gara C.F.R.",
@@ -125,45 +154,52 @@ ROUTES = {
                           "FAC. DE MEDICINA", "MICRO 19"],
             },
         },
-        # code: (name, lat, lon). "GARA  CFR" (TUR) and "GARA CFR" (RETUR) are
-        # the same physical stop spelled differently by the site.
-        "stops": {
-            "MICRO 19": ("Micro 19", 45.4133153, 28.0124752),
-            "BLD. GALATI": ("Bld. Galați", 45.4108853, 28.0147926),
-            "ZENNER": ("Zenner", 45.4093346, 28.0111119),
-            "BLOC A8": ("Bloc A8", 45.4113856, 28.0083163),
-            "CIMITIR CATUSA": ("Cimitir Cătușa", 45.4130442, 28.0063495),
-            "GRADINITA PRICHINDEL": ("Grădinița Prichindel", 45.4150000, 28.0097000),
-            "NEACSU": ("Neacșu", 45.4169588, 28.0130412),
-            "SPITALUL JUDETEAN": ("Spitalul Județean", 45.4193509, 28.0177710),
-            "PRIVILEGE": ("Privilege", 45.4261475, 28.0233600),
-            "TIGLINA I": ("Țiglina I", 45.4276057, 28.0281282),
-            "ROMTELECOM": ("Romtelecom", 45.4286741, 28.0396232),
-            "MAZEPA": ("Mazepa", 45.4305181, 28.0462169),
-            "POTCOAVA DE AUR": ("Potcoava de Aur", 45.4327326, 28.0504231),
-            "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046),
-            "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444),
-            "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478),
-            "GARA  CFR": ("Gara C.F.R.", 45.4444747, 28.0598390),
-            "GARA CFR": ("Gara C.F.R.", 45.4444747, 28.0598390),
-            "AUTOGARA": ("Autogară", 45.4432060, 28.0586207),
-            "STR.GARII": ("Str. Gării", 45.4438402, 28.0537161),
-            "F.E.E.A": ("F.E.E.A.", 45.4415000, 28.0533000),
-            "C.N.V.A.": ("C.N.V.A.", 45.4392000, 28.0530000),
-            "ALBATROS": ("Albatros", 45.4369171, 28.0526448),
-            "CENTRU": ("Centru", 45.4342165, 28.0539635),
-            "AGENTIA C.F.R.": ("Agenția C.F.R.", 45.4310705, 28.0466092),
-            "PARCARE BANCI": ("Parcare Bănci", 45.4292945, 28.0414140),
-            "C.E.C. TIGLINA II": ("CEC Țiglina II", 45.4285875, 28.0355499),
-            "TIGLINA II": ("Țiglina II", 45.4279325, 28.0280075),
-            "FARMACIA HYGEIA": ("Farmacia Hygeia", 45.4191133, 28.0168623),
-            "SERVICE  VECHI": ("Service Vechi", 45.4168495, 28.0124289),
-            "IATSA": ("IATSA", 45.4142302, 28.0072252),
-            "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235),
-            "FAC. DE MEDICINA": ("Fac. de Medicină", 45.4106737, 28.0149120),
+    },
+    "105": {
+        "route_long_name": "Micro 19 - Grădina Publică",
+        "route_type": 3,  # bus
+        "route_color": "FF6D00",
+        "aliases": {
+            "F.E.A.A.": "F.E.E.A",
+            "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Grădina Publică",
+                "stops": ["MICRO 19", "BLD. GALATI", "ZENNER", "BLOC A8",
+                          "CIMITIR CATUSA", "GRADINITA PRICHINDEL", "NEACSU",
+                          "SPITALUL JUDETEAN", "PRIVILEGE", "TIGLINA I",
+                          "ROMTELECOM", "MAZEPA", "POTCOAVA DE AUR",
+                          "GALERIILE DE ARTA", "UNIVERSITATE", "PARFUMUL TEILOR",
+                          "DIRECTIA AGRICOLA", "BLOC IALOMITA", "GRADINA PUBLICA"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "stops": ["GRADINA PUBLICA", "MUZEUL DE ARTA", "STR. VULTUR",
+                          "LICEUL DE ARTA", "STR. GARII", "F.E.A.A.",
+                          "C.N.V.A.", "ALBATROS", "CENTRU", "AGENTIA C.F.R.",
+                          "PARCARE BANCI", "CEC TIGLINA II", "TIGLINA II",
+                          "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE VECHI",
+                          "IATSA", "CIMITIR CATUSA", "BLOC B3", "ZENNER",
+                          "FACULTATEA DE MEDICINA", "MICRO 19"],
+            },
         },
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# Shape sources: OSM route relation ids per route/direction.
+# Use "osrm" to generate a shape by routing between consecutive stops
+# (needed when no relation is mapped on OSM yet, e.g. route 106).
+# ---------------------------------------------------------------------------
+SHAPES = {
+    "102": {"TUR": 7514198, "RETUR": 309380},
+    "105": {"TUR": 10177285, "RETUR": 10177284},
+    "106": {"TUR": 21211344, "RETUR": 21211343},
+}
+
+OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
 
 
 def stop_id(code: str) -> str:
@@ -199,8 +235,107 @@ def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str],
     return re.findall(r"(\d{2}:\d{2})", m.group(1)), re.findall(r"(\d{2}:\d{2})", m.group(2))
 
 
+def overpass(query: str, cache_name: str) -> dict:
+    """Run an Overpass query, caching the JSON response."""
+    cache = CACHE_DIR / cache_name
+    if cache.exists():
+        return json.loads(cache.read_text(encoding="utf-8"))
+    req = urllib.request.Request(
+        "https://overpass-api.de/api/interpreter",
+        data=urllib.parse.urlencode({"data": query}).encode(),
+        headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = resp.read().decode("utf-8", errors="replace")
+    cache.write_text(data, encoding="utf-8")
+    time.sleep(1)
+    return json.loads(data)
+
+
+def osm_shape_points(rel_id: int, stops: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Extract an ordered (lat, lon) polyline from an OSM route relation.
+
+    `stops` is the direction's stop sequence used to orient the first way
+    (relations sometimes map its first way against the direction of travel).
+    """
+    j = overpass(f"[out:json][timeout:60];relation({rel_id});out geom;",
+                 f"rel_{rel_id}.json")
+    members = j["elements"][0]["members"]
+    path = []
+    for m in members:
+        if m.get("type") != "way":
+            continue
+        pts = [(p["lat"], p["lon"]) for p in m["geometry"]]
+        if path:
+            last = path[-1]
+            d_first = (pts[0][0] - last[0]) ** 2 + (pts[0][1] - last[1]) ** 2
+            d_last = (pts[-1][0] - last[0]) ** 2 + (pts[-1][1] - last[1]) ** 2
+            if d_last < d_first:
+                pts.reverse()
+            if (pts[0][0] - last[0]) ** 2 + (pts[0][1] - last[1]) ** 2 < 1e-10:
+                pts = pts[1:]
+        else:  # first way: orient against the first stop
+            d_start = (pts[0][0] - stops[0][0]) ** 2 + (pts[0][1] - stops[0][1]) ** 2
+            d_end = (pts[-1][0] - stops[0][0]) ** 2 + (pts[-1][1] - stops[0][1]) ** 2
+            if d_end < d_start:
+                pts.reverse()
+        path.extend(pts)
+    return dedup_points(path)
+
+
+def shape_ok(pts: list[tuple[float, float]], stops: list[tuple[float, float]],
+             max_dist_m: float = 150.0) -> bool:
+    """Every stop must be close to the shape and visited in order."""
+    tol = (max_dist_m / 111000.0) ** 2
+    prev = -1
+    for lat, lon in stops:
+        best, idx = 1e18, -1
+        for i, (pl, pn) in enumerate(pts):
+            d = (pl - lat) ** 2 + (pn - lon) ** 2
+            if d < best:
+                best, idx = d, i
+        if best > tol or idx < prev:
+            return False
+        prev = idx
+    return True
+
+
+def osrm_shape_points(stops: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Route along the road network between consecutive stops (fallback)."""
+    path = []
+    for a, b in zip(stops, stops[1:]):
+        url = (f"{OSRM_URL}/{b[1]:.6f},{b[0]:.6f};{a[1]:.6f},{a[0]:.6f}"
+               "?overview=full&geometries=geojson&steps=false")
+        cache = CACHE_DIR / f"osrm_{a[0]:.5f}_{a[1]:.5f}_{b[0]:.5f}_{b[1]:.5f}.json"
+        if cache.exists():
+            j = json.loads(cache.read_text(encoding="utf-8"))
+        else:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                j = json.loads(resp.read().decode("utf-8", errors="replace"))
+            cache.write_text(json.dumps(j), encoding="utf-8")
+            time.sleep(0.3)
+        coords = j.get("routes", [{}])[0].get("geometry", {}).get("coordinates", [])
+        if not coords:
+            print(f"  osrm: no route {a} -> {b}, using straight line")
+            coords = [[a[1], a[0]], [b[1], b[0]]]
+        if path:
+            coords = coords[1:]
+        path.extend((lat, lon) for lon, lat in coords)
+    return dedup_points(path)
+
+
+def dedup_points(path: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    out = []
+    for p in path:
+        if not out or out[-1] != p:
+            out.append(p)
+    return out
+
+
 def collect_route(route_id: str, cfg: dict) -> dict:
     """Return dict with 'stops' (unique), 'trips' (rows) and 'stop_times' (rows)."""
+    aliases = cfg.get("aliases", {})  # site code -> canonical STOPS code
+    canon = lambda code: aliases.get(code, code)
     # 1) fetch and validate per-direction timetables
     times = {}  # times[direction][station][service] = [hh:mm, ...]
     for direction, d in cfg["directions"].items():
@@ -230,39 +365,47 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                     prev = t
         print(f"route {route_id} {direction}: {n_wd} WD trips, {n_we} WE trips")
 
-    # 2) unique stops
+    # 2) unique stops used by this route
     stops = {}
     for cfg_stops in cfg["directions"].values():
         for code in cfg_stops["stops"]:
-            name, lat, lon = cfg["stops"][code]
-            stops[stop_id(code)] = {"code": code, "name": name, "lat": lat, "lon": lon}
+            c = canon(code)
+            if c not in STOPS:
+                raise KeyError(f"route {route_id}: stop {code!r} not in STOPS catalog")
+            name, lat, lon = STOPS[c]
+            stops[stop_id(c)] = {"code": c, "name": name, "lat": lat, "lon": lon}
 
     # 3) trips + stop_times
     trips, stop_times = [], []
+    stop_order = {}
     trip_no = 0
     for direction, d in cfg["directions"].items():
         direction_id = 0 if direction == "TUR" else 1
+        shape_id = f"{route_id}-{direction}"
+        stop_order[direction] = [STOPS[canon(s)][1:] for s in d["stops"]]
         for service in ("WD", "WE"):
             ntrip = len(times[direction][d["stops"][0]][service])
             for i in range(ntrip):
                 trip_no += 1
                 tid = f"{route_id}-{direction[0]}-{service}-{i + 1:03d}"
-                trips.append((route_id, service, tid, d["headsign"], direction_id))
+                trips.append((route_id, service, tid, d["headsign"], direction_id, shape_id))
                 for seq, station in enumerate(d["stops"], start=1):
                     t = times[direction][station][service][i] + ":00"
-                    stop_times.append((tid, t, t, stop_id(station), seq))
-    return {"stops": stops, "trips": trips, "stop_times": stop_times}
+                    stop_times.append((tid, t, t, stop_id(canon(station)), seq))
+    return {"stops": stops, "trips": trips, "stop_times": stop_times,
+            "stop_order": stop_order}
 
 
 def write_feed(route_ids: list[str]) -> None:
     OUT_DIR.mkdir(exist_ok=True)
-    all_stops, all_trips, all_st = {}, [], []
+    all_stops, all_trips, all_st, all_order = {}, [], [], {}
     for rid in route_ids:
         cfg = ROUTES[rid]
         data = collect_route(rid, cfg)
         all_stops.update(data["stops"])
         all_trips.extend(data["trips"])
         all_st.extend(data["stop_times"])
+        all_order[rid] = data["stop_order"]
 
     def wcsv(name: str, header: list[str], rows: list[list]) -> None:
         with open(OUT_DIR / name, "w", encoding="utf-8", newline="") as fh:
@@ -291,10 +434,42 @@ def write_feed(route_ids: list[str]) -> None:
     wcsv("calendar_dates.txt", ["service_id", "date", "exception_type"],
          [[svc, d, ex] for d in HOLIDAYS_2026 for svc, ex in (("WE", 1), ("WD", 2))])
 
-    wcsv("trips.txt", ["route_id", "service_id", "trip_id", "trip_headsign", "direction_id"],
+    wcsv("trips.txt", ["route_id", "service_id", "trip_id", "trip_headsign",
+                       "direction_id", "shape_id"],
          all_trips)
     wcsv("stop_times.txt", ["trip_id", "arrival_time", "departure_time", "stop_id",
                             "stop_sequence"], all_st)
+
+    # shapes: exact road geometry per route/direction
+    shape_rows = []
+    shape_report = []
+    for rid in route_ids:
+        for direction in ROUTES[rid]["directions"]:
+            shape_id = f"{rid}-{direction}"
+            order = all_order[rid][direction]
+            src = SHAPES.get(rid, {}).get(direction, "osrm")
+            if isinstance(src, int):
+                pts = osm_shape_points(src, order)
+                if not shape_ok(pts, order):
+                    print(f"shape {shape_id}: relation {src} fails check, "
+                          f"falling back to OSRM")
+                    pts = osrm_shape_points(order)
+                    shape_report.append(
+                        f"{shape_id}: OSRM (OSM relation {src} fails check)")
+                else:
+                    print(f"shape {shape_id}: {len(pts)} points (OSM relation {src})")
+                    shape_report.append(f"{shape_id}: OSM relation {src}")
+            else:
+                pts = osrm_shape_points(order)
+                print(f"shape {shape_id}: {len(pts)} points (OSRM routing)")
+                shape_report.append(f"{shape_id}: OSRM (no OSM relation configured)")
+            for seq, (lat, lon) in enumerate(pts, start=1):
+                shape_rows.append((shape_id, f"{lat:.6f}", f"{lon:.6f}", seq))
+    wcsv("shapes.txt", ["shape_id", "shape_pt_lat", "shape_pt_lon",
+                        "shape_pt_sequence"], shape_rows)
+    print("\nshape sources:")
+    for line in shape_report:
+        print("  " + line)
 
     wcsv("feed_info.txt",
          ["feed_publisher_name", "feed_publisher_url", "feed_lang", "default_lang",
