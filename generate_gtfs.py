@@ -86,6 +86,8 @@ STOPS = {
     "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235),
     "FAC. DE MEDICINA": ("Fac. de Medicină", 45.4106737, 28.0149120),
     "GRADINA PUBLICA": ("Grădina Publică", 45.4513651, 28.0510709),
+    "CAMINELE COMBINATULUI": ("Căminele Combinatului", 45.4420380, 28.0133603),
+    "PIATA ENERGIEI": ("Piața Energiei", 45.4398644, 28.0205822),
 }
 
 # ---------------------------------------------------------------------------
@@ -159,7 +161,7 @@ ROUTES = {
     "105": {
         "route_long_name": "Micro 19 - Grădina Publică",
         "route_type": 3,  # bus
-        "route_color": "FF6D00",
+        "route_color": "1565C0",
         "aliases": {
             "F.E.A.A.": "F.E.E.A",
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
@@ -186,18 +188,35 @@ ROUTES = {
             },
         },
     },
+    "43": {
+        "route_long_name": "Căminele Combinatului - Piața Energiei",
+        "route_type": 3,  # bus
+        "route_color": "1E88E5",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "Piața Energiei",
+                "stops": ["CAMINELE COMBINATULUI", "PIATA ENERGIEI"],
+            },
+            "RETUR": {
+                "headsign": "Căminele Combinatului",
+                "stops": ["PIATA ENERGIEI", "CAMINELE COMBINATULUI"],
+            },
+        },
+    },
 }
 
 
 # ---------------------------------------------------------------------------
 # Shape sources: OSM route relation ids per route/direction.
 # Use "osrm" to generate a shape by routing between consecutive stops
-# (needed when no relation is mapped on OSM yet, e.g. route 106).
+# (only when no relation is mapped on OSM yet).
 # ---------------------------------------------------------------------------
 SHAPES = {
     "102": {"TUR": 7514198, "RETUR": 309380},
     "105": {"TUR": 10177285, "RETUR": 10177284},
     "106": {"TUR": 21211344, "RETUR": 21211343},
+    "43": {"TUR": 21213681, "RETUR": 21213682},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"

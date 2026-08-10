@@ -25,9 +25,11 @@
 <div id="panel">
   <h1>Transurb Galați &mdash; GTFS</h1>
   <label><input type="checkbox" id="cStops" checked> Show stops</label>
-  <div id="routeToggles"></div>
-  <label>Highlight trip:
+  <label><input type="checkbox" id="cBoth"> Show both directions</label>
+  <label>Route:
     <select id="routeSelect"></select>
+  </label>
+  <label>Highlight trip:
     <select id="tripSelect"></select>
   </label>
   <div id="status">loading&hellip;</div>
@@ -82,13 +84,16 @@ async function init() {
   stimes.forEach(st => (stByTrip[st.trip_id] = stByTrip[st.trip_id] || []).push(st));
   Object.values(stByTrip).forEach(arr => arr.sort((a, b) => +a.stop_sequence - +b.stop_sequence));
 
-  // which stops belong to each route
-  const tripRoute = {};
-  trips.forEach(t => tripRoute[t.trip_id] = t.route_id);
+  // which stops belong to each route/direction
+  const tripInfo = {};
+  trips.forEach(t => tripInfo[t.trip_id] = { rid: t.route_id, dir: t.direction_id == 0 ? 'TUR' : 'RETUR' });
   const routeStopIds = {};
   stimes.forEach(st => {
-    const rid = tripRoute[st.trip_id];
-    if (rid) (routeStopIds[rid] = routeStopIds[rid] || new Set()).add(st.stop_id);
+    const info = tripInfo[st.trip_id];
+    if (info) {
+      routeStopIds[info.rid] = routeStopIds[info.rid] || { TUR: new Set(), RETUR: new Set() };
+      routeStopIds[info.rid][info.dir].add(st.stop_id);
+    }
   });
 
   // shapes: shape_id -> ordered [lat, lon] points
@@ -111,10 +116,11 @@ async function init() {
       }).filter(Boolean);
     }
     if (latlngs.length < 2) return;
+    const dir = t.direction_id == 0 ? 'TUR' : 'RETUR';
     const line = L.polyline(latlngs, {
-      color: r.route_color || '#333', weight: 2.5, opacity: 0.85
-    }).bindTooltip(`${r.route_short_name} · ${t.direction_id == 0 ? 'TUR' : 'RETUR'} (shape)`);
-    (routeLayers[r.route_id] = routeLayers[r.route_id] || []).push(line);
+      color: '#ff9800', weight: 2.5, opacity: 0.85
+    }).bindTooltip(`${r.route_short_name} · ${dir} (shape)`);
+    (routeLayers[r.route_id] = routeLayers[r.route_id] || { TUR: [], RETUR: [] })[dir].push(line);
   });
 
   // all trips (for the dropdown), no lines
@@ -126,34 +132,47 @@ async function init() {
     tripFeatures.push({ route: r, trip: t, seq });
   });
 
-  // route toggles + selects
-  const toggles = document.getElementById('routeToggles');
+  // route select + trip select
   const routeSel = document.getElementById('routeSelect');
   routeList.forEach(r => {
-    const sw = document.createElement('span');
-    sw.className = 'swatch'; sw.style.background = r.route_color || '#333';
-    const label = document.createElement('label');
-    label.innerHTML = `<input type="checkbox" class="rtoggle" data-route="${r.route_id}" checked>
-                       ${sw.outerHTML}<b>${r.route_short_name}</b> ${r.route_long_name}
-                       <span class="mode">(${MODE[r.route_type] || 'transit'})</span>`;
-    toggles.appendChild(label);
     const opt = document.createElement('option');
     opt.value = r.route_id;
-    opt.textContent = `${r.route_short_name} ${r.route_long_name}`;
+    opt.textContent = `${r.route_short_name} ${r.route_long_name} (${MODE[r.route_type] || 'transit'})`;
     routeSel.appendChild(opt);
   });
 
-  function redraw() {
-    const state = {};
-    document.querySelectorAll('.rtoggle').forEach(cb => state[cb.dataset.route] = cb.checked);
-    Object.entries(routeLayers).forEach(([rid, layers]) => {
-      layers.forEach(l => state[rid] ? l.addTo(map) : map.removeLayer(l));
+  // direction of the currently selected trip (defaults to TUR)
+  function selectedDirection() {
+    const id = document.getElementById('tripSelect').value;
+    const f = id && tripFeatures.find(x => x.trip.trip_id === id);
+    return f ? (f.trip.direction_id == 0 ? 'TUR' : 'RETUR') : 'TUR';
+  }
+
+  // show the selected route's shapes (direction of the selected trip,
+  // or both when the "both directions" box is checked)
+  function showRoute(rid) {
+    const showBoth = document.getElementById('cBoth').checked;
+    const wantDir = selectedDirection();
+    Object.entries(routeLayers).forEach(([r2, dirs]) => {
+      const onRoute = r2 === rid;
+      Object.entries(dirs).forEach(([dir, lines]) => {
+        const show = onRoute && (showBoth || dir === wantDir);
+        lines.forEach(l => show ? l.addTo(map) : map.removeLayer(l));
+      });
     });
   }
 
   function renderStops() {
     stopsLayer.clearLayers();
-    const ids = routeStopIds[document.getElementById('routeSelect').value] || new Set();
+    const rid = document.getElementById('routeSelect').value;
+    const showBoth = document.getElementById('cBoth').checked;
+    const dirSets = routeStopIds[rid] || {};
+    const ids = new Set();
+    if (showBoth) {
+      Object.values(dirSets).forEach(s => s.forEach(id => ids.add(id)));
+    } else {
+      (dirSets[selectedDirection()] || new Set()).forEach(id => ids.add(id));
+    }
     stops.forEach(s => {
       if (!ids.has(s.stop_id)) return;
       const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: '#058B8C', fillOpacity: 0.9 });
@@ -176,6 +195,12 @@ async function init() {
 
   function highlight() {
     if (window._hl) { window._hl.remove(); window._hl = null; }
+    showRoute(document.getElementById('routeSelect').value);
+    if (document.getElementById('cStops').checked) {
+      renderStops();
+      stopsLayer.addTo(map);
+      stopsLayer.bringToFront();
+    }
     const id = document.getElementById('tripSelect').value;
     if (!id) return;
     const f = tripFeatures.find(x => x.trip.trip_id === id);
@@ -204,8 +229,16 @@ async function init() {
       map.removeLayer(stopsLayer);
     }
   });
-  toggles.addEventListener('change', redraw);
+  document.getElementById('cBoth').addEventListener('change', () => {
+    showRoute(document.getElementById('routeSelect').value);
+    if (document.getElementById('cStops').checked) {
+      renderStops();
+      stopsLayer.addTo(map);
+      stopsLayer.bringToFront();
+    }
+  });
   routeSel.addEventListener('change', () => {
+    showRoute(routeSel.value);
     renderStops();
     if (document.getElementById('cStops').checked) {
       stopsLayer.addTo(map);
@@ -217,8 +250,8 @@ async function init() {
   document.getElementById('tripSelect').addEventListener('change', highlight);
   window.addEventListener('keydown', e => { if (e.key === 'Escape' && window._hl) { window._hl.remove(); window._hl = null; } });
 
-  redraw();
   populateTrips();
+  showRoute(routeSel.value);
   renderStops();
   stopsLayer.bringToFront();
 
