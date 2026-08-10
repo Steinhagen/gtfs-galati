@@ -206,13 +206,29 @@ def stop_id(code: str) -> str:
     return re.sub(r"\s+", "-", code.replace(".", ""))
 
 
+def http_get(url: str, data: bytes | None = None, headers: dict | None = None,
+             tries: int = 3, timeout: int = 60) -> bytes:
+    """GET/POST with retries (the APIs used here are sometimes flaky)."""
+    last = None
+    for attempt in range(1, tries + 1):
+        try:
+            req = urllib.request.Request(url, data=data,
+                                         headers=headers or {"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return resp.read()
+        except Exception as e:
+            last = e
+            if attempt < tries:
+                print(f"  http error ({e}); retry {attempt}/{tries - 1} in {5 * attempt}s")
+                time.sleep(5 * attempt)
+    raise last
+
+
 def fetch_page(url: str, cache_file: Path) -> str:
     if cache_file.exists():
         return cache_file.read_text(encoding="utf-8")
     cache_file.parent.mkdir(parents=True, exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        data = resp.read().decode("utf-8", errors="replace")
+    data = http_get(url).decode("utf-8", errors="replace")
     cache_file.write_text(data, encoding="utf-8")
     time.sleep(0.3)
     return data
@@ -240,13 +256,9 @@ def overpass(query: str, cache_name: str) -> dict:
     cache = CACHE_DIR / cache_name
     if cache.exists():
         return json.loads(cache.read_text(encoding="utf-8"))
-    req = urllib.request.Request(
-        "https://overpass-api.de/api/interpreter",
-        data=urllib.parse.urlencode({"data": query}).encode(),
-        headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        data = resp.read().decode("utf-8", errors="replace")
-    cache.write_text(data, encoding="utf-8")
+    data = http_get("https://overpass-api.de/api/interpreter",
+                    data=urllib.parse.urlencode({"data": query}).encode())
+    cache.write_text(data.decode("utf-8", "replace"), encoding="utf-8")
     time.sleep(1)
     return json.loads(data)
 
@@ -309,9 +321,7 @@ def osrm_shape_points(stops: list[tuple[float, float]]) -> list[tuple[float, flo
         if cache.exists():
             j = json.loads(cache.read_text(encoding="utf-8"))
         else:
-            req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                j = json.loads(resp.read().decode("utf-8", errors="replace"))
+            j = json.loads(http_get(url).decode("utf-8", "replace"))
             cache.write_text(json.dumps(j), encoding="utf-8")
             time.sleep(0.3)
         coords = j.get("routes", [{}])[0].get("geometry", {}).get("coordinates", [])
