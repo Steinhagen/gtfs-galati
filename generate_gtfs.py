@@ -19,6 +19,7 @@ import time
 import zipfile
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 BASE_URL = "https://transurbgalati.ro/program_circulatie"
@@ -251,16 +252,75 @@ def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str],
     return re.findall(r"(\d{2}:\d{2})", m.group(1)), re.findall(r"(\d{2}:\d{2})", m.group(2))
 
 
+OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+    "https://overpass.osm.ch/api/interpreter",
+]
+
+
 def overpass(query: str, cache_name: str) -> dict:
-    """Run an Overpass query, caching the JSON response."""
+    """Run an Overpass query against the first working mirror, caching the result."""
     cache = CACHE_DIR / cache_name
     if cache.exists():
         return json.loads(cache.read_text(encoding="utf-8"))
-    data = http_get("https://overpass-api.de/api/interpreter",
-                    data=urllib.parse.urlencode({"data": query}).encode())
-    cache.write_text(data.decode("utf-8", "replace"), encoding="utf-8")
-    time.sleep(1)
-    return json.loads(data)
+    last = None
+    for endpoint in OVERPASS_ENDPOINTS:
+        try:
+            data = http_get(endpoint,
+                            data=urllib.parse.urlencode({"data": query}).encode(),
+                            tries=2)
+            cache.write_text(data.decode("utf-8", "replace"), encoding="utf-8")
+            time.sleep(1)
+            return json.loads(data)
+        except Exception as e:
+            last = e
+            print(f"  overpass mirror {endpoint} failed ({e})")
+    raise last
+
+
+def osm_api_relation_members(rel_id: int) -> list[dict]:
+    """Fallback: fetch relation geometry from the OSM API (/full, XML)."""
+    url = f"https://api.openstreetmap.org/api/0.6/relation/{rel_id}/full"
+    xml = http_get(url, tries=3).decode("utf-8", "replace")
+    root = ET.fromstring(xml)
+    nodes, ways, members = {}, {}, []
+    for el in root:
+        if el.tag == "node":
+            nodes[int(el.get("id"))] = {"lat": float(el.get("lat")),
+                                        "lon": float(el.get("lon"))}
+        elif el.tag == "way":
+            ways[int(el.get("id"))] = [int(nd.get("ref")) for nd in el.findall("nd")]
+        elif el.tag == "relation" and int(el.get("id")) == rel_id:
+            members = [(m.get("type"), int(m.get("ref")), m.get("role"))
+                       for m in el.findall("member")]
+    out = []
+    for typ, ref, role in members:
+        if typ == "way" and ref in ways:
+            geom = [nodes[n] for n in ways[ref] if n in nodes]
+            if len(geom) >= 2:
+                out.append({"type": "way", "ref": ref, "role": role,
+                            "geometry": geom})
+    if not out:
+        raise RuntimeError(f"no way geometry for relation {rel_id}")
+    return out
+
+
+def relation_members(rel_id: int, cache_name: str) -> list[dict]:
+    """Relation members with way geometry: Overpass mirrors, then OSM API."""
+    try:
+        j = overpass(f"[out:json][timeout:60];relation({rel_id});out geom;",
+                     cache_name)
+        return j["elements"][0]["members"]
+    except Exception:
+        print(f"  overpass failed for relation {rel_id}; falling back to OSM API")
+        members = osm_api_relation_members(rel_id)
+        # seed the overpass cache so future runs skip the flaky endpoints
+        payload = {"elements": [{"type": "relation", "id": rel_id,
+                                 "members": members}]}
+        (CACHE_DIR / cache_name).write_text(json.dumps(payload), encoding="utf-8")
+        return members
 
 
 def osm_shape_points(rel_id: int, stops: list[tuple[float, float]]) -> list[tuple[float, float]]:
@@ -269,9 +329,7 @@ def osm_shape_points(rel_id: int, stops: list[tuple[float, float]]) -> list[tupl
     `stops` is the direction's stop sequence used to orient the first way
     (relations sometimes map its first way against the direction of travel).
     """
-    j = overpass(f"[out:json][timeout:60];relation({rel_id});out geom;",
-                 f"rel_{rel_id}.json")
-    members = j["elements"][0]["members"]
+    members = relation_members(rel_id, f"rel_{rel_id}.json")
     path = []
     for m in members:
         if m.get("type") != "way":
