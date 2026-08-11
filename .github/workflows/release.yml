@@ -69,3 +69,7 @@ jobs:
               --title "Galati GTFS feed" \
               --notes "Regenerated GTFS feed for TRANSURB S.A. Galati."
           fi
+          # Move the tag to this commit so GitHub's "Source code"
+          # archives also reflect the latest code.
+          git tag -f "$TAG" "${{ github.sha }}"
+          git push --force origin "refs/tags/$TAG"
