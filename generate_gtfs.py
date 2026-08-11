@@ -113,6 +113,16 @@ STOPS = {
     "GAMACRIS": ("Gamacris", 45.4223635, 28.0287486),
     "SIDERURGISTUL": ("Siderurgistul", 45.4195125, 28.0286957),
     "TRECERE BAC": ("Trecere BAC", 45.4167491, 28.0327079),
+    "PIATA CENTRALA": ("Piața Centrală", 45.4379920, 28.0491857),
+    "BAIA COMUNALA": ("Baia Comunală", 45.4433732, 28.0470814),
+    "SPITALUL MILITAR": ("Spitalul Militar", 45.4500767, 28.0436126),
+    "STR. CEZAR": ("Str. Cezar", 45.4525210, 28.0423838),
+    "SPITAL MUNICIPAL": ("Spitalul Municipal", 45.4591894, 28.0389306),
+    "DUMBRAVA ROSIE": ("Str. Dumbrava Roșie", 45.4693589, 28.0342615),
+    "CARTIERUL NOU": ("Cartierul Nou", 45.4723052, 28.0340765),
+    "AUTOMECANICA": ("Automecanica", 45.4749344, 28.0339283),
+    "FITOSANITAR": ("Fitosanitar", 45.4812757, 28.0336127),
+    "METRO": ("Metro", 45.4842680, 28.0325695),
 }
 
 # ---------------------------------------------------------------------------
@@ -299,6 +309,50 @@ ROUTES = {
             },
         },
     },
+    "35": {
+        "route_long_name": "Piața Centrală - Metro",
+        "route_type": 3,  # bus
+        "route_color": "00838F",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "Metro",
+                "stops": ["PIATA CENTRALA", "BAIA COMUNALA", "STR. VULTUR",
+                          "SPITALUL MILITAR", "STR. CEZAR", "STR. RADU NEGRU",
+                          "SPITAL MUNICIPAL", "STR. PRUNDULUI", "BARIERA TRAIAN",
+                          "DUMBRAVA ROSIE", "CARTIERUL NOU", "AUTOMECANICA",
+                          "FITOSANITAR", "METRO"],
+                # stops whose position here differs from the canonical catalog
+                "platforms": {
+                    "STR. VULTUR": (45.4465182, 28.0454307),
+                    "STR. RADU NEGRU": (45.4564418, 28.0403786),
+                    "BARIERA TRAIAN": (45.4656738, 28.0355956),
+                },
+            },
+            "RETUR": {
+                "headsign": "Piața Centrală",
+                "stops": ["METRO", "FITOSANITAR", "AUTOMECANICA",
+                          "CARTIERUL NOU", "DUMBRAVA ROSIE", "BARIERA TRAIAN",
+                          "STR. PRUNDULUI", "SPITAL MUNICIPAL", "STR. RADU NEGRU",
+                          "STR. CEZAR", "SPITALUL MILITAR", "STR. VULTUR",
+                          "BAIA COMUNALA", "PIATA CENTRALA"],
+                "platforms": {
+                    "FITOSANITAR": (45.4804959, 28.0333683),
+                    "AUTOMECANICA": (45.4743560, 28.0337685),
+                    "CARTIERUL NOU": (45.4723829, 28.0338740),
+                    "DUMBRAVA ROSIE": (45.4692975, 28.0340694),
+                    "BARIERA TRAIAN": (45.4648565, 28.0357945),
+                    "STR. PRUNDULUI": (45.4630080, 28.0368426),
+                    "SPITAL MUNICIPAL": (45.4594392, 28.0386342),
+                    "STR. RADU NEGRU": (45.4566782, 28.0400876),
+                    "STR. CEZAR": (45.4525968, 28.0421792),
+                    "SPITALUL MILITAR": (45.4488580, 28.0440525),
+                    "STR. VULTUR": (45.4464087, 28.0453834),
+                    "BAIA COMUNALA": (45.4432424, 28.0470002),
+                },
+            },
+        },
+    },
 }
 
 
@@ -315,6 +369,7 @@ SHAPES = {
     "41": {"TUR": 21214588, "RETUR": 21214510},
     "38": {"TUR": 21216887},
     "37": {"TUR": 21217269, "RETUR": 21217291},
+    "35": {"TUR": 21217560, "RETUR": 21217559},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -612,7 +667,12 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                 return f"{stop_id(canon(code))}-{direction}"
             return stop_id(canon(code))
 
-        stop_order[direction] = [STOPS[canon(s)][1:] for s in d["stops"]]
+        def eff_pos(code):
+            if code in platforms:
+                return platforms[code]
+            return STOPS[canon(code)][1:]
+
+        stop_order[direction] = [eff_pos(s) for s in d["stops"]]
         for service in ("WD", "WE"):
             station_times = [times[direction][station][service]
                              for station in d["stops"]]
@@ -722,7 +782,7 @@ def write_feed(route_ids: list[str]) -> None:
           "feed_contact_url"],
          [["TRANSURB S.A. Galati", "https://transurbgalati.ro", "ro", "ro",
            FEED_START, FEED_END,
-           "transurb-" + time.strftime("%Y%m%d") + "-" + "-".join(route_ids),
+           "transurb-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()),
            "transurbgl@gmail.com", "https://transurbgalati.ro/contact"]])
 
     with zipfile.ZipFile(ZIP_PATH, "w", zipfile.ZIP_DEFLATED) as zf:

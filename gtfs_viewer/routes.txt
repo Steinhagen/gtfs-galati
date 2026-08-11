@@ -6,3 +6,4 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 41,transurb,41,Dimitrie Cantemir - Micro 19,3,2E7D32,FFFFFF
 38,transurb,38,Micro 19 - Micro 19 (buclă),3,C62828,FFFFFF
 37,transurb,37,Levaditti - Trecere BAC,3,6D4C41,FFFFFF
+35,transurb,35,Piața Centrală - Metro,3,00838F,FFFFFF
