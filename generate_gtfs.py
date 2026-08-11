@@ -79,8 +79,8 @@ STOPS = {
     "GARA CFR": ("Gara C.F.R.", 45.4444747, 28.0598390),
     "AUTOGARA": ("Autogară", 45.4432060, 28.0586207),
     "STR. GARII": ("Str. Gării", 45.4438402, 28.0537161),
-    "F.E.E.A": ("Facultatea de Științe Economice", 45.4432509, 28.0517570),
-    "C.N.V.A.": ("Colegiul Național Vasile Alecsandri", 45.4406250, 28.0521298),
+    "F.E.E.A": ("F.E.E.A.", 45.4432509, 28.0517570),
+    "C.N.V.A.": ("C.N.V.A.", 45.4406250, 28.0521298),
     "ALBATROS": ("Albatros", 45.4369171, 28.0526448),
     "IATSA": ("IATSA", 45.4142302, 28.0072252),
     "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235),
@@ -88,6 +88,21 @@ STOPS = {
     "GRADINA PUBLICA": ("Grădina Publică", 45.4513651, 28.0510709),
     "CAMINELE COMBINATULUI": ("Căminele Combinatului", 45.4420380, 28.0133603),
     "PIATA ENERGIEI": ("Piața Energiei", 45.4398644, 28.0205822),
+    "DIMITRIE CANTEMIR": ("Dimitrie Cantemir", 45.3880242, 28.0100516),
+    "BLOC S13": ("Bloc S13", 45.3881889, 28.0139244),
+    "UNIV. DANUBIUS": ("Universitatea Danubius", 45.4037799, 28.0152731),
+    "SELGROS": ("Selgros", 45.4057111, 28.0185789),
+    "CENTRUL DELFINUL": ("Centrul Delfinul", 45.4049966, 28.0220893),
+    "ATAC": ("Auchan", 45.4039373, 28.0200582),
+    "DANUBIUS": ("Danubius", 45.4037967, 28.0160994),
+    "SCOALA 40": ("Școala Nr. 40", 45.4173262, 28.0101278),
+    "PETRU GROZA": ("Petru Groza", 45.4207347, 28.0108704),
+    "CARTIER LOCUINTE SOCIALE M17": ("Cartier Locuințe Sociale M17", 45.4231133, 28.0071980),
+    "MATHAUS": ("Mathaus", 45.4244505, 28.0051981),
+    "DEDEMAN": ("Dedeman", 45.4261431, 28.0088618),
+    "BLOC L3": ("Bloc L3", 45.4213951, 28.0132961),
+    "PIATA MICRO 17": ("Piața Micro 17", 45.4193765, 28.0138592),
+    "SCOALA NR. 40": ("Școala Nr. 40", 45.4170616, 28.0093162),
 }
 
 # ---------------------------------------------------------------------------
@@ -204,6 +219,45 @@ ROUTES = {
             },
         },
     },
+    "41": {
+        "route_long_name": "Dimitrie Cantemir - Micro 19",
+        "route_type": 3,  # bus
+        "route_color": "2E7D32",
+        "aliases": {
+            "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Micro 19",
+                "stops": ["DIMITRIE CANTEMIR", "BLOC S13", "UNIV. DANUBIUS",
+                          "SELGROS", "CENTRUL DELFINUL", "ATAC", "DANUBIUS",
+                          "FACULTATEA DE MEDICINA", "MICRO 19"],
+            },
+            "RETUR": {
+                "headsign": "Dimitrie Cantemir",
+                "stops": ["MICRO 19", "BLD. GALATI", "DANUBIUS", "SELGROS",
+                          "CENTRUL DELFINUL", "ATAC", "BLOC S13",
+                          "DIMITRIE CANTEMIR"],
+            },
+        },
+    },
+    "38": {
+        "route_long_name": "Micro 19 - Micro 19 (buclă)",
+        "route_type": 3,  # bus
+        "route_color": "C62828",
+        "aliases": {
+            "MICRO 19 (SOSIRE)": "MICRO 19",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Micro 19",
+                "stops": ["MICRO 19", "SCOALA 40", "PETRU GROZA",
+                          "CARTIER LOCUINTE SOCIALE M17", "MATHAUS", "DEDEMAN",
+                          "BLOC L3", "PIATA MICRO 17", "SCOALA NR. 40",
+                          "IATSA", "GRADINITA PRICHINDEL", "MICRO 19 (SOSIRE)"],
+            },
+        },
+    },
 }
 
 
@@ -217,6 +271,8 @@ SHAPES = {
     "105": {"TUR": 10177285, "RETUR": 10177284},
     "106": {"TUR": 21211344, "RETUR": 21211343},
     "43": {"TUR": 21213681, "RETUR": 21213682},
+    "41": {"TUR": 21214588, "RETUR": 21214510},
+    "38": {"TUR": 21216887},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -373,18 +429,22 @@ def osm_shape_points(rel_id: int, stops: list[tuple[float, float]]) -> list[tupl
 
 def shape_ok(pts: list[tuple[float, float]], stops: list[tuple[float, float]],
              max_dist_m: float = 150.0) -> bool:
-    """Every stop must be close to the shape and visited in order."""
+    """Every stop must be close to the shape and visited in order.
+
+    Stops that are passed more than once (loops, or both sides of a street)
+    match the first occurrence at or after the previous stop's position.
+    """
     tol = (max_dist_m / 111000.0) ** 2
     prev = -1
     for lat, lon in stops:
-        best, idx = 1e18, -1
+        found = False
         for i, (pl, pn) in enumerate(pts):
-            d = (pl - lat) ** 2 + (pn - lon) ** 2
-            if d < best:
-                best, idx = d, i
-        if best > tol or idx < prev:
+            if i >= prev and (pl - lat) ** 2 + (pn - lon) ** 2 <= tol:
+                prev = i
+                found = True
+                break
+        if not found:
             return False
-        prev = idx
     return True
 
 
@@ -419,38 +479,65 @@ def dedup_points(path: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return out
 
 
+def _minutes(hhmm: str) -> int:
+    h, m = hhmm.split(":")
+    return int(h) * 60 + int(m)
+
+
+def align_times(station_times: list[list[str]]) -> list[list[str | None]]:
+    """Align each station's sorted times to the trips.
+
+    The first station defines the trips. Later stations may have fewer times,
+    meaning some trips do not stop there (the time is set to None).
+    """
+    n = len(station_times[0])
+    rows = [[None] * n for _ in station_times]
+    rows[0] = list(station_times[0])
+    for k in range(1, len(station_times)):
+        tk = station_times[k]
+        if len(tk) == n:
+            rows[k] = list(tk)
+            continue
+        if len(tk) > n:
+            raise RuntimeError(f"station {k} has {len(tk)} times, more than {n} trips")
+        j = 0
+        for i in range(n):
+            if j >= len(tk):
+                break
+            t = tk[j]
+            prev = station_times[0][i]
+            nxt = station_times[0][i + 1] if i + 1 < n else None
+            # a time belongs to trip i if it falls inside trip i's slot and
+            # the trip can plausibly reach this station within 45 minutes
+            if t >= prev and (nxt is None or t < nxt) and _minutes(t) - _minutes(prev) <= 45:
+                rows[k][i] = t
+                j += 1
+            # otherwise trip i skips this station
+    # monotonicity check within each trip
+    for i in range(n):
+        prev = None
+        for k in range(len(rows)):
+            t = rows[k][i]
+            if t is None:
+                continue
+            if prev is not None and t < prev:
+                raise RuntimeError(
+                    f"decreasing time in trip {i} at station {k}: {prev} -> {t}")
+            prev = t
+    return rows
+
+
 def collect_route(route_id: str, cfg: dict) -> dict:
     """Return dict with 'stops' (unique), 'trips' (rows) and 'stop_times' (rows)."""
     aliases = cfg.get("aliases", {})  # site code -> canonical STOPS code
     canon = lambda code: aliases.get(code, code)
-    # 1) fetch and validate per-direction timetables
+    # 1) fetch per-direction timetables
     times = {}  # times[direction][station][service] = [hh:mm, ...]
     for direction, d in cfg["directions"].items():
-        first = d["stops"][0]
-        counts = {}
         for station in d["stops"]:
             wd, we = fetch_schedule(route_id, direction, station)
             times.setdefault(direction, {}).setdefault(station, {})["WD"] = wd
             times[direction][station]["WE"] = we
-            counts[station] = (len(wd), len(we))
-        n_wd, n_we = counts[first]
-        for station, (c_wd, c_we) in counts.items():
-            if (c_wd, c_we) != (n_wd, n_we):
-                raise RuntimeError(
-                    f"count mismatch route {route_id} {direction}: {first} "
-                    f"({n_wd}/{n_we}) vs {station} ({c_wd}/{c_we})")
-        # monotonicity check within each trip
-        for service in ("WD", "WE"):
-            for i in range(len(times[direction][first][service])):
-                prev = None
-                for station in d["stops"]:
-                    t = times[direction][station][service][i]
-                    if prev is not None and t < prev:
-                        raise RuntimeError(
-                            f"decreasing time route {route_id} {direction} "
-                            f"trip {i} at {station}: {prev} -> {t}")
-                    prev = t
-        print(f"route {route_id} {direction}: {n_wd} WD trips, {n_we} WE trips")
 
     # 2) unique stops used by this route
     stops = {}
@@ -471,14 +558,29 @@ def collect_route(route_id: str, cfg: dict) -> dict:
         shape_id = f"{route_id}-{direction}"
         stop_order[direction] = [STOPS[canon(s)][1:] for s in d["stops"]]
         for service in ("WD", "WE"):
-            ntrip = len(times[direction][d["stops"][0]][service])
-            for i in range(ntrip):
+            station_times = [times[direction][station][service]
+                             for station in d["stops"]]
+            rows = align_times(station_times)
+            n = len(rows[0])
+            skipped = sum(1 for k in range(1, len(rows))
+                          for i in range(n) if rows[k][i] is None)
+            if skipped:
+                print(f"  route {route_id} {direction} {service}: "
+                      f"{skipped} skipped stop visits")
+            for i in range(n):
                 trip_no += 1
                 tid = f"{route_id}-{direction[0]}-{service}-{i + 1:03d}"
-                trips.append((route_id, service, tid, d["headsign"], direction_id, shape_id))
-                for seq, station in enumerate(d["stops"], start=1):
-                    t = times[direction][station][service][i] + ":00"
-                    stop_times.append((tid, t, t, stop_id(canon(station)), seq))
+                trips.append((route_id, service, tid, d["headsign"],
+                              direction_id, shape_id))
+                for k, station in enumerate(d["stops"], start=1):
+                    t = rows[k - 1][i]
+                    if t is None:
+                        continue
+                    t = t + ":00"
+                    stop_times.append((tid, t, t, stop_id(canon(station)), k))
+        print(f"route {route_id} {direction}: "
+              f"{len(times[direction][d['stops'][0]]['WD'])} WD trips, "
+              f"{len(times[direction][d['stops'][0]]['WE'])} WE trips")
     return {"stops": stops, "trips": trips, "stop_times": stop_times,
             "stop_order": stop_order}
 
