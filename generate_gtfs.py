@@ -103,6 +103,16 @@ STOPS = {
     "BLOC L3": ("Bloc L3", 45.4213951, 28.0132961),
     "PIATA MICRO 17": ("Piața Micro 17", 45.4193765, 28.0138592),
     "SCOALA NR. 40": ("Școala Nr. 40", 45.4170616, 28.0093162),
+    "LEVADITTI": ("Levaditti", 45.4348774, 28.0147279),
+    "BL. BUJOR/NUFAR": ("Bloc Bujor/Nufăr", 45.4317467, 28.0129793),
+    "CIMITIR SF. LAZAR": ("Cimitirul Sfântul Lazăr", 45.4274038, 28.0116835),
+    "TIGLINA III": ("Țiglina III", 45.4265265, 28.0138162),
+    "MINION": ("Minion", 45.4267704, 28.0164596),
+    "KAUFLAND": ("Kaufland", 45.4272284, 28.0213826),
+    "PIATA TIGLINA I": ("Piața Țiglina I", 45.4253484, 28.0292427),
+    "GAMACRIS": ("Gamacris", 45.4223635, 28.0287486),
+    "SIDERURGISTUL": ("Siderurgistul", 45.4195125, 28.0286957),
+    "TRECERE BAC": ("Trecere BAC", 45.4167491, 28.0327079),
 }
 
 # ---------------------------------------------------------------------------
@@ -258,6 +268,37 @@ ROUTES = {
             },
         },
     },
+    "37": {
+        "route_long_name": "Levaditti - Trecere BAC",
+        "route_type": 3,  # bus
+        "route_color": "6D4C41",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "Trecere BAC",
+                "stops": ["LEVADITTI", "BL. BUJOR/NUFAR", "CIMITIR SF. LAZAR",
+                          "TIGLINA III", "MINION", "KAUFLAND", "TIGLINA I",
+                          "PIATA TIGLINA I", "GAMACRIS", "SIDERURGISTUL",
+                          "TRECERE BAC"],
+            },
+            "RETUR": {
+                "headsign": "Levaditti",
+                "stops": ["TRECERE BAC", "GAMACRIS", "PIATA TIGLINA I",
+                          "TIGLINA II", "KAUFLAND", "MINION", "TIGLINA III",
+                          "CIMITIR SF. LAZAR", "BL. BUJOR/NUFAR", "LEVADITTI"],
+                # same-named stops with a different platform in this direction
+                "platforms": {
+                    "GAMACRIS": (45.4222665, 28.0288788),
+                    "PIATA TIGLINA I": (45.4253052, 28.0293943),
+                    "KAUFLAND": (45.4273641, 28.0213569),
+                    "MINION": (45.4269296, 28.0164459),
+                    "TIGLINA III": (45.4267982, 28.0143178),
+                    "CIMITIR SF. LAZAR": (45.4274190, 28.0117718),
+                    "BL. BUJOR/NUFAR": (45.4317808, 28.0131788),
+                },
+            },
+        },
+    },
 }
 
 
@@ -273,6 +314,7 @@ SHAPES = {
     "43": {"TUR": 21213681, "RETUR": 21213682},
     "41": {"TUR": 21214588, "RETUR": 21214510},
     "38": {"TUR": 21216887},
+    "37": {"TUR": 21217269, "RETUR": 21217291},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -539,15 +581,22 @@ def collect_route(route_id: str, cfg: dict) -> dict:
             times.setdefault(direction, {}).setdefault(station, {})["WD"] = wd
             times[direction][station]["WE"] = we
 
-    # 2) unique stops used by this route
+    # 2) unique stops used by this route (direction-specific platforms
+    #    get a direction-suffixed stop id)
     stops = {}
-    for cfg_stops in cfg["directions"].values():
-        for code in cfg_stops["stops"]:
+    for direction, d in cfg["directions"].items():
+        platforms = d.get("platforms", {})
+        for code in d["stops"]:
             c = canon(code)
             if c not in STOPS:
                 raise KeyError(f"route {route_id}: stop {code!r} not in STOPS catalog")
             name, lat, lon = STOPS[c]
-            stops[stop_id(c)] = {"code": c, "name": name, "lat": lat, "lon": lon}
+            if code in platforms:
+                lat, lon = platforms[code]
+                sid = f"{stop_id(c)}-{direction}"
+            else:
+                sid = stop_id(c)
+            stops.setdefault(sid, {"code": c, "name": name, "lat": lat, "lon": lon})
 
     # 3) trips + stop_times
     trips, stop_times = [], []
@@ -556,6 +605,13 @@ def collect_route(route_id: str, cfg: dict) -> dict:
     for direction, d in cfg["directions"].items():
         direction_id = 0 if direction == "TUR" else 1
         shape_id = f"{route_id}-{direction}"
+        platforms = d.get("platforms", {})
+
+        def sid_for(code):
+            if code in platforms:
+                return f"{stop_id(canon(code))}-{direction}"
+            return stop_id(canon(code))
+
         stop_order[direction] = [STOPS[canon(s)][1:] for s in d["stops"]]
         for service in ("WD", "WE"):
             station_times = [times[direction][station][service]
@@ -577,7 +633,7 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                     if t is None:
                         continue
                     t = t + ":00"
-                    stop_times.append((tid, t, t, stop_id(canon(station)), k))
+                    stop_times.append((tid, t, t, sid_for(station), k))
         print(f"route {route_id} {direction}: "
               f"{len(times[direction][d['stops'][0]]['WD'])} WD trips, "
               f"{len(times[direction][d['stops'][0]]['WE'])} WE trips")
