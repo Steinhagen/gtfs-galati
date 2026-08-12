@@ -135,6 +135,28 @@ STOPS = {
     # physical stops, so separate catalog entries.
     "STR. VULTUR / TRAIAN": ("Str. Vultur", 45.4465182, 28.0454307, 6906785248),
     "STR. RADU NEGRU / TRAIAN": ("Str. Radu Negru", 45.4564418, 28.0403786, 6895095244),
+    # Route 10 stops (port/shipyard area and Țiglina side streets)
+    "BLD. DUNAREA": ("Bld. Dunărea", 45.4099336, 28.0176862, 6896713532),
+    "CINEMA DACIA": ("Cinema Dacia", 45.4128375, 28.0168936, 6896713530),
+    "BLD. OTELARILOR": ("Bld. Oțelarilor", 45.4143701, 28.0191223, 6896713528),
+    "BLOC D19": ("Bloc D19", 45.4163758, 28.0229189, 6896713526),
+    "SALA SPORTURILOR": ("Sala Sporturilor", 45.4195388, 28.0214699, 6896716339),
+    "ORASELUL COPIILOR": ("Orășelul Copiilor", 45.4263668, 28.0323841, 2904472149),
+    "COMPLEX FRANCEZI": ("Complex Francezi", 45.4226341, 28.0337243, 6875033913),
+    "BLOC E6": ("Bloc E6", 45.4236003, 28.0374999, 6875033914),
+    "CENTRUL DE RECOLTARE": ("Centrul de Recoltare", 45.4258794, 28.0386478, 6875033915),
+    "COMPLEX SPICUL": ("Complex Spicul", 45.4322606, 28.0561323, 6892672437),
+    "NAVROM": ("Navrom", 45.4317407, 28.0617947, 6892672435),
+    "LICEUL DE MARINA": ("Liceul de Marină", 45.4341334, 28.0663207, 6896819822),
+    "ANA IPATESCU": ("Ana Ipătescu", 45.4370917, 28.0680707, 14090438578),
+    "STR. ALEX. MORUZZI": ("Str. Alex. Moruzzi", 45.4403339, 28.0659666, 14090438573),
+    "MORUZZI": ("Moruzzi", 45.4419211, 28.0700939, 6896966052),
+    "STR. LEMNARI": ("Str. Lemnari", 45.4449763, 28.0754757, 6896966050),
+    "EEKELS": ("Eekels", 45.4454240, 28.0805456, 6896966048),
+    "DAMEN": ("Damen", 45.4440364, 28.0829432, 6896966047),
+    "TRIBUNAL": ("Tribunal", 45.4261655, 28.0380834, 6878887385),
+    "BLOC O": ("Bloc O", 45.4164428, 28.0227571, 6897924687),
+    "STR. OTELARILOR": ("Str. Oțelarilor", 45.4145323, 28.0190191, 6897924685),
 }
 
 # ---------------------------------------------------------------------------
@@ -278,7 +300,7 @@ ROUTES = {
         },
     },
     "38": {
-        "route_long_name": "Micro 19 - Micro 19 (buclă)",
+        "route_long_name": "Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă)",
         "route_type": 3,  # bus
         "route_color": "C62828",
         "aliases": {
@@ -343,6 +365,67 @@ ROUTES = {
             },
         },
     },
+    "9": {
+        "route_long_name": "Cimitirul Sfântul Lazăr - Gara C.F.R.",
+        "route_type": 3,  # bus
+        "route_color": "F57C00",
+        "aliases": {
+            "GALERIA DE ARTA": "GALERIILE DE ARTA",
+            "GARA C.F.R.": "GARA CFR",
+            "F.S.E.A.": "F.E.E.A",
+            "STR. GARII": "STR. GARII",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Gara C.F.R.",
+                "stops": ["CIMITIR SF. LAZAR", "TIGLINA III", "MINION",
+                          "KAUFLAND", "TIGLINA I", "ROMTELECOM", "MAZEPA",
+                          "POTCOAVA DE AUR", "GALERIA DE ARTA", "UNIVERSITATE",
+                          "PARFUMUL TEILOR", "GARA C.F.R."],
+            },
+            "RETUR": {
+                "headsign": "Cimitirul Sfântul Lazăr",
+                "stops": ["GARA C.F.R.", "AUTOGARA", "STR. GARII", "F.S.E.A.",
+                          "C.N.V.A.", "ALBATROS", "CENTRU", "AGENTIA C.F.R.",
+                          "PARCARE BANCI", "CEC TIGLINA II", "TIGLINA II",
+                          "KAUFLAND", "MINION", "TIGLINA III",
+                          "CIMITIR SF. LAZAR"],
+            },
+        },
+    },
+    "10": {
+        "route_long_name": "Micro 19 - Damen",
+        "route_type": 3,  # bus
+        "route_color": "AD1457",
+        "aliases": {
+            "AGENTIA CFR": "AGENTIA C.F.R.",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Damen",
+                "stops": ["MICRO 19", "BLD. GALATI", "BLD. DUNAREA",
+                          "CINEMA DACIA", "BLD. OTELARILOR", "BLOC D19",
+                          "SALA SPORTURILOR", "PRIVILEGE", "TIGLINA I",
+                          "ORASELUL COPIILOR", "COMPLEX FRANCEZI", "BLOC E6",
+                          "CENTRUL DE RECOLTARE", "ROMTELECOM", "MAZEPA",
+                          "POTCOAVA DE AUR", "COMPLEX SPICUL", "NAVROM",
+                          "LICEUL DE MARINA", "ANA IPATESCU",
+                          "STR. ALEX. MORUZZI", "MORUZZI", "STR. LEMNARI",
+                          "EEKELS", "DAMEN"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "stops": ["DAMEN", "EEKELS", "STR. LEMNARI", "MORUZZI",
+                          "STR. ALEX. MORUZZI", "ANA IPATESCU",
+                          "LICEUL DE MARINA", "NAVROM", "COMPLEX SPICUL",
+                          "CENTRU", "AGENTIA CFR", "PARCARE BANCI",
+                          "TRIBUNAL", "BLOC E6", "COMPLEX FRANCEZI",
+                          "ORASELUL COPIILOR", "TIGLINA II", "PRIVILEGE",
+                          "SALA SPORTURILOR", "BLOC O", "STR. OTELARILOR",
+                          "CINEMA DACIA", "MICRO 19"],
+            },
+        },
+    },
 }
 
 
@@ -360,6 +443,8 @@ SHAPES = {
     "38": {"TUR": 21216887},
     "37": {"TUR": 21217269, "RETUR": 21217291},
     "35": {"TUR": 21217560, "RETUR": 21217559},
+    "9": {"TUR": 309379, "RETUR": 10154626},
+    "10": {"TUR": 358092, "RETUR": 10176664},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"

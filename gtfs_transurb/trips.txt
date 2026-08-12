@@ -1225,3 +1225,273 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 35,WE,35-R-WE-032,Piața Centrală,1,35-RETUR
 35,WE,35-R-WE-033,Piața Centrală,1,35-RETUR
 35,WE,35-R-WE-034,Piața Centrală,1,35-RETUR
+9,WD,9-T-WD-001,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-002,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-003,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-004,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-005,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-006,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-007,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-008,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-009,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-010,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-011,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-012,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-013,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-014,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-015,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-016,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-017,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-018,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-019,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-020,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-021,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-022,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-023,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-024,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-025,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-026,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-027,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-028,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-029,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-030,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-031,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-032,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-033,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-034,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-035,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-036,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-037,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-038,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-039,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-040,Gara C.F.R.,0,9-TUR
+9,WD,9-T-WD-041,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-001,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-002,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-003,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-004,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-005,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-006,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-007,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-008,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-009,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-010,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-011,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-012,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-013,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-014,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-015,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-016,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-017,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-018,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-019,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-020,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-021,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-022,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-023,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-024,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-025,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-026,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-027,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-028,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-029,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-030,Gara C.F.R.,0,9-TUR
+9,WE,9-T-WE-031,Gara C.F.R.,0,9-TUR
+9,WD,9-R-WD-001,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-002,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-003,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-004,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-005,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-006,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-007,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-008,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-009,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-010,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-011,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-012,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-013,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-014,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-015,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-016,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-017,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-018,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-019,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-020,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-021,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-022,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-023,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-024,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-025,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-026,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-027,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-028,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-029,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-030,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-031,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-032,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-033,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-034,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-035,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-036,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-037,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-038,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-039,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-040,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-041,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WD,9-R-WD-042,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-001,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-002,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-003,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-004,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-005,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-006,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-007,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-008,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-009,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-010,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-011,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-012,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-013,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-014,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-015,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-016,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-017,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-018,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-019,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-020,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-021,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-022,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-023,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-024,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-025,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-026,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-027,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-028,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-029,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-030,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-031,Cimitirul Sfântul Lazăr,1,9-RETUR
+9,WE,9-R-WE-032,Cimitirul Sfântul Lazăr,1,9-RETUR
+10,WD,10-T-WD-001,Damen,0,10-TUR
+10,WD,10-T-WD-002,Damen,0,10-TUR
+10,WD,10-T-WD-003,Damen,0,10-TUR
+10,WD,10-T-WD-004,Damen,0,10-TUR
+10,WD,10-T-WD-005,Damen,0,10-TUR
+10,WD,10-T-WD-006,Damen,0,10-TUR
+10,WD,10-T-WD-007,Damen,0,10-TUR
+10,WD,10-T-WD-008,Damen,0,10-TUR
+10,WD,10-T-WD-009,Damen,0,10-TUR
+10,WD,10-T-WD-010,Damen,0,10-TUR
+10,WD,10-T-WD-011,Damen,0,10-TUR
+10,WD,10-T-WD-012,Damen,0,10-TUR
+10,WD,10-T-WD-013,Damen,0,10-TUR
+10,WD,10-T-WD-014,Damen,0,10-TUR
+10,WD,10-T-WD-015,Damen,0,10-TUR
+10,WD,10-T-WD-016,Damen,0,10-TUR
+10,WD,10-T-WD-017,Damen,0,10-TUR
+10,WD,10-T-WD-018,Damen,0,10-TUR
+10,WD,10-T-WD-019,Damen,0,10-TUR
+10,WD,10-T-WD-020,Damen,0,10-TUR
+10,WD,10-T-WD-021,Damen,0,10-TUR
+10,WD,10-T-WD-022,Damen,0,10-TUR
+10,WD,10-T-WD-023,Damen,0,10-TUR
+10,WD,10-T-WD-024,Damen,0,10-TUR
+10,WD,10-T-WD-025,Damen,0,10-TUR
+10,WD,10-T-WD-026,Damen,0,10-TUR
+10,WD,10-T-WD-027,Damen,0,10-TUR
+10,WD,10-T-WD-028,Damen,0,10-TUR
+10,WD,10-T-WD-029,Damen,0,10-TUR
+10,WD,10-T-WD-030,Damen,0,10-TUR
+10,WD,10-T-WD-031,Damen,0,10-TUR
+10,WD,10-T-WD-032,Damen,0,10-TUR
+10,WD,10-T-WD-033,Damen,0,10-TUR
+10,WD,10-T-WD-034,Damen,0,10-TUR
+10,WD,10-T-WD-035,Damen,0,10-TUR
+10,WD,10-T-WD-036,Damen,0,10-TUR
+10,WD,10-T-WD-037,Damen,0,10-TUR
+10,WD,10-T-WD-038,Damen,0,10-TUR
+10,WE,10-T-WE-001,Damen,0,10-TUR
+10,WE,10-T-WE-002,Damen,0,10-TUR
+10,WE,10-T-WE-003,Damen,0,10-TUR
+10,WE,10-T-WE-004,Damen,0,10-TUR
+10,WE,10-T-WE-005,Damen,0,10-TUR
+10,WE,10-T-WE-006,Damen,0,10-TUR
+10,WE,10-T-WE-007,Damen,0,10-TUR
+10,WE,10-T-WE-008,Damen,0,10-TUR
+10,WE,10-T-WE-009,Damen,0,10-TUR
+10,WE,10-T-WE-010,Damen,0,10-TUR
+10,WE,10-T-WE-011,Damen,0,10-TUR
+10,WE,10-T-WE-012,Damen,0,10-TUR
+10,WE,10-T-WE-013,Damen,0,10-TUR
+10,WE,10-T-WE-014,Damen,0,10-TUR
+10,WE,10-T-WE-015,Damen,0,10-TUR
+10,WE,10-T-WE-016,Damen,0,10-TUR
+10,WE,10-T-WE-017,Damen,0,10-TUR
+10,WE,10-T-WE-018,Damen,0,10-TUR
+10,WE,10-T-WE-019,Damen,0,10-TUR
+10,WE,10-T-WE-020,Damen,0,10-TUR
+10,WE,10-T-WE-021,Damen,0,10-TUR
+10,WE,10-T-WE-022,Damen,0,10-TUR
+10,WE,10-T-WE-023,Damen,0,10-TUR
+10,WE,10-T-WE-024,Damen,0,10-TUR
+10,WD,10-R-WD-001,Micro 19,1,10-RETUR
+10,WD,10-R-WD-002,Micro 19,1,10-RETUR
+10,WD,10-R-WD-003,Micro 19,1,10-RETUR
+10,WD,10-R-WD-004,Micro 19,1,10-RETUR
+10,WD,10-R-WD-005,Micro 19,1,10-RETUR
+10,WD,10-R-WD-006,Micro 19,1,10-RETUR
+10,WD,10-R-WD-007,Micro 19,1,10-RETUR
+10,WD,10-R-WD-008,Micro 19,1,10-RETUR
+10,WD,10-R-WD-009,Micro 19,1,10-RETUR
+10,WD,10-R-WD-010,Micro 19,1,10-RETUR
+10,WD,10-R-WD-011,Micro 19,1,10-RETUR
+10,WD,10-R-WD-012,Micro 19,1,10-RETUR
+10,WD,10-R-WD-013,Micro 19,1,10-RETUR
+10,WD,10-R-WD-014,Micro 19,1,10-RETUR
+10,WD,10-R-WD-015,Micro 19,1,10-RETUR
+10,WD,10-R-WD-016,Micro 19,1,10-RETUR
+10,WD,10-R-WD-017,Micro 19,1,10-RETUR
+10,WD,10-R-WD-018,Micro 19,1,10-RETUR
+10,WD,10-R-WD-019,Micro 19,1,10-RETUR
+10,WD,10-R-WD-020,Micro 19,1,10-RETUR
+10,WD,10-R-WD-021,Micro 19,1,10-RETUR
+10,WD,10-R-WD-022,Micro 19,1,10-RETUR
+10,WD,10-R-WD-023,Micro 19,1,10-RETUR
+10,WD,10-R-WD-024,Micro 19,1,10-RETUR
+10,WD,10-R-WD-025,Micro 19,1,10-RETUR
+10,WD,10-R-WD-026,Micro 19,1,10-RETUR
+10,WD,10-R-WD-027,Micro 19,1,10-RETUR
+10,WD,10-R-WD-028,Micro 19,1,10-RETUR
+10,WD,10-R-WD-029,Micro 19,1,10-RETUR
+10,WD,10-R-WD-030,Micro 19,1,10-RETUR
+10,WD,10-R-WD-031,Micro 19,1,10-RETUR
+10,WD,10-R-WD-032,Micro 19,1,10-RETUR
+10,WD,10-R-WD-033,Micro 19,1,10-RETUR
+10,WD,10-R-WD-034,Micro 19,1,10-RETUR
+10,WD,10-R-WD-035,Micro 19,1,10-RETUR
+10,WD,10-R-WD-036,Micro 19,1,10-RETUR
+10,WD,10-R-WD-037,Micro 19,1,10-RETUR
+10,WD,10-R-WD-038,Micro 19,1,10-RETUR
+10,WE,10-R-WE-001,Micro 19,1,10-RETUR
+10,WE,10-R-WE-002,Micro 19,1,10-RETUR
+10,WE,10-R-WE-003,Micro 19,1,10-RETUR
+10,WE,10-R-WE-004,Micro 19,1,10-RETUR
+10,WE,10-R-WE-005,Micro 19,1,10-RETUR
+10,WE,10-R-WE-006,Micro 19,1,10-RETUR
+10,WE,10-R-WE-007,Micro 19,1,10-RETUR
+10,WE,10-R-WE-008,Micro 19,1,10-RETUR
+10,WE,10-R-WE-009,Micro 19,1,10-RETUR
+10,WE,10-R-WE-010,Micro 19,1,10-RETUR
+10,WE,10-R-WE-011,Micro 19,1,10-RETUR
+10,WE,10-R-WE-012,Micro 19,1,10-RETUR
+10,WE,10-R-WE-013,Micro 19,1,10-RETUR
+10,WE,10-R-WE-014,Micro 19,1,10-RETUR
+10,WE,10-R-WE-015,Micro 19,1,10-RETUR
+10,WE,10-R-WE-016,Micro 19,1,10-RETUR
+10,WE,10-R-WE-017,Micro 19,1,10-RETUR
+10,WE,10-R-WE-018,Micro 19,1,10-RETUR
+10,WE,10-R-WE-019,Micro 19,1,10-RETUR
+10,WE,10-R-WE-020,Micro 19,1,10-RETUR
+10,WE,10-R-WE-021,Micro 19,1,10-RETUR
+10,WE,10-R-WE-022,Micro 19,1,10-RETUR
+10,WE,10-R-WE-023,Micro 19,1,10-RETUR
+10,WE,10-R-WE-024,Micro 19,1,10-RETUR
