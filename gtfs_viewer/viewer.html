@@ -73,7 +73,7 @@ async function init() {
 
   stops.forEach(s => stopsById[s.stop_id] = s);
   routes.forEach(r => { routesById[r.route_id] = r; routeList.push(r); });
-  routeList.sort((a, b) => a.route_id.localeCompare(b.route_id));
+  routeList.sort((a, b) => (+a.route_id) - (+b.route_id));
 
   // stop markers (filtered to the selected route by renderStops)
   stopsLayer = L.featureGroup();

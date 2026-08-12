@@ -26,7 +26,6 @@ Trasee Urbane:
     26
     28
     30
-    31
     32
     33
     34
@@ -62,4 +61,4 @@ Str. X                  Strada X   (Cezar, Prundului, Vultur, Dumbrava Roșie)
 Note DANUBIUS and UNIV-DANUBIUS are separate physical stops (~1 km apart) but both nearby OSM nodes are named "Universitatea Danubius" — worth a look if you care about name uniqueness.
 
 Separately: the routes still listed in the README FIXME (50, 55, 7, 44, 39/39B, 11-34) aren't built yet, so their stops aren't in stops.txt. OSM does have relations for several of them (11, 15, 20, 24, 26, 28, 34, 39, 44, 7), so
-shape data is available when you get to them. Routes 13, 23, 25, 30, 31, 32, 33, 50, 55 either have no relation or an unnamed/stale one
+shape data is available when you get to them. Routes 13, 23, 25, 30, 32, 33, 50, 55 either have no relation or an unnamed/stale one

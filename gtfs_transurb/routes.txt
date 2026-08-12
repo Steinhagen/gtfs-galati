@@ -9,3 +9,4 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 35,transurb,35,Piața Centrală - Metro,3,00838F,FFFFFF
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,F57C00,FFFFFF
 10,transurb,10,Micro 19 - Damen,3,AD1457,FFFFFF
+31,transurb,31,Micro 19 - Barboși,3,558B2F,FFFFFF

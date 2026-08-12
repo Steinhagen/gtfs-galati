@@ -157,6 +157,11 @@ STOPS = {
     "TRIBUNAL": ("Tribunal", 45.4261655, 28.0380834, 6878887385),
     "BLOC O": ("Bloc O", 45.4164428, 28.0227571, 6897924687),
     "STR. OTELARILOR": ("Str. Oțelarilor", 45.4145323, 28.0190191, 6897924685),
+    # Route 31 stops (western suburbs toward Barboși)
+    "POLIGON": ("Poligon", 45.4081074, 27.9980931, 14090544330),
+    "RELEU": ("Releu", 45.4052609, 27.9923930, 14090544327),
+    "GARA BARBOSI": ("Gara Barboși", 45.4018959, 27.9885697, 14090544331),
+    "BARBOSI": ("Barboși", 45.3979735, 27.9857382, 14090544333),
 }
 
 # ---------------------------------------------------------------------------
@@ -426,6 +431,24 @@ ROUTES = {
             },
         },
     },
+    "31": {
+        "route_long_name": "Micro 19 - Barboși",
+        "route_type": 3,  # bus
+        "route_color": "558B2F",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "Barboși",
+                "stops": ["MICRO 19", "IATSA", "POLIGON", "RELEU",
+                          "GARA BARBOSI", "BARBOSI"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "stops": ["BARBOSI", "GARA BARBOSI", "RELEU", "POLIGON",
+                          "GRADINITA PRICHINDEL", "MICRO 19"],
+            },
+        },
+    },
 }
 
 
@@ -445,6 +468,7 @@ SHAPES = {
     "35": {"TUR": 21217560, "RETUR": 21217559},
     "9": {"TUR": 309379, "RETUR": 10154626},
     "10": {"TUR": 358092, "RETUR": 10176664},
+    "31": {"TUR": 21222269, "RETUR": 21222268},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
