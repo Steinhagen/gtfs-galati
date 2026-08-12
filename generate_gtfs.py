@@ -162,6 +162,8 @@ STOPS = {
     "RELEU": ("Releu", 45.4052609, 27.9923930, 14090544327),
     "GARA BARBOSI": ("Gara Barboși", 45.4018959, 27.9885697, 14090544331),
     "BARBOSI": ("Barboși", 45.3979735, 27.9857382, 14090544333),
+    # Route 33 stops
+    "PLAJA DUNAREA": ("Plaja Dunărea", 45.4137758, 28.0292958, 14090652421),
 }
 
 # ---------------------------------------------------------------------------
@@ -449,6 +451,25 @@ ROUTES = {
             },
         },
     },
+    "33": {
+        "route_long_name": "Țiglina II - Plaja Dunărea",
+        "route_type": 3,  # bus
+        "route_color": "0097A7",
+        "aliases": {},
+        "service_days": "TF",  # Tuesday-Friday (no Monday service)
+        "directions": {
+            "TUR": {
+                "headsign": "Plaja Dunărea",
+                "stops": ["TIGLINA II", "TIGLINA I", "PIATA TIGLINA I",
+                          "GAMACRIS", "SIDERURGISTUL", "PLAJA DUNAREA"],
+            },
+            "RETUR": {
+                "headsign": "Țiglina II",
+                "stops": ["PLAJA DUNAREA", "GAMACRIS", "PIATA TIGLINA I",
+                          "TIGLINA II"],
+            },
+        },
+    },
 }
 
 
@@ -469,6 +490,7 @@ SHAPES = {
     "9": {"TUR": 309379, "RETUR": 10154626},
     "10": {"TUR": 358092, "RETUR": 10176664},
     "31": {"TUR": 21222269, "RETUR": 21222268},
+    "33": {"TUR": 21222431, "RETUR": 21222473},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -518,7 +540,7 @@ def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str],
     })
     cache = CACHE_DIR / f"{route}_{direction}_{station}.html"
     html = fetch_page(f"{BASE_URL}/veziProgram?{query}", cache)
-    m = re.search(r"DE LUNI PÂNĂ VINERI(.*?)WEEKEND ȘI SĂRBĂTORI LEGALE(.*?)</table>",
+    m = re.search(r"DE \w+ PÂNĂ VINERI(.*?)WEEKEND ȘI SĂRBĂTORI LEGALE(.*?)</table>",
                   html, re.S)
     if not m:
         raise RuntimeError(f"could not parse timetable for route {route} {direction} {station}")
@@ -859,7 +881,9 @@ def collect_route(route_id: str, cfg: dict) -> dict:
             return STOPS[canon(code)][1:3]
 
         stop_order[direction] = [eff_pos(s) for s in d["stops"]]
+        wd_service = cfg.get("service_days", "WD")
         for service in ("WD", "WE"):
+            svc_id = wd_service if service == "WD" else "WE"
             station_times = [times[direction][station][service]
                              for station in d["stops"]]
             rows = align_times(station_times)
@@ -871,8 +895,8 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                       f"{skipped} skipped stop visits")
             for i in range(n):
                 trip_no += 1
-                tid = f"{route_id}-{direction[0]}-{service}-{i + 1:03d}"
-                trips.append((route_id, service, tid, d["headsign"],
+                tid = f"{route_id}-{direction[0]}-{svc_id}-{i + 1:03d}"
+                trips.append((route_id, svc_id, tid, d["headsign"],
                               direction_id, shape_id))
                 for k, station in enumerate(d["stops"], start=1):
                     t = rows[k - 1][i]
@@ -917,13 +941,30 @@ def write_feed(route_ids: list[str]) -> None:
     wcsv("stops.txt", ["stop_id", "stop_name", "stop_lat", "stop_lon"],
          [[sid, s["name"], f"{s['lat']:.7f}", f"{s['lon']:.7f}"] for sid, s in sorted(all_stops.items())])
 
+    # Determine which service_ids are actually used
+    used_services = set(t[1] for t in all_trips)
+
+    calendar_rows = []
+    if "WD" in used_services:
+        calendar_rows.append(["WD", "1", "1", "1", "1", "1", "0", "0", FEED_START, FEED_END])
+    if "TF" in used_services:
+        calendar_rows.append(["TF", "0", "1", "1", "1", "1", "0", "0", FEED_START, FEED_END])
+    if "WE" in used_services:
+        calendar_rows.append(["WE", "0", "0", "0", "0", "0", "1", "1", FEED_START, FEED_END])
+
     wcsv("calendar.txt", ["service_id", "monday", "tuesday", "wednesday", "thursday",
                           "friday", "saturday", "sunday", "start_date", "end_date"],
-         [["WD", "1", "1", "1", "1", "1", "0", "0", FEED_START, FEED_END],
-          ["WE", "0", "0", "0", "0", "0", "1", "1", FEED_START, FEED_END]])
+         calendar_rows)
 
-    wcsv("calendar_dates.txt", ["service_id", "date", "exception_type"],
-         [[svc, d, ex] for d in HOLIDAYS_2026 for svc, ex in (("WE", 1), ("WD", 2))])
+    cal_dates_rows = []
+    for d in HOLIDAYS_2026:
+        if "WE" in used_services:
+            cal_dates_rows.append(["WE", d, 1])
+        if "WD" in used_services:
+            cal_dates_rows.append(["WD", d, 2])
+        if "TF" in used_services:
+            cal_dates_rows.append(["TF", d, 2])
+    wcsv("calendar_dates.txt", ["service_id", "date", "exception_type"], cal_dates_rows)
 
     wcsv("trips.txt", ["route_id", "service_id", "trip_id", "trip_headsign",
                        "direction_id", "shape_id"],
