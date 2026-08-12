@@ -1,2 +1,2 @@
 feed_publisher_name,feed_publisher_url,feed_lang,default_lang,feed_start_date,feed_end_date,feed_version,feed_contact_email,feed_contact_url
-TRANSURB S.A. Galati,https://transurbgalati.ro,ro,ro,20260101,20261231,transurb-20260811-220417,transurbgl@gmail.com,https://transurbgalati.ro/contact
+TRANSURB S.A. Galati,https://transurbgalati.ro,ro,ro,20260101,20261231,transurb-20260812-084853,transurbgl@gmail.com,https://transurbgalati.ro/contact

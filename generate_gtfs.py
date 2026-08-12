@@ -50,7 +50,7 @@ STOPS = {
     "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046),
     "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444),
     "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478),
-    "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4461186, 28.0541986),
+    "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4454016, 28.0548729),
     "BLOC IALOMITA": ("Bloc Ialomița", 45.4495658, 28.0524493),
     "CAMINE STUDENTESTI": ("Cămine Studențești", 45.4539921, 28.0497540),
     "CAMINUL DE BATRANI": ("Căminul de Bătrâni", 45.4580487, 28.0473113),
@@ -149,6 +149,10 @@ ROUTES = {
                           "DIRECTIA AGRICOLA", "BLOC IALOMITA", "CAMINE STUDENTESTI",
                           "CAMINUL DE BATRANI", "PARC C.F.R.", "STR. PRUNDULUI",
                           "BARIERA TRAIAN"],
+                # stops whose position here differs from the canonical catalog
+                "platforms": {
+                    "PARC C.F.R.": (45.4633441, 28.0438172),  # n6928123651
+                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -159,6 +163,10 @@ ROUTES = {
                           "PARCARE BANCI", "CEC TIGLINA II", "TIGLINA II",
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE VECHI",
                           "MICRO 19"],
+                "platforms": {
+                    "CAMINE STUDENTESTI": (45.4543728, 28.0493431),  # n6879824375
+                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
+                },
             },
         },
     },
@@ -181,6 +189,9 @@ ROUTES = {
                           "ROMTELECOM", "MAZEPA", "POTCOAVA DE AUR",
                           "GALERIILE DE ARTA", "UNIVERSITATE", "PARFUMUL TEILOR",
                           "GARA  CFR"],
+                "platforms": {
+                    "CIMITIR CATUSA": (45.4129561, 28.0067003),  # n6892672444
+                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -190,6 +201,9 @@ ROUTES = {
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE  VECHI",
                           "IATSA", "CIMITIR CATUSA", "BLOC B3", "ZENNER",
                           "FAC. DE MEDICINA", "MICRO 19"],
+                "platforms": {
+                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
+                },
             },
         },
     },
@@ -210,6 +224,10 @@ ROUTES = {
                           "ROMTELECOM", "MAZEPA", "POTCOAVA DE AUR",
                           "GALERIILE DE ARTA", "UNIVERSITATE", "PARFUMUL TEILOR",
                           "DIRECTIA AGRICOLA", "BLOC IALOMITA", "GRADINA PUBLICA"],
+                "platforms": {
+                    "CIMITIR CATUSA": (45.4129561, 28.0067003),  # n6892672444
+                    "GRADINA PUBLICA": (45.4516141, 28.0514553),  # n6898365514
+                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -220,6 +238,9 @@ ROUTES = {
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE VECHI",
                           "IATSA", "CIMITIR CATUSA", "BLOC B3", "ZENNER",
                           "FACULTATEA DE MEDICINA", "MICRO 19"],
+                "platforms": {
+                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
+                },
             },
         },
     },
