@@ -12,6 +12,7 @@ Usage:
 
 import argparse
 import json
+import math
 import os
 import re
 import sys
@@ -35,94 +36,105 @@ HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
                  "20260501", "20260601", "20261130", "20261201", "20261225"]
 
 # ---------------------------------------------------------------------------
-# Stop catalog: canonical code -> (display name, lat, lon).
-# One entry per physical stop, shared by every route.
+# Stop catalog: canonical code -> (display name, lat, lon, osm_node).
+# One entry per physical stop, shared by every route. Declared once here only.
+#
+# lat/lon and osm_node are the *canonical* platform: the side of the street
+# used by the route's forward (TUR) direction. Stops served from a second
+# platform in the other direction are NOT listed per route -- the opposite
+# platform is read automatically from the OSM route relation at build time
+# (see resolve_platforms), which is why adding a route needs no coordinates.
 # ---------------------------------------------------------------------------
 STOPS = {
-    "MICRO 19": ("Micro 19", 45.4133153, 28.0124752),
-    "NEACSU": ("Neacșu", 45.4169588, 28.0130412),
-    "SPITALUL JUDETEAN": ("Spitalul Județean", 45.4193509, 28.0177710),
-    "PRIVILEGE": ("Privilege", 45.4261475, 28.0233600),
-    "TIGLINA I": ("Țiglina I", 45.4276057, 28.0281282),
-    "ROMTELECOM": ("Romtelecom", 45.4286741, 28.0396232),
-    "MAZEPA": ("Mazepa", 45.4305181, 28.0462169),
-    "POTCOAVA DE AUR": ("Potcoava de Aur", 45.4327326, 28.0504231),
-    "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046),
-    "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444),
-    "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478),
-    "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4454016, 28.0548729),
-    "BLOC IALOMITA": ("Bloc Ialomița", 45.4495658, 28.0524493),
-    "CAMINE STUDENTESTI": ("Cămine Studențești", 45.4539921, 28.0497540),
-    "CAMINUL DE BATRANI": ("Căminul de Bătrâni", 45.4580487, 28.0473113),
-    "PARC C.F.R.": ("Parc C.F.R.", 45.4623733, 28.0447250),
-    "STR. PRUNDULUI": ("Str. Prundului", 45.4630597, 28.0369371),
-    "BARIERA TRAIAN": ("Bariera Traian", 45.4653144, 28.0362148),
-    "STR. RADU NEGRU": ("Str. Radu Negru", 45.4589088, 28.0465985),
-    "A.J.O.F.M.": ("A.J.O.F.M.", 45.4569492, 28.0477278),
-    "MUZEUL DE ARTA": ("Muzeul de Artă", 45.4506850, 28.0515363),
-    "STR. VULTUR": ("Str. Vultur", 45.4483643, 28.0529454),
-    "LICEUL DE ARTA": ("Liceul de Artă", 45.4450969, 28.0548432),
-    "TEATRUL DRAMATIC": ("Teatrul Dramatic", 45.4413412, 28.0561051),
-    "PARC EMINESCU": ("Parc Eminescu", 45.4361285, 28.0557148),
-    "CENTRU": ("Centru", 45.4342165, 28.0539635),
-    "AGENTIA C.F.R.": ("Agenția C.F.R.", 45.4310705, 28.0466092),
-    "PARCARE BANCI": ("Parcare Bănci", 45.4292945, 28.0414140),
-    "CEC TIGLINA II": ("CEC Țiglina II", 45.4285875, 28.0355499),
-    "TIGLINA II": ("Țiglina II", 45.4279325, 28.0280075),
-    "FARMACIA HYGEIA": ("Farmacia Hygeia", 45.4191133, 28.0168623),
-    "SERVICE VECHI": ("Service Vechi", 45.4168495, 28.0124289),
-    "BLD. GALATI": ("Bld. Galați", 45.4108853, 28.0147926),
-    "ZENNER": ("Zenner", 45.4093346, 28.0111119),
-    "BLOC A8": ("Bloc A8", 45.4113856, 28.0083163),
-    "CIMITIR CATUSA": ("Cimitir Cătușa", 45.4130442, 28.0063495),
-    "GRADINITA PRICHINDEL": ("Grădinița Prichindel", 45.4139447, 28.0070235),
-    "GARA CFR": ("Gara C.F.R.", 45.4444747, 28.0598390),
-    "AUTOGARA": ("Autogară", 45.4432060, 28.0586207),
-    "STR. GARII": ("Str. Gării", 45.4438402, 28.0537161),
-    "F.E.E.A": ("F.E.E.A.", 45.4432509, 28.0517570),
-    "C.N.V.A.": ("C.N.V.A.", 45.4406250, 28.0521298),
-    "ALBATROS": ("Albatros", 45.4369171, 28.0526448),
-    "IATSA": ("IATSA", 45.4142302, 28.0072252),
-    "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235),
-    "FAC. DE MEDICINA": ("Fac. de Medicină", 45.4106737, 28.0149120),
-    "GRADINA PUBLICA": ("Grădina Publică", 45.4513651, 28.0510709),
-    "CAMINELE COMBINATULUI": ("Căminele Combinatului", 45.4420380, 28.0133603),
-    "PIATA ENERGIEI": ("Piața Energiei", 45.4398644, 28.0205822),
-    "DIMITRIE CANTEMIR": ("Dimitrie Cantemir", 45.3880242, 28.0100516),
-    "BLOC S13": ("Bloc S13", 45.3881889, 28.0139244),
-    "UNIV. DANUBIUS": ("Universitatea Danubius", 45.4037799, 28.0152731),
-    "SELGROS": ("Selgros", 45.4057111, 28.0185789),
-    "CENTRUL DELFINUL": ("Centrul Delfinul", 45.4049966, 28.0220893),
-    "ATAC": ("Auchan", 45.4039373, 28.0200582),
-    "DANUBIUS": ("Danubius", 45.4037967, 28.0160994),
-    "SCOALA 40": ("Școala Nr. 40", 45.4173262, 28.0101278),
-    "PETRU GROZA": ("Petru Groza", 45.4207347, 28.0108704),
-    "CARTIER LOCUINTE SOCIALE M17": ("Cartier Locuințe Sociale M17", 45.4231133, 28.0071980),
-    "MATHAUS": ("Mathaus", 45.4244505, 28.0051981),
-    "DEDEMAN": ("Dedeman", 45.4261431, 28.0088618),
-    "BLOC L3": ("Bloc L3", 45.4213951, 28.0132961),
-    "PIATA MICRO 17": ("Piața Micro 17", 45.4193765, 28.0138592),
-    "SCOALA NR. 40": ("Școala Nr. 40", 45.4170616, 28.0093162),
-    "LEVADITTI": ("Levaditti", 45.4348774, 28.0147279),
-    "BL. BUJOR/NUFAR": ("Bloc Bujor/Nufăr", 45.4317467, 28.0129793),
-    "CIMITIR SF. LAZAR": ("Cimitirul Sfântul Lazăr", 45.4274038, 28.0116835),
-    "TIGLINA III": ("Țiglina III", 45.4265265, 28.0138162),
-    "MINION": ("Minion", 45.4267704, 28.0164596),
-    "KAUFLAND": ("Kaufland", 45.4272284, 28.0213826),
-    "PIATA TIGLINA I": ("Piața Țiglina I", 45.4253484, 28.0292427),
-    "GAMACRIS": ("Gamacris", 45.4223635, 28.0287486),
-    "SIDERURGISTUL": ("Siderurgistul", 45.4195125, 28.0286957),
-    "TRECERE BAC": ("Trecere BAC", 45.4167491, 28.0327079),
-    "PIATA CENTRALA": ("Piața Centrală", 45.4379920, 28.0491857),
-    "BAIA COMUNALA": ("Baia Comunală", 45.4433732, 28.0470814),
-    "SPITALUL MILITAR": ("Spitalul Militar", 45.4500767, 28.0436126),
-    "STR. CEZAR": ("Str. Cezar", 45.4525210, 28.0423838),
-    "SPITAL MUNICIPAL": ("Spitalul Municipal", 45.4591894, 28.0389306),
-    "DUMBRAVA ROSIE": ("Str. Dumbrava Roșie", 45.4693589, 28.0342615),
-    "CARTIERUL NOU": ("Cartierul Nou", 45.4723052, 28.0340765),
-    "AUTOMECANICA": ("Automecanica", 45.4749344, 28.0339283),
-    "FITOSANITAR": ("Fitosanitar", 45.4812757, 28.0336127),
-    "METRO": ("Metro", 45.4842680, 28.0325695),
+    "MICRO 19": ("Micro 19", 45.4133153, 28.0124752, 123745651),
+    "NEACSU": ("Neacșu", 45.4169588, 28.0130412, 529895200),
+    "SPITALUL JUDETEAN": ("Spitalul Județean", 45.4193509, 28.0177710, 530187911),
+    "PRIVILEGE": ("Privilege", 45.4261475, 28.0233600, 6878557416),
+    "TIGLINA I": ("Țiglina I", 45.4276057, 28.0281282, 529898235),
+    "ROMTELECOM": ("Romtelecom", 45.4286741, 28.0396232, 472614576),
+    "MAZEPA": ("Mazepa", 45.4305181, 28.0462169, 530256106),
+    "POTCOAVA DE AUR": ("Potcoava de Aur", 45.4327326, 28.0504231, 6875033916),
+    "GALERIILE DE ARTA": ("Galeriile de Artă", 45.4354384, 28.0557046, 530256646),
+    "UNIVERSITATE": ("Universitate", 45.4392722, 28.0565444, 530257449),
+    "PARFUMUL TEILOR": ("Parfumul Teilor", 45.4426716, 28.0559478, 530257932),
+    "DIRECTIA AGRICOLA": ("Direcția Agricolă", 45.4454016, 28.0548729, 530258190),
+    "BLOC IALOMITA": ("Bloc Ialomița", 45.4495658, 28.0524493, 6879824354),
+    "CAMINE STUDENTESTI": ("Cămine Studențești", 45.4539921, 28.0497540, 6879824355),
+    "CAMINUL DE BATRANI": ("Căminul de Bătrâni", 45.4580487, 28.0473113, 6879824356),
+    "PARC C.F.R.": ("Parc C.F.R.", 45.4623733, 28.0447250, 6879824370),
+    "STR. PRUNDULUI": ("Str. Prundului", 45.4630597, 28.0369371, 6895570670),
+    "BARIERA TRAIAN": ("Bariera Traian", 45.4653144, 28.0362148, 6895570666),
+    "STR. RADU NEGRU": ("Str. Radu Negru", 45.4589088, 28.0465985, 6879824358),
+    "A.J.O.F.M.": ("A.J.O.F.M.", 45.4569492, 28.0477278, 6879824373),
+    "MUZEUL DE ARTA": ("Muzeul de Artă", 45.4506850, 28.0515363, 6879824376),
+    "STR. VULTUR": ("Str. Vultur", 45.4483643, 28.0529454, 6879824377),
+    "LICEUL DE ARTA": ("Liceul de Artă", 45.4450969, 28.0548432, 534270716),
+    "TEATRUL DRAMATIC": ("Teatrul Dramatic", 45.4413412, 28.0561051, 6879824378),
+    "PARC EMINESCU": ("Parc Eminescu", 45.4361285, 28.0557148, 1932207593),
+    "CENTRU": ("Centru", 45.4342165, 28.0539635, 530256687),
+    "AGENTIA C.F.R.": ("Agenția C.F.R.", 45.4310705, 28.0466092, 530256244),
+    "PARCARE BANCI": ("Parcare Bănci", 45.4292945, 28.0414140, 6875960831),
+    "CEC TIGLINA II": ("CEC Țiglina II", 45.4285875, 28.0355499, 530256058),
+    "TIGLINA II": ("Țiglina II", 45.4279325, 28.0280075, 530776769),
+    "FARMACIA HYGEIA": ("Farmacia Hygeia", 45.4191133, 28.0168623, 6893391135),
+    "SERVICE VECHI": ("Service Vechi", 45.4168495, 28.0124289, 6893391133),
+    "BLD. GALATI": ("Bld. Galați", 45.4108853, 28.0147926, 4907189684),
+    "ZENNER": ("Zenner", 45.4093346, 28.0111119, 6892672447),
+    "BLOC A8": ("Bloc A8", 45.4113856, 28.0083163, 6892672446),
+    "CIMITIR CATUSA": ("Cimitir Cătușa", 45.4130442, 28.0063495, 6893391129),
+    "GRADINITA PRICHINDEL": ("Grădinița Prichindel", 45.4139447, 28.0070235, 6892672442),
+    "GARA CFR": ("Gara C.F.R.", 45.4444747, 28.0598390, 6875107385),
+    "AUTOGARA": ("Autogară", 45.4433347, 28.0585570, 6881503385),
+    "STR. GARII": ("Str. Gării", 45.4438402, 28.0537161, 534270437),
+    "F.E.E.A": ("F.E.E.A.", 45.4432509, 28.0517570, 534268996),
+    "C.N.V.A.": ("C.N.V.A.", 45.4406250, 28.0521298, 534268981),
+    "ALBATROS": ("Albatros", 45.4369171, 28.0526448, 614962899),
+    "IATSA": ("IATSA", 45.4142302, 28.0072252, 6893391131),
+    "BLOC B3": ("Bloc B3", 45.4110405, 28.0084235, 6893391127),
+    "FAC. DE MEDICINA": ("Fac. de Medicină", 45.4106737, 28.0149120, 6893391123),
+    "GRADINA PUBLICA": ("Grădina Publică", 45.4513651, 28.0510709, 14086091994),
+    "CAMINELE COMBINATULUI": ("Căminele Combinatului", 45.4420380, 28.0133603, 14086450125),
+    "PIATA ENERGIEI": ("Piața Energiei", 45.4398644, 28.0205822, 6896006837),
+    "DIMITRIE CANTEMIR": ("Dimitrie Cantemir", 45.3880242, 28.0100516, 6896665346),
+    "BLOC S13": ("Bloc S13", 45.3881889, 28.0139244, 6896665345),
+    "UNIV. DANUBIUS": ("Universitatea Danubius", 45.4037799, 28.0152731, 6896665344),
+    "SELGROS": ("Selgros", 45.4057111, 28.0185789, 14086946895),
+    "CENTRUL DELFINUL": ("Centrul Delfinul", 45.4049966, 28.0220893, 14086946893),
+    "ATAC": ("Auchan", 45.4039373, 28.0200582, 14086946891),
+    "DANUBIUS": ("Danubius", 45.4037967, 28.0160994, 6897986189),
+    "SCOALA 40": ("Școala Nr. 40", 45.4173262, 28.0101278, 6894593244),
+    "PETRU GROZA": ("Petru Groza", 45.4207347, 28.0108704, 14088247742),
+    "CARTIER LOCUINTE SOCIALE M17": ("Cartier Locuințe Sociale M17", 45.4231133, 28.0071980, 14088247741),
+    "MATHAUS": ("Mathaus", 45.4244505, 28.0051981, 14088247738),
+    "DEDEMAN": ("Dedeman", 45.4261431, 28.0088618, 14088247737),
+    "BLOC L3": ("Bloc L3", 45.4213951, 28.0132961, 14088247734),
+    "PIATA MICRO 17": ("Piața Micro 17", 45.4193765, 28.0138592, 6896006822),
+    "SCOALA NR. 40": ("Școala Nr. 40", 45.4170616, 28.0093162, 6896163912),
+    "LEVADITTI": ("Levaditti", 45.4348774, 28.0147279, 14088449870),
+    "BL. BUJOR/NUFAR": ("Bloc Bujor/Nufăr", 45.4317467, 28.0129793, 14088449868),
+    "CIMITIR SF. LAZAR": ("Cimitirul Sfântul Lazăr", 45.4274038, 28.0116835, 1720639175),
+    "TIGLINA III": ("Țiglina III", 45.4265265, 28.0138162, 1932184795),
+    "MINION": ("Minion", 45.4267704, 28.0164596, 1932184796),
+    "KAUFLAND": ("Kaufland", 45.4272284, 28.0213826, 6874360932),
+    "PIATA TIGLINA I": ("Piața Țiglina I", 45.4253484, 28.0292427, 6905457936),
+    "GAMACRIS": ("Gamacris", 45.4223635, 28.0287486, 6905457934),
+    "SIDERURGISTUL": ("Siderurgistul", 45.4195125, 28.0286957, 14088449866),
+    "TRECERE BAC": ("Trecere BAC", 45.4167491, 28.0327079, 6905457933),
+    "PIATA CENTRALA": ("Piața Centrală", 45.4379920, 28.0491857, 6898532656),
+    "BAIA COMUNALA": ("Baia Comunală", 45.4433732, 28.0470814, 6906785250),
+    "SPITALUL MILITAR": ("Spitalul Militar", 45.4500767, 28.0436126, 6895095250),
+    "STR. CEZAR": ("Str. Cezar", 45.4525210, 28.0423838, 6895095246),
+    "SPITAL MUNICIPAL": ("Spitalul Municipal", 45.4591894, 28.0389306, 6895570669),
+    "DUMBRAVA ROSIE": ("Str. Dumbrava Roșie", 45.4693589, 28.0342615, 6899023168),
+    "CARTIERUL NOU": ("Cartierul Nou", 45.4723052, 28.0340765, 6899023166),
+    "AUTOMECANICA": ("Automecanica", 45.4749344, 28.0339283, 6899023165),
+    "FITOSANITAR": ("Fitosanitar", 45.4812757, 28.0336127, 6899023163),
+    "METRO": ("Metro", 45.4842680, 28.0325695, 6899023161),
+    # Route 35 runs along Strada Traian, where two stops repeat street names
+    # already used by the Strada Domnească stops above (~600 m away). Separate
+    # physical stops, so separate catalog entries.
+    "STR. VULTUR / TRAIAN": ("Str. Vultur", 45.4465182, 28.0454307, 6906785248),
+    "STR. RADU NEGRU / TRAIAN": ("Str. Radu Negru", 45.4564418, 28.0403786, 6895095244),
 }
 
 # ---------------------------------------------------------------------------
@@ -133,6 +145,10 @@ STOPS = {
 #
 # If the site spells a stop differently for this route than in STOPS (e.g.
 # extra spaces, abbreviations), map it to the canonical code under `aliases`.
+#
+# No coordinates go here. Where a direction stops on the opposite side of the
+# street, the platform is resolved from the route's OSM relation in SHAPES, so
+# the same stop is never re-declared across routes.
 # ---------------------------------------------------------------------------
 ROUTES = {
     "102": {
@@ -149,10 +165,6 @@ ROUTES = {
                           "DIRECTIA AGRICOLA", "BLOC IALOMITA", "CAMINE STUDENTESTI",
                           "CAMINUL DE BATRANI", "PARC C.F.R.", "STR. PRUNDULUI",
                           "BARIERA TRAIAN"],
-                # stops whose position here differs from the canonical catalog
-                "platforms": {
-                    "PARC C.F.R.": (45.4633441, 28.0438172),  # n6928123651
-                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -163,10 +175,6 @@ ROUTES = {
                           "PARCARE BANCI", "CEC TIGLINA II", "TIGLINA II",
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE VECHI",
                           "MICRO 19"],
-                "platforms": {
-                    "CAMINE STUDENTESTI": (45.4543728, 28.0493431),  # n6879824375
-                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
-                },
             },
         },
     },
@@ -189,9 +197,6 @@ ROUTES = {
                           "ROMTELECOM", "MAZEPA", "POTCOAVA DE AUR",
                           "GALERIILE DE ARTA", "UNIVERSITATE", "PARFUMUL TEILOR",
                           "GARA  CFR"],
-                "platforms": {
-                    "CIMITIR CATUSA": (45.4129561, 28.0067003),  # n6892672444
-                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -201,9 +206,6 @@ ROUTES = {
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE  VECHI",
                           "IATSA", "CIMITIR CATUSA", "BLOC B3", "ZENNER",
                           "FAC. DE MEDICINA", "MICRO 19"],
-                "platforms": {
-                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
-                },
             },
         },
     },
@@ -224,10 +226,6 @@ ROUTES = {
                           "ROMTELECOM", "MAZEPA", "POTCOAVA DE AUR",
                           "GALERIILE DE ARTA", "UNIVERSITATE", "PARFUMUL TEILOR",
                           "DIRECTIA AGRICOLA", "BLOC IALOMITA", "GRADINA PUBLICA"],
-                "platforms": {
-                    "CIMITIR CATUSA": (45.4129561, 28.0067003),  # n6892672444
-                    "GRADINA PUBLICA": (45.4516141, 28.0514553),  # n6898365514
-                },
             },
             "RETUR": {
                 "headsign": "Micro 19",
@@ -238,9 +236,6 @@ ROUTES = {
                           "PRIVILEGE", "FARMACIA HYGEIA", "SERVICE VECHI",
                           "IATSA", "CIMITIR CATUSA", "BLOC B3", "ZENNER",
                           "FACULTATEA DE MEDICINA", "MICRO 19"],
-                "platforms": {
-                    "PRIVILEGE": (45.4264471, 28.0233218),  # n6878557415
-                },
             },
         },
     },
@@ -317,16 +312,6 @@ ROUTES = {
                 "stops": ["TRECERE BAC", "GAMACRIS", "PIATA TIGLINA I",
                           "TIGLINA II", "KAUFLAND", "MINION", "TIGLINA III",
                           "CIMITIR SF. LAZAR", "BL. BUJOR/NUFAR", "LEVADITTI"],
-                # same-named stops with a different platform in this direction
-                "platforms": {
-                    "GAMACRIS": (45.4222665, 28.0288788),
-                    "PIATA TIGLINA I": (45.4253052, 28.0293943),
-                    "KAUFLAND": (45.4273641, 28.0213569),
-                    "MINION": (45.4269296, 28.0164459),
-                    "TIGLINA III": (45.4267982, 28.0143178),
-                    "CIMITIR SF. LAZAR": (45.4274190, 28.0117718),
-                    "BL. BUJOR/NUFAR": (45.4317808, 28.0131788),
-                },
             },
         },
     },
@@ -334,7 +319,11 @@ ROUTES = {
         "route_long_name": "Piața Centrală - Metro",
         "route_type": 3,  # bus
         "route_color": "00838F",
-        "aliases": {},
+        "aliases": {
+            # on Strada Traian, not the Strada Domnească stops of the same name
+            "STR. VULTUR": "STR. VULTUR / TRAIAN",
+            "STR. RADU NEGRU": "STR. RADU NEGRU / TRAIAN",
+        },
         "directions": {
             "TUR": {
                 "headsign": "Metro",
@@ -343,12 +332,6 @@ ROUTES = {
                           "SPITAL MUNICIPAL", "STR. PRUNDULUI", "BARIERA TRAIAN",
                           "DUMBRAVA ROSIE", "CARTIERUL NOU", "AUTOMECANICA",
                           "FITOSANITAR", "METRO"],
-                # stops whose position here differs from the canonical catalog
-                "platforms": {
-                    "STR. VULTUR": (45.4465182, 28.0454307),
-                    "STR. RADU NEGRU": (45.4564418, 28.0403786),
-                    "BARIERA TRAIAN": (45.4656738, 28.0355956),
-                },
             },
             "RETUR": {
                 "headsign": "Piața Centrală",
@@ -357,20 +340,6 @@ ROUTES = {
                           "STR. PRUNDULUI", "SPITAL MUNICIPAL", "STR. RADU NEGRU",
                           "STR. CEZAR", "SPITALUL MILITAR", "STR. VULTUR",
                           "BAIA COMUNALA", "PIATA CENTRALA"],
-                "platforms": {
-                    "FITOSANITAR": (45.4804959, 28.0333683),
-                    "AUTOMECANICA": (45.4743560, 28.0337685),
-                    "CARTIERUL NOU": (45.4723829, 28.0338740),
-                    "DUMBRAVA ROSIE": (45.4692975, 28.0340694),
-                    "BARIERA TRAIAN": (45.4648565, 28.0357945),
-                    "STR. PRUNDULUI": (45.4630080, 28.0368426),
-                    "SPITAL MUNICIPAL": (45.4594392, 28.0386342),
-                    "STR. RADU NEGRU": (45.4566782, 28.0400876),
-                    "STR. CEZAR": (45.4525968, 28.0421792),
-                    "SPITALUL MILITAR": (45.4488580, 28.0440525),
-                    "STR. VULTUR": (45.4464087, 28.0453834),
-                    "BAIA COMUNALA": (45.4432424, 28.0470002),
-                },
             },
         },
     },
@@ -397,7 +366,9 @@ OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
 
 
 def stop_id(code: str) -> str:
-    return re.sub(r"\s+", "-", code.replace(".", ""))
+    """Slug for a catalog code: 'STR. VULTUR / TRAIAN' -> 'STR-VULTUR-TRAIAN'."""
+    return re.sub(r"-+", "-", re.sub(r"[^A-Z0-9]+", "-",
+                                     code.replace(".", ""))).strip("-")
 
 
 def http_get(url: str, data: bytes | None = None, headers: dict | None = None,
@@ -490,12 +461,15 @@ def osm_api_relation_members(rel_id: int) -> list[dict]:
                        for m in el.findall("member")]
     out = []
     for typ, ref, role in members:
-        if typ == "way" and ref in ways:
+        if typ == "node" and ref in nodes:
+            out.append({"type": "node", "ref": ref, "role": role,
+                        "lat": nodes[ref]["lat"], "lon": nodes[ref]["lon"]})
+        elif typ == "way" and ref in ways:
             geom = [nodes[n] for n in ways[ref] if n in nodes]
             if len(geom) >= 2:
                 out.append({"type": "way", "ref": ref, "role": role,
                             "geometry": geom})
-    if not out:
+    if not any(m["type"] == "way" for m in out):
         raise RuntimeError(f"no way geometry for relation {rel_id}")
     return out
 
@@ -514,6 +488,85 @@ def relation_members(rel_id: int, cache_name: str) -> list[dict]:
                                  "members": members}]}
         (CACHE_DIR / cache_name).write_text(json.dumps(payload), encoding="utf-8")
         return members
+
+
+PLATFORM_ROLES = ("platform", "platform_entry_only", "platform_exit_only")
+
+# A resolved platform further than this from the catalog position is treated as
+# a different physical stop that happens to share a name (Galați has several),
+# not as the opposite side of the same street.
+PLATFORM_MAX_M = 200.0
+
+
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Great-circle distance in metres."""
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp = p2 - p1
+    dl = math.radians(lon2 - lon1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * 6371000.0 * math.asin(math.sqrt(a))
+
+
+def relation_platforms(rel_id: int) -> list[tuple[int, float, float]]:
+    """Ordered (osm_id, lat, lon) platforms of an OSM route relation.
+
+    Route relations list their platforms in travel order, so this is the
+    direction's stop sequence with the exact per-direction platform position
+    (which side of the street the vehicle actually stops at).
+    """
+    out = []
+    for m in relation_members(rel_id, f"rel_{rel_id}.json"):
+        if m.get("role") not in PLATFORM_ROLES:
+            continue
+        if m["type"] == "node" and "lat" in m:
+            out.append((m["ref"], m["lat"], m["lon"]))
+        elif m.get("geometry"):  # platform mapped as a way: use its midpoint
+            pts = [p for p in m["geometry"] if p]
+            if pts:
+                out.append((m["ref"],
+                            sum(p["lat"] for p in pts) / len(pts),
+                            sum(p["lon"] for p in pts) / len(pts)))
+    return out
+
+
+def resolve_platforms(route_id: str, direction: str, codes: list[str],
+                      canon) -> dict[str, tuple[float, float]]:
+    """Map a direction's stop codes to their OSM platform positions.
+
+    Returns {code: (lat, lon)} for the stops whose platform in this direction
+    differs from the canonical catalog position. Falls back to an empty dict
+    (catalog positions everywhere) when the relation cannot be used, so a
+    stale or half-mapped relation degrades instead of corrupting the feed.
+    """
+    rel = SHAPES.get(route_id, {}).get(direction)
+    if not isinstance(rel, int):
+        return {}
+    try:
+        plats = relation_platforms(rel)
+    except Exception as e:
+        print(f"  route {route_id} {direction}: cannot read platforms "
+              f"from relation {rel} ({e}); using catalog positions")
+        return {}
+    if len(plats) != len(codes):
+        print(f"  route {route_id} {direction}: relation {rel} has "
+              f"{len(plats)} platforms but the route has {len(codes)} stops; "
+              f"using catalog positions")
+        return {}
+
+    out = {}
+    for code, (osm_id, lat, lon) in zip(codes, plats):
+        c = canon(code)
+        expected = STOPS[c][3]
+        if osm_id == expected:
+            continue  # canonical platform, keep the catalog entry
+        cat_lat, cat_lon = STOPS[c][1:3]
+        if haversine(cat_lat, cat_lon, lat, lon) > PLATFORM_MAX_M:
+            print(f"  route {route_id} {direction}: platform n{osm_id} for "
+                  f"{c!r} is {haversine(cat_lat, cat_lon, lat, lon):.0f}m from "
+                  f"the catalog position; using catalog position")
+            continue
+        out[code] = (lat, lon)
+    return out
 
 
 def osm_shape_points(rel_id: int, stops: list[tuple[float, float]]) -> list[tuple[float, float]]:
@@ -657,16 +710,19 @@ def collect_route(route_id: str, cfg: dict) -> dict:
             times.setdefault(direction, {}).setdefault(station, {})["WD"] = wd
             times[direction][station]["WE"] = we
 
-    # 2) unique stops used by this route (direction-specific platforms
-    #    get a direction-suffixed stop id)
+    # 2) resolve each direction's platforms from its OSM route relation, then
+    #    collect the unique stops (a stop served from a different platform in
+    #    this direction gets a direction-suffixed stop id)
+    resolved = {direction: resolve_platforms(route_id, direction, d["stops"], canon)
+                for direction, d in cfg["directions"].items()}
     stops = {}
     for direction, d in cfg["directions"].items():
-        platforms = d.get("platforms", {})
+        platforms = resolved[direction]
         for code in d["stops"]:
             c = canon(code)
             if c not in STOPS:
                 raise KeyError(f"route {route_id}: stop {code!r} not in STOPS catalog")
-            name, lat, lon = STOPS[c]
+            name, lat, lon = STOPS[c][:3]
             if code in platforms:
                 lat, lon = platforms[code]
                 sid = f"{stop_id(c)}-{direction}"
@@ -681,17 +737,17 @@ def collect_route(route_id: str, cfg: dict) -> dict:
     for direction, d in cfg["directions"].items():
         direction_id = 0 if direction == "TUR" else 1
         shape_id = f"{route_id}-{direction}"
-        platforms = d.get("platforms", {})
+        platforms = resolved[direction]
 
-        def sid_for(code):
+        def sid_for(code, platforms=platforms, direction=direction):
             if code in platforms:
                 return f"{stop_id(canon(code))}-{direction}"
             return stop_id(canon(code))
 
-        def eff_pos(code):
+        def eff_pos(code, platforms=platforms):
             if code in platforms:
                 return platforms[code]
-            return STOPS[canon(code)][1:]
+            return STOPS[canon(code)][1:3]
 
         stop_order[direction] = [eff_pos(s) for s in d["stops"]]
         for service in ("WD", "WE"):
