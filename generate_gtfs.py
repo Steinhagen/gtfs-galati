@@ -118,6 +118,7 @@ STOPS = {
     "KAUFLAND": ("Kaufland", 45.4272284, 28.0213826, 6874360932),
     "PIATA TIGLINA I": ("Piața Țiglina I", 45.4253484, 28.0292427, 6905457936),
     "GAMACRIS": ("Gamacris", 45.4223635, 28.0287486, 6905457934),
+    "CLOSCA": ("Cloșca", 45.4208957, 28.0277397, 14091746744),
     "SIDERURGISTUL": ("Siderurgistul", 45.4195125, 28.0286957, 14088449866),
     "TRECERE BAC": ("Trecere BAC", 45.4167491, 28.0327079, 6905457933),
     "PIATA CENTRALA": ("Piața Centrală", 45.4379920, 28.0491857, 6898532656),
@@ -451,6 +452,26 @@ ROUTES = {
             },
         },
     },
+    "32": {
+        "route_long_name": "Micro 19 - Plaja Dunărea",
+        "route_type": 3,  # bus
+        "route_color": "4CAF50",
+        "aliases": {},
+        "service_days": "TF",  # Tuesday-Friday (no Monday service)
+        "directions": {
+            "TUR": {
+                "headsign": "Plaja Dunărea",
+                "stops": ["MICRO 19", "NEACSU", "SPITALUL JUDETEAN",
+                          "PRIVILEGE", "CLOSCA", "SIDERURGISTUL",
+                          "PLAJA DUNAREA"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "stops": ["PLAJA DUNAREA", "CLOSCA", "PRIVILEGE",
+                          "FARMACIA HYGEIA", "SERVICE VECHI", "MICRO 19"],
+            },
+        },
+    },
     "33": {
         "route_long_name": "Țiglina II - Plaja Dunărea",
         "route_type": 3,  # bus
@@ -490,6 +511,7 @@ SHAPES = {
     "9": {"TUR": 309379, "RETUR": 10154626},
     "10": {"TUR": 358092, "RETUR": 10176664},
     "31": {"TUR": 21222269, "RETUR": 21222268},
+    "32": {"TUR": 21223845, "RETUR": 21223844},
     "33": {"TUR": 21222431, "RETUR": 21222473},
 }
 
@@ -933,10 +955,11 @@ def write_feed(route_ids: list[str]) -> None:
          [["transurb", "TRANSURB S.A. Galati", "https://transurbgalati.ro",
            "Europe/Bucharest", "ro", "+40 721 111 602"]])
 
+    sorted_ids = sorted(route_ids, key=lambda r: int(r))
     wcsv("routes.txt", ["route_id", "agency_id", "route_short_name", "route_long_name",
                         "route_type", "route_color", "route_text_color"],
          [[rid, "transurb", rid, ROUTES[rid]["route_long_name"], ROUTES[rid]["route_type"],
-           ROUTES[rid]["route_color"], "FFFFFF"] for rid in route_ids])
+           ROUTES[rid]["route_color"], "FFFFFF"] for rid in sorted_ids])
 
     wcsv("stops.txt", ["stop_id", "stop_name", "stop_lat", "stop_lon"],
          [[sid, s["name"], f"{s['lat']:.7f}", f"{s['lon']:.7f}"] for sid, s in sorted(all_stops.items())])

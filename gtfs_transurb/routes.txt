@@ -1,13 +1,14 @@
 route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
-102,transurb,102,Micro 19 - Bariera Traian,11,058B8C,FFFFFF
-106,transurb,106,Micro 19 - Gara CFR,3,7B1FA2,FFFFFF
-105,transurb,105,Micro 19 - Grădina Publică,3,1565C0,FFFFFF
-43,transurb,43,Căminele Combinatului - Piața Energiei,3,1E88E5,FFFFFF
-41,transurb,41,Dimitrie Cantemir - Micro 19,3,2E7D32,FFFFFF
-38,transurb,38,Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă),3,C62828,FFFFFF
-37,transurb,37,Levaditti - Trecere BAC,3,6D4C41,FFFFFF
-35,transurb,35,Piața Centrală - Metro,3,00838F,FFFFFF
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,F57C00,FFFFFF
 10,transurb,10,Micro 19 - Damen,3,AD1457,FFFFFF
 31,transurb,31,Micro 19 - Barboși,3,558B2F,FFFFFF
+32,transurb,32,Micro 19 - Plaja Dunărea,3,4CAF50,FFFFFF
 33,transurb,33,Țiglina II - Plaja Dunărea,3,0097A7,FFFFFF
+35,transurb,35,Piața Centrală - Metro,3,00838F,FFFFFF
+37,transurb,37,Levaditti - Trecere BAC,3,6D4C41,FFFFFF
+38,transurb,38,Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă),3,C62828,FFFFFF
+41,transurb,41,Dimitrie Cantemir - Micro 19,3,2E7D32,FFFFFF
+43,transurb,43,Căminele Combinatului - Piața Energiei,3,1E88E5,FFFFFF
+102,transurb,102,Micro 19 - Bariera Traian,11,058B8C,FFFFFF
+105,transurb,105,Micro 19 - Grădina Publică,3,1565C0,FFFFFF
+106,transurb,106,Micro 19 - Gara CFR,3,7B1FA2,FFFFFF
