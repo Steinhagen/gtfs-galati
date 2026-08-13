@@ -920,7 +920,9 @@ def collect_route(route_id: str, cfg: dict) -> dict:
     # 1) fetch per-direction timetables
     times = {}  # times[direction][station][service] = [hh:mm, ...]
     for direction, d in cfg["directions"].items():
-        for station in d["stops"]:
+        n_stops = len(d["stops"])
+        for i, station in enumerate(d["stops"], 1):
+            print(f"  [{direction} {i}/{n_stops}] {station}", flush=True)
             wd, we = fetch_schedule(route_id, direction, station)
             times.setdefault(direction, {}).setdefault(station, {})["WD"] = wd
             times[direction][station]["WE"] = we
@@ -998,7 +1000,9 @@ def collect_route(route_id: str, cfg: dict) -> dict:
 def write_feed(route_ids: list[str]) -> None:
     OUT_DIR.mkdir(exist_ok=True)
     all_stops, all_trips, all_st, all_order = {}, [], [], {}
-    for rid in route_ids:
+    for i, rid in enumerate(route_ids, 1):
+        print(f"\n[{i}/{len(route_ids)}] Route {rid}: {ROUTES[rid]['route_long_name']}",
+              flush=True)
         cfg = ROUTES[rid]
         data = collect_route(rid, cfg)
         all_stops.update(data["stops"])
