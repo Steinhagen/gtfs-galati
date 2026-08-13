@@ -185,6 +185,10 @@ STOPS = {
     "MEHID": ("Mehid", 45.4487085, 28.0353274, 6899023176),
     "COMAT": ("COMAT", 45.4553759, 28.0289514, 6924935089),
     "BLOC L": ("Bloc L", 45.4508738, 28.0234253, 6896006843),
+    # Route 30 stops (Micro 19 - ADA Motors via Str. Brăilei)
+    "TIRIGHINA": ("Tirighina", 45.4084178, 27.9939702, 14093112491),
+    "STR. BRAILEI": ("Str. Brăilei", 45.4066105, 27.988187, 14093112489),
+    "ADA MOTORS (BORCAN)": ("ADA Motors (Borcan)", 45.4080801, 27.9770381, 14093112487),
 }
 
 # ---------------------------------------------------------------------------
@@ -553,6 +557,25 @@ ROUTES = {
             },
         },
     },
+    "30": {
+        "route_long_name": "Micro 19 - ADA Motors (Borcan)",
+        "route_type": 3,  # bus
+        "route_color": "303030",
+        "route_text_color": "FFFFFF",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "ADA Motors (Borcan)",
+                "stops": ["MICRO 19", "IATSA", "TIRIGHINA", "STR. BRAILEI",
+                          "ADA MOTORS (BORCAN)"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "stops": ["ADA MOTORS (BORCAN)", "STR. BRAILEI", "TIRIGHINA",
+                          "GRADINITA PRICHINDEL", "MICRO 19"],
+            },
+        },
+    },
 }
 
 
@@ -576,6 +599,7 @@ SHAPES = {
     "32": {"TUR": 21223845, "RETUR": 21223844},
     "33": {"TUR": 21222431, "RETUR": 21222473},
     "34": {"TUR": 10188176, "RETUR": 10188475},
+    "30": {"TUR": 21226359, "RETUR": 21226358},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -636,9 +660,13 @@ def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str],
     html = fetch_page(f"{BASE_URL}/veziProgram?{query}", cache)
     m = re.search(r"DE \w+ PÂNĂ VINERI(.*?)WEEKEND ȘI SĂRBĂTORI LEGALE(.*?)</table>",
                   html, re.S)
-    if not m:
-        raise RuntimeError(f"could not parse timetable for route {route} {direction} {station}")
-    return re.findall(r"(\d{2}:\d{2})", m.group(1)), re.findall(r"(\d{2}:\d{2})", m.group(2))
+    if m:
+        return re.findall(r"(\d{2}:\d{2})", m.group(1)), re.findall(r"(\d{2}:\d{2})", m.group(2))
+    # Weekday-only routes: no weekend section on the page
+    m_wd = re.search(r"DE \w+ PÂNĂ VINERI(.*?)</table>", html, re.S)
+    if m_wd:
+        return re.findall(r"(\d{2}:\d{2})", m_wd.group(1)), []
+    raise RuntimeError(f"could not parse timetable for route {route} {direction} {station}")
 
 
 OVERPASS_ENDPOINTS = [
@@ -988,6 +1016,8 @@ def collect_route(route_id: str, cfg: dict) -> dict:
             svc_id = wd_service if service == "WD" else "WE"
             station_times = [times[direction][station][service]
                              for station in d["stops"]]
+            if not station_times[0]:
+                continue  # no service in this period (e.g. weekday-only route)
             rows = align_times(station_times)
             n = len(rows[0])
             skipped = sum(1 for k in range(1, len(rows))
