@@ -165,6 +165,25 @@ STOPS = {
     "BARBOSI": ("Barboși", 45.3979735, 27.9857382, 14090544333),
     # Route 33 stops
     "PLAJA DUNAREA": ("Plaja Dunărea", 45.4137758, 28.0292958, 14090652421),
+    # Route 34 stops (Micro 13 - Intfor, via Strada Brăilei corridor)
+    "MICRO 13": ("Micro 13", 45.4505622, 28.0196142, 6898532664),
+    "COMPLEX IONESCU": ("Complex Ionescu", 45.4540387, 28.0186156, 8689062536),
+    "STR. IONEL FERNIC": ("Str. Ionel Fernic", 45.4566036, 28.0188122, 6898532661),
+    "STR. TRAIAN VUIA": ("Str. Traian Vuia", 45.4579682, 28.0222633, 6898532659),
+    "PIATA MICRO 39": ("Piața Micro 39", 45.4548291, 28.0247599, 6895095257),
+    "KAUFLAND (PATINOAR)": ("Kaufland (Patinoar)", 45.4550978, 28.0289548, 6960962993),
+    "PATINOAR": ("Patinoar", 45.4554069, 28.0335182, 6895095248),
+    "TREFO": ("TREFO", 45.4532279, 28.0345214, 6895095254),
+    "LICEUL C.F.R.": ("Liceul C.F.R.", 45.4472971, 28.0351504, 6899152585),
+    "CIMITIR ETERNITATEA": ("Cimitirul Eternitatea", 45.4424960, 28.0357115, 6899129583),
+    "STR. TECUCI": ("Str. Tecuci", 45.4381813, 28.0361388, 6899129581),
+    "STR. CRIZANTEMELOR": ("Str. Crizantemelor", 45.4343852, 28.0364714, 6899129579),
+    "INTFOR": ("Intfor", 45.4371997, 28.0710875, 6897791667),
+    "HOTEL SOFIN": ("Hotel Sofin", 45.4294194, 28.0371610, 6899023184),
+    "STR. M. KOGALNICEANU": ("Str. M. Kogălniceanu", 45.4343522, 28.0366766, 6899023182),
+    "MEHID": ("Mehid", 45.4487085, 28.0353274, 6899023176),
+    "COMAT": ("COMAT", 45.4553759, 28.0289514, 6924935089),
+    "BLOC L": ("Bloc L", 45.4508738, 28.0234253, 6896006843),
 }
 
 # ---------------------------------------------------------------------------
@@ -491,6 +510,34 @@ ROUTES = {
             },
         },
     },
+    "34": {
+        "route_long_name": "Micro 13 - Intfor",
+        "route_type": 3,  # bus
+        "route_color": "1B5E20",
+        "aliases": {},
+        "directions": {
+            "TUR": {
+                "headsign": "Intfor",
+                "stops": ["MICRO 13", "COMPLEX IONESCU", "STR. IONEL FERNIC",
+                          "STR. TRAIAN VUIA", "PIATA MICRO 39",
+                          "KAUFLAND (PATINOAR)", "PATINOAR", "TREFO",
+                          "LICEUL C.F.R.", "CIMITIR ETERNITATEA", "STR. TECUCI",
+                          "STR. CRIZANTEMELOR", "ROMTELECOM", "MAZEPA",
+                          "POTCOAVA DE AUR", "COMPLEX SPICUL", "NAVROM",
+                          "LICEUL DE MARINA", "ANA IPATESCU",
+                          "STR. ALEX. MORUZZI", "INTFOR"],
+            },
+            "RETUR": {
+                "headsign": "Micro 13",
+                "stops": ["INTFOR", "LICEUL DE MARINA", "NAVROM",
+                          "COMPLEX SPICUL", "CENTRU", "AGENTIA C.F.R.",
+                          "PARCARE BANCI", "HOTEL SOFIN",
+                          "STR. M. KOGALNICEANU", "STR. TECUCI",
+                          "CIMITIR ETERNITATEA", "MEHID", "TREFO", "COMAT",
+                          "PIATA MICRO 39", "BLOC L", "MICRO 13"],
+            },
+        },
+    },
 }
 
 
@@ -513,6 +560,7 @@ SHAPES = {
     "31": {"TUR": 21222269, "RETUR": 21222268},
     "32": {"TUR": 21223845, "RETUR": 21223844},
     "33": {"TUR": 21222431, "RETUR": 21222473},
+    "34": {"TUR": 10188176, "RETUR": 10188475},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
