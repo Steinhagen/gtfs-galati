@@ -18,6 +18,7 @@ import re
 import sys
 import time
 import zipfile
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -596,6 +597,15 @@ def http_get(url: str, data: bytes | None = None, headers: dict | None = None,
                                          headers=headers or {"User-Agent": UA})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return resp.read()
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code == 429 and attempt < tries:
+                wait = 10 * attempt
+                print(f"  rate limited (429); waiting {wait}s before retry", flush=True)
+                time.sleep(wait)
+            elif attempt < tries:
+                print(f"  http error ({e}); retry {attempt}/{tries - 1} in {5 * attempt}s")
+                time.sleep(5 * attempt)
         except Exception as e:
             last = e
             if attempt < tries:
@@ -610,7 +620,7 @@ def fetch_page(url: str, cache_file: Path) -> str:
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     data = http_get(url).decode("utf-8", errors="replace")
     cache_file.write_text(data, encoding="utf-8")
-    time.sleep(0.3)
+    time.sleep(0.6)
     return data
 
 
@@ -644,6 +654,7 @@ def overpass(query: str, cache_name: str) -> dict:
     cache = CACHE_DIR / cache_name
     if cache.exists():
         return json.loads(cache.read_text(encoding="utf-8"))
+    print(f"    overpass: querying {cache_name}...", flush=True)
     last = None
     for endpoint in OVERPASS_ENDPOINTS:
         try:
@@ -655,12 +666,13 @@ def overpass(query: str, cache_name: str) -> dict:
             return json.loads(data)
         except Exception as e:
             last = e
-            print(f"  overpass mirror {endpoint} failed ({e})")
+            print(f"    overpass mirror {endpoint} failed ({e})", flush=True)
     raise last
 
 
 def osm_api_relation_members(rel_id: int) -> list[dict]:
     """Fallback: fetch relation geometry from the OSM API (/full, XML)."""
+    print(f"    osm api: fetching relation {rel_id}/full...", flush=True)
     url = f"https://api.openstreetmap.org/api/0.6/relation/{rel_id}/full"
     xml = http_get(url, tries=3).decode("utf-8", "replace")
     root = ET.fromstring(xml)
@@ -930,8 +942,12 @@ def collect_route(route_id: str, cfg: dict) -> dict:
     # 2) resolve each direction's platforms from its OSM route relation, then
     #    collect the unique stops (a stop served from a different platform in
     #    this direction gets a direction-suffixed stop id)
-    resolved = {direction: resolve_platforms(route_id, direction, d["stops"], canon)
-                for direction, d in cfg["directions"].items()}
+    resolved = {}
+    for direction, d in cfg["directions"].items():
+        rel = SHAPES.get(route_id, {}).get(direction)
+        if isinstance(rel, int):
+            print(f"  [platforms] {direction}: fetching relation {rel}...", flush=True)
+        resolved[direction] = resolve_platforms(route_id, direction, d["stops"], canon)
     stops = {}
     for direction, d in cfg["directions"].items():
         platforms = resolved[direction]
@@ -997,8 +1013,48 @@ def collect_route(route_id: str, cfg: dict) -> dict:
             "stop_order": stop_order}
 
 
+def prefetch_relations(route_ids: list[str]) -> None:
+    """Fetch all uncached OSM relations in a single Overpass query."""
+    needed = []
+    for rid in route_ids:
+        for direction, rel_id in SHAPES.get(rid, {}).items():
+            if isinstance(rel_id, int):
+                cache = CACHE_DIR / f"rel_{rel_id}.json"
+                if not cache.exists():
+                    needed.append(rel_id)
+    if not needed:
+        return
+    print(f"\nPrefetching {len(needed)} OSM relation(s): {needed}", flush=True)
+    # Fetch all in one query
+    id_list = "".join(f"relation({r});" for r in needed)
+    query = f"[out:json][timeout:120];({id_list});out geom;"
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    last = None
+    for endpoint in OVERPASS_ENDPOINTS:
+        try:
+            print(f"  trying {endpoint}...", flush=True)
+            data = http_get(endpoint,
+                            data=urllib.parse.urlencode({"data": query}).encode(),
+                            tries=2, timeout=120)
+            j = json.loads(data.decode("utf-8", "replace"))
+            # Split into individual cache files
+            for el in j.get("elements", []):
+                rel_id = el["id"]
+                cache = CACHE_DIR / f"rel_{rel_id}.json"
+                payload = json.dumps({"elements": [el]})
+                cache.write_text(payload, encoding="utf-8")
+            print(f"  cached {len(j.get('elements', []))} relations", flush=True)
+            time.sleep(1)
+            return
+        except Exception as e:
+            last = e
+            print(f"  failed ({e})", flush=True)
+    print(f"  prefetch failed; will fetch individually as fallback", flush=True)
+
+
 def write_feed(route_ids: list[str]) -> None:
     OUT_DIR.mkdir(exist_ok=True)
+    prefetch_relations(route_ids)
     all_stops, all_trips, all_st, all_order = {}, [], [], {}
     for i, rid in enumerate(route_ids, 1):
         print(f"\n[{i}/{len(route_ids)}] Route {rid}: {ROUTES[rid]['route_long_name']}",
