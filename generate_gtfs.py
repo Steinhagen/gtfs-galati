@@ -203,7 +203,8 @@ ROUTES = {
     "102": {
         "route_long_name": "Micro 19 - Bariera Traian",
         "route_type": 11,  # trolleybus
-        "route_color": "00695C",
+        "route_color": "26D100",
+        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -230,7 +231,8 @@ ROUTES = {
     "106": {
         "route_long_name": "Micro 19 - Gara CFR",
         "route_type": 3,  # bus
-        "route_color": "4A148C",
+        "route_color": "400244",
+        "route_text_color": "FFFFFF",
         "aliases": {
             "GARA  CFR": "GARA CFR",
             "SERVICE  VECHI": "SERVICE VECHI",
@@ -261,7 +263,8 @@ ROUTES = {
     "105": {
         "route_long_name": "Micro 19 - Grădina Publică",
         "route_type": 3,  # bus
-        "route_color": "37474F",
+        "route_color": "FB483A",
+        "route_text_color": "000000",
         "aliases": {
             "F.E.A.A.": "F.E.E.A",
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
@@ -291,7 +294,8 @@ ROUTES = {
     "43": {
         "route_long_name": "Căminele Combinatului - Piața Energiei",
         "route_type": 3,  # bus
-        "route_color": "1A237E",
+        "route_color": "FF9D16",
+        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -307,7 +311,8 @@ ROUTES = {
     "41": {
         "route_long_name": "Dimitrie Cantemir - Micro 19",
         "route_type": 3,  # bus
-        "route_color": "827717",
+        "route_color": "4054C7",
+        "route_text_color": "FFFFFF",
         "aliases": {
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
         },
@@ -329,7 +334,8 @@ ROUTES = {
     "38": {
         "route_long_name": "Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă)",
         "route_type": 3,  # bus
-        "route_color": "C62828",
+        "route_color": "C350E9",
+        "route_text_color": "000000",
         "aliases": {
             "MICRO 19 (SOSIRE)": "MICRO 19",
         },
@@ -346,7 +352,8 @@ ROUTES = {
     "37": {
         "route_long_name": "Levaditti - Trecere BAC",
         "route_type": 3,  # bus
-        "route_color": "5D4037",
+        "route_color": "F5996A",
+        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -367,7 +374,8 @@ ROUTES = {
     "35": {
         "route_long_name": "Piața Centrală - Metro",
         "route_type": 3,  # bus
-        "route_color": "6A1B9A",
+        "route_color": "89B1F5",
+        "route_text_color": "000000",
         "aliases": {
             # on Strada Traian, not the Strada Domnească stops of the same name
             "STR. VULTUR": "STR. VULTUR / TRAIAN",
@@ -395,7 +403,8 @@ ROUTES = {
     "9": {
         "route_long_name": "Cimitirul Sfântul Lazăr - Gara C.F.R.",
         "route_type": 3,  # bus
-        "route_color": "E65100",
+        "route_color": "E1B348",
+        "route_text_color": "000000",
         "aliases": {
             "GALERIA DE ARTA": "GALERIILE DE ARTA",
             "GARA C.F.R.": "GARA CFR",
@@ -423,7 +432,8 @@ ROUTES = {
     "10": {
         "route_long_name": "Micro 19 - Damen",
         "route_type": 3,  # bus
-        "route_color": "AD1457",
+        "route_color": "F99BAD",
+        "route_text_color": "000000",
         "aliases": {
             "AGENTIA CFR": "AGENTIA C.F.R.",
         },
@@ -456,7 +466,8 @@ ROUTES = {
     "31": {
         "route_long_name": "Micro 19 - Barboși",
         "route_type": 3,  # bus
-        "route_color": "558B2F",
+        "route_color": "A94023",
+        "route_text_color": "FFFFFF",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -474,7 +485,8 @@ ROUTES = {
     "32": {
         "route_long_name": "Micro 19 - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "00838F",
+        "route_color": "3AD1FB",
+        "route_text_color": "000000",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
@@ -494,7 +506,8 @@ ROUTES = {
     "33": {
         "route_long_name": "Țiglina II - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "1565C0",
+        "route_color": "3AD1FB",
+        "route_text_color": "000000",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
@@ -513,7 +526,8 @@ ROUTES = {
     "34": {
         "route_long_name": "Micro 13 - Intfor",
         "route_type": 3,  # bus
-        "route_color": "1B5E20",
+        "route_color": "F1EB2C",
+        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -1007,7 +1021,8 @@ def write_feed(route_ids: list[str]) -> None:
     wcsv("routes.txt", ["route_id", "agency_id", "route_short_name", "route_long_name",
                         "route_type", "route_color", "route_text_color"],
          [[rid, "transurb", rid, ROUTES[rid]["route_long_name"], ROUTES[rid]["route_type"],
-           ROUTES[rid]["route_color"], "FFFFFF"] for rid in sorted_ids])
+           ROUTES[rid]["route_color"], ROUTES[rid].get("route_text_color", "000000")]
+          for rid in sorted_ids])
 
     wcsv("stops.txt", ["stop_id", "stop_name", "stop_lat", "stop_lon"],
          [[sid, s["name"], f"{s['lat']:.7f}", f"{s['lon']:.7f}"] for sid, s in sorted(all_stops.items())])
