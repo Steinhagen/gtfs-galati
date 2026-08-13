@@ -19,12 +19,19 @@
   .swatch { display:inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
   .mode { color: #777; font-size: 11px; }
   #status { color: #666; margin-top: 6px; font-size: 12px; }
+  .stop-label span {
+    white-space: nowrap; font-size: 11px; font-family: system-ui, sans-serif;
+    background: rgba(255,255,255,0.9); padding: 1px 4px; border-radius: 3px;
+    border: 1px solid #999; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .stop-label b { color: #333; }
 </style>
 </head>
 <body>
 <div id="panel">
   <h1>Transurb Galați &mdash; GTFS</h1>
   <label><input type="checkbox" id="cStops" checked> Show stops</label>
+  <label><input type="checkbox" id="cLabels" checked> Show labels</label>
   <label><input type="checkbox" id="cBoth"> Show both directions</label>
   <label>Route:
     <select id="routeSelect"></select>
@@ -165,6 +172,8 @@ async function init() {
   function renderStops() {
     stopsLayer.clearLayers();
     const rid = document.getElementById('routeSelect').value;
+    const r = routesById[rid];
+    const stopColor = r ? '#' + r.route_color : '#058B8C';
     const showBoth = document.getElementById('cBoth').checked;
     const dirSets = routeStopIds[rid] || {};
     const ids = new Set();
@@ -175,7 +184,7 @@ async function init() {
     }
     stops.forEach(s => {
       if (!ids.has(s.stop_id)) return;
-      const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: '#058B8C', fillOpacity: 0.9 });
+      const m = L.circleMarker([s.stop_lat, s.stop_lon], { radius: 6, color: '#333', weight: 1, fillColor: stopColor, fillOpacity: 0.9 });
       m.bindTooltip(s.stop_name);
       stopsLayer.addLayer(m);
     });
@@ -193,14 +202,62 @@ async function init() {
     });
   }
 
+  function renderLabels() {
+    if (window._stopLabels) { window._stopLabels.forEach(l => l.remove()); window._stopLabels = null; }
+    if (!document.getElementById('cLabels').checked) return;
+
+    const labels = [];
+    const rid = document.getElementById('routeSelect').value;
+    const showBoth = document.getElementById('cBoth').checked;
+    const id = document.getElementById('tripSelect').value;
+    const f = id && tripFeatures.find(x => x.trip.trip_id === id);
+
+    // Build a map of stop_id -> time from the selected trip
+    const tripTimes = {};
+    if (f) {
+      f.seq.forEach(st => {
+        const time = (st.departure_time || st.arrival_time || '').replace(/:00$/, '');
+        tripTimes[st.stop_id] = time;
+      });
+    }
+
+    // Determine which stops should have labels (same logic as renderStops)
+    const dirSets = routeStopIds[rid] || {};
+    const ids = new Set();
+    if (showBoth) {
+      Object.values(dirSets).forEach(s => s.forEach(id => ids.add(id)));
+    } else {
+      const dir = f ? (f.trip.direction_id == 0 ? 'TUR' : 'RETUR') : 'TUR';
+      (dirSets[dir] || new Set()).forEach(id => ids.add(id));
+    }
+
+    stops.forEach(s => {
+      if (!ids.has(s.stop_id)) return;
+      const time = tripTimes[s.stop_id];
+      const text = time ? `${s.stop_name} <b>${time}</b>` : s.stop_name;
+      const label = L.marker([+s.stop_lat, +s.stop_lon], {
+        icon: L.divIcon({
+          className: 'stop-label',
+          html: `<span>${text}</span>`,
+          iconSize: null,
+          iconAnchor: [-8, 12]
+        })
+      }).addTo(map);
+      labels.push(label);
+    });
+    window._stopLabels = labels;
+  }
+
   function highlight() {
     if (window._hl) { window._hl.remove(); window._hl = null; }
+    if (window._stopLabels) { window._stopLabels.forEach(l => l.remove()); window._stopLabels = null; }
     showRoute(document.getElementById('routeSelect').value);
     if (document.getElementById('cStops').checked) {
       renderStops();
       stopsLayer.addTo(map);
       stopsLayer.bringToFront();
     }
+    renderLabels();
     const id = document.getElementById('tripSelect').value;
     if (!id) return;
     const f = tripFeatures.find(x => x.trip.trip_id === id);
@@ -212,9 +269,9 @@ async function init() {
         return s ? [+s.stop_lat, +s.stop_lon] : null;
       }).filter(Boolean);
     }
-    const hl = L.polyline(latlngs, { color: '#' + f.route.route_color, weight: 5, opacity: 0.95 }).addTo(map)
-      .bindTooltip(`${f.route.route_short_name} ${f.trip.trip_id}: ${f.trip.trip_headsign} ${f.trip.service_id}`, { permanent: true });
+    const hl = L.polyline(latlngs, { color: '#' + f.route.route_color, weight: 5, opacity: 0.95 }).addTo(map);
     window._hl = hl;
+
     map.fitBounds(hl.getBounds());
     document.getElementById('status').innerHTML =
       'Trip <b>' + id + '</b>: ' + f.seq.map(x => x.departure_time).join(' &rarr; ');
@@ -236,7 +293,9 @@ async function init() {
       stopsLayer.addTo(map);
       stopsLayer.bringToFront();
     }
+    renderLabels();
   });
+  document.getElementById('cLabels').addEventListener('change', () => renderLabels());
   routeSel.addEventListener('change', () => {
     showRoute(routeSel.value);
     renderStops();
@@ -248,12 +307,13 @@ async function init() {
     highlight();
   });
   document.getElementById('tripSelect').addEventListener('change', highlight);
-  window.addEventListener('keydown', e => { if (e.key === 'Escape' && window._hl) { window._hl.remove(); window._hl = null; } });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') { if (window._hl) { window._hl.remove(); window._hl = null; } if (window._stopLabels) { window._stopLabels.forEach(l => l.remove()); window._stopLabels = null; } } });
 
   populateTrips();
   showRoute(routeSel.value);
   renderStops();
   stopsLayer.bringToFront();
+  highlight();
 
   const ll = stops.map(s => [+s.stop_lat, +s.stop_lon]);
   map.fitBounds(ll);
