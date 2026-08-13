@@ -2,14 +2,14 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,E1B348,000000
 10,transurb,10,Micro 19 - Damen,3,F99BAD,000000
 31,transurb,31,Micro 19 - Barboși,3,A94023,FFFFFF
-32,transurb,32,Micro 19 - Plaja Dunărea,3,3AD1FB,000000
-33,transurb,33,Țiglina II - Plaja Dunărea,3,3AD1FB,000000
+32,transurb,32,Micro 19 - Plaja Dunărea,3,039BE5,000000
+33,transurb,33,Țiglina II - Plaja Dunărea,3,006064,FFFFFF
 34,transurb,34,Micro 13 - Intfor,3,F1EB2C,000000
 35,transurb,35,Piața Centrală - Metro,3,89B1F5,000000
 37,transurb,37,Levaditti - Trecere BAC,3,F5996A,000000
 38,transurb,38,Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă),3,C350E9,000000
 41,transurb,41,Dimitrie Cantemir - Micro 19,3,4054C7,FFFFFF
-43,transurb,43,Căminele Combinatului - Piața Energiei,3,FF9D16,000000
+43,transurb,43,Căminele Combinatului - Piața Energiei,3,AA00FF,FFFFFF
 102,transurb,102,Micro 19 - Bariera Traian,11,26D100,000000
 105,transurb,105,Micro 19 - Grădina Publică,3,FB483A,000000
 106,transurb,106,Micro 19 - Gara CFR,3,400244,FFFFFF

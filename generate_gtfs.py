@@ -294,8 +294,8 @@ ROUTES = {
     "43": {
         "route_long_name": "Căminele Combinatului - Piața Energiei",
         "route_type": 3,  # bus
-        "route_color": "FF9D16",
-        "route_text_color": "000000",
+        "route_color": "AA00FF",
+        "route_text_color": "FFFFFF",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -485,7 +485,7 @@ ROUTES = {
     "32": {
         "route_long_name": "Micro 19 - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "3AD1FB",
+        "route_color": "039BE5",
         "route_text_color": "000000",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
@@ -506,8 +506,8 @@ ROUTES = {
     "33": {
         "route_long_name": "Țiglina II - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "3AD1FB",
-        "route_text_color": "000000",
+        "route_color": "006064",
+        "route_text_color": "FFFFFF",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
