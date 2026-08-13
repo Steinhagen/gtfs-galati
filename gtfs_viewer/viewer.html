@@ -118,7 +118,7 @@ async function init() {
     if (latlngs.length < 2) return;
     const dir = t.direction_id == 0 ? 'TUR' : 'RETUR';
     const line = L.polyline(latlngs, {
-      color: '#ff9800', weight: 2.5, opacity: 0.85
+      color: '#' + r.route_color, weight: 2.5, opacity: 0.85
     }).bindTooltip(`${r.route_short_name} · ${dir} (shape)`);
     (routeLayers[r.route_id] = routeLayers[r.route_id] || { TUR: [], RETUR: [] })[dir].push(line);
   });
@@ -212,7 +212,7 @@ async function init() {
         return s ? [+s.stop_lat, +s.stop_lon] : null;
       }).filter(Boolean);
     }
-    const hl = L.polyline(latlngs, { color: '#ff9800', weight: 5, opacity: 0.95 }).addTo(map)
+    const hl = L.polyline(latlngs, { color: '#' + f.route.route_color, weight: 5, opacity: 0.95 }).addTo(map)
       .bindTooltip(`${f.route.route_short_name} ${f.trip.trip_id}: ${f.trip.trip_headsign} ${f.trip.service_id}`, { permanent: true });
     window._hl = hl;
     map.fitBounds(hl.getBounds());

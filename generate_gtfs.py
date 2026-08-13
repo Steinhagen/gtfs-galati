@@ -184,7 +184,7 @@ ROUTES = {
     "102": {
         "route_long_name": "Micro 19 - Bariera Traian",
         "route_type": 11,  # trolleybus
-        "route_color": "058B8C",
+        "route_color": "00695C",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -211,7 +211,7 @@ ROUTES = {
     "106": {
         "route_long_name": "Micro 19 - Gara CFR",
         "route_type": 3,  # bus
-        "route_color": "7B1FA2",
+        "route_color": "4A148C",
         "aliases": {
             "GARA  CFR": "GARA CFR",
             "SERVICE  VECHI": "SERVICE VECHI",
@@ -242,7 +242,7 @@ ROUTES = {
     "105": {
         "route_long_name": "Micro 19 - Grădina Publică",
         "route_type": 3,  # bus
-        "route_color": "1565C0",
+        "route_color": "37474F",
         "aliases": {
             "F.E.A.A.": "F.E.E.A",
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
@@ -272,7 +272,7 @@ ROUTES = {
     "43": {
         "route_long_name": "Căminele Combinatului - Piața Energiei",
         "route_type": 3,  # bus
-        "route_color": "1E88E5",
+        "route_color": "1A237E",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -288,7 +288,7 @@ ROUTES = {
     "41": {
         "route_long_name": "Dimitrie Cantemir - Micro 19",
         "route_type": 3,  # bus
-        "route_color": "2E7D32",
+        "route_color": "827717",
         "aliases": {
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
         },
@@ -327,7 +327,7 @@ ROUTES = {
     "37": {
         "route_long_name": "Levaditti - Trecere BAC",
         "route_type": 3,  # bus
-        "route_color": "6D4C41",
+        "route_color": "5D4037",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -348,7 +348,7 @@ ROUTES = {
     "35": {
         "route_long_name": "Piața Centrală - Metro",
         "route_type": 3,  # bus
-        "route_color": "00838F",
+        "route_color": "6A1B9A",
         "aliases": {
             # on Strada Traian, not the Strada Domnească stops of the same name
             "STR. VULTUR": "STR. VULTUR / TRAIAN",
@@ -376,7 +376,7 @@ ROUTES = {
     "9": {
         "route_long_name": "Cimitirul Sfântul Lazăr - Gara C.F.R.",
         "route_type": 3,  # bus
-        "route_color": "F57C00",
+        "route_color": "E65100",
         "aliases": {
             "GALERIA DE ARTA": "GALERIILE DE ARTA",
             "GARA C.F.R.": "GARA CFR",
@@ -455,7 +455,7 @@ ROUTES = {
     "32": {
         "route_long_name": "Micro 19 - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "4CAF50",
+        "route_color": "00838F",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
@@ -475,7 +475,7 @@ ROUTES = {
     "33": {
         "route_long_name": "Țiglina II - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "0097A7",
+        "route_color": "1565C0",
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
