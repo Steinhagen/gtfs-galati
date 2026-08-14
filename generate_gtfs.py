@@ -209,6 +209,7 @@ STOPS = {
     "LICEUL NR. 3": ("Liceul Nr. 3", 45.4478510, 28.0246069, 6896006841),
     "STR. GHE. DOJA": ("Str. Gheorghe Doja", 45.4341258, 28.0241168, 6896006833),
     "BINGO EUROPA": ("Bingo Europa", 45.4311118, 28.0207200, 6896006831),
+    "GALMOPAN": ("Galmopan", 45.4598427, 28.0341852, 6899023172),
 }
 
 # ---------------------------------------------------------------------------
@@ -422,6 +423,37 @@ ROUTES = {
                           "STR. PRUNDULUI", "SPITAL MUNICIPAL", "STR. RADU NEGRU",
                           "STR. CEZAR", "SPITALUL MILITAR", "STR. VULTUR",
                           "BAIA COMUNALA", "PIATA CENTRALA"],
+            },
+        },
+    },
+    "26": {
+        "route_long_name": "Micro 13 - Gara C.F.R.",
+        "route_type": 3,  # bus
+        "route_color": "F770B9",
+        "route_text_color": "000000",
+        "aliases": {
+            "GARA C.F.R.": "GARA CFR",
+            "CAMINELE STUDENTESTI": "CAMINE STUDENTESTI",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Gara C.F.R.",
+                "stops": ["MICRO 13", "COMPLEX IONESCU", "STR. IONEL FERNIC",
+                          "STR. TRAIAN VUIA", "PIATA MICRO 39",
+                          "KAUFLAND (PATINOAR)", "PATINOAR", "GALMOPAN",
+                          "BARIERA TRAIAN", "PARC C.F.R.", "STR. RADU NEGRU",
+                          "A.J.O.F.M.", "CAMINELE STUDENTESTI",
+                          "MUZEUL DE ARTA", "STR. VULTUR", "LICEUL DE ARTA",
+                          "GARA C.F.R."],
+            },
+            "RETUR": {
+                "headsign": "Micro 13",
+                "stops": ["GARA C.F.R.", "AUTOGARA", "DIRECTIA AGRICOLA",
+                          "BLOC IALOMITA", "CAMINELE STUDENTESTI",
+                          "CAMINUL DE BATRANI", "PARC C.F.R.",
+                          "STR. PRUNDULUI", "BARIERA TRAIAN", "GALMOPAN",
+                          "PATINOAR", "COMAT", "PIATA MICRO 39", "BLOC L",
+                          "MICRO 13"],
             },
         },
     },
@@ -662,6 +694,7 @@ SHAPES = {
     "34": {"TUR": 10188176, "RETUR": 10188475},
     "30": {"TUR": 21226359, "RETUR": 21226358},
     "28": {"TUR": 10172140, "RETUR": 10173216},
+    "26": {"TUR": 10278404, "RETUR": 10278471},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
