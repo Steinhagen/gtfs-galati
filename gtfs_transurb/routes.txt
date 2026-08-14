@@ -1,6 +1,7 @@
 route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,E1B348,000000
 10,transurb,10,Micro 19 - Damen,3,F99BAD,000000
+28,transurb,28,Micro 19 - Bariera Traian,3,3AD1FB,000000
 30,transurb,30,Micro 19 - ADA Motors (Borcan),3,303030,FFFFFF
 31,transurb,31,Micro 19 - Barboși,3,A94023,FFFFFF
 32,transurb,32,Micro 19 - Plaja Dunărea,3,039BE5,000000

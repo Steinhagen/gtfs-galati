@@ -189,6 +189,26 @@ STOPS = {
     "TIRIGHINA": ("Tirighina", 45.4084178, 27.9939702, 14093112491),
     "STR. BRAILEI": ("Str. Brăilei", 45.4066105, 27.988187, 14093112489),
     "ADA MOTORS (BORCAN)": ("ADA Motors (Borcan)", 45.4080801, 27.9770381, 14093112487),
+    # Route 28 stops (Micro 19 - Bariera Traian via Str. Aurel Vlaicu)
+    "LIDL": ("Lidl", 45.4161512, 28.0075325, 6894593246),
+    "LICEUL DUNAREA": ("Liceul Dunărea", 45.4208879, 28.0169830, 6894593240),
+    "CASA MINION": ("Casa Minion", 45.4229901, 28.0175326, 6882472288),
+    "STR. OLTULUI": ("Str. Oltului", 45.4249612, 28.0174258, 6894593237),
+    "FLORA": ("Flora", 45.4292527, 28.0190971, 6894604139),
+    "BISERICA SF. VASILE": ("Biserica Sfântul Vasile", 45.4316985, 28.0214114, 6894604138),
+    "IREG": ("IREG", 45.4357433, 28.0246572, 6894604136),
+    "MASNITA": ("Mașniță", 45.4419231, 28.0215622, 6894604132),
+    "MASNITA / LICEUL NR. 3": ("Mașniță", 45.4446028, 28.0227528, 6896006839),
+    "STR. 9 MAI": ("Str. 9 Mai", 45.4449811, 28.0233267, 6894604130),
+    "STR. AUREL VLAICU - (1 DECEMBRIE)": ("Str. Aurel Vlaicu (1 Decembrie)", 45.4479263, 28.0250515, 6894604128),
+    "STR. AUREL VLAICU": ("Str. Aurel Vlaicu", 45.4480326, 28.0266552, 6963443072),
+    "ODOBESTI": ("Odobești", 45.4483589, 28.0333398, 14093719323),
+    "BUCOVINEI": ("Bucovinei", 45.4509636, 28.0393192, 6895095252),
+    "RIZER": ("Rizer", 45.4506461, 28.0424342, 14093698654),
+    "SHOPPING CITY": ("Shopping City", 45.4517433, 28.0333180, 6960963010),
+    "LICEUL NR. 3": ("Liceul Nr. 3", 45.4478510, 28.0246069, 6896006841),
+    "STR. GHE. DOJA": ("Str. Gheorghe Doja", 45.4341258, 28.0241168, 6896006833),
+    "BINGO EUROPA": ("Bingo Europa", 45.4311118, 28.0207200, 6896006831),
 }
 
 # ---------------------------------------------------------------------------
@@ -405,6 +425,47 @@ ROUTES = {
             },
         },
     },
+    "28": {
+        "route_long_name": "Micro 19 - Bariera Traian",
+        "route_type": 3,  # bus
+        "route_color": "3AD1FB",
+        "route_text_color": "000000",
+        "aliases": {
+            "CEZAR": "STR. CEZAR",
+            "STR. RADU NEGRU": "STR. RADU NEGRU / TRAIAN",
+            "SPITALUL MUNICIPAL": "SPITAL MUNICIPAL",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Bariera Traian",
+                "stops": ["MICRO 19", "IATSA", "LIDL", "SCOALA NR. 40",
+                          "PIATA MICRO 17", "LICEUL DUNAREA", "CASA MINION",
+                          "STR. OLTULUI", "FLORA", "BISERICA SF. VASILE",
+                          "IREG", "PIATA ENERGIEI", "MASNITA", "STR. 9 MAI",
+                          "STR. AUREL VLAICU - (1 DECEMBRIE)",
+                          "STR. AUREL VLAICU", "ODOBESTI", "MEHID",
+                          "BUCOVINEI", "RIZER", "CEZAR", "STR. RADU NEGRU",
+                          "SPITALUL MUNICIPAL", "STR. PRUNDULUI",
+                          "BARIERA TRAIAN"],
+            },
+            "RETUR": {
+                "headsign": "Micro 19",
+                "aliases": {
+                    # the north end of the street, not the TUR stop
+                    "MASNITA": "MASNITA / LICEUL NR. 3",
+                },
+                "stops": ["BARIERA TRAIAN", "STR. PRUNDULUI",
+                          "SPITALUL MUNICIPAL", "STR. RADU NEGRU",
+                          "STR. CEZAR", "RIZER", "BUCOVINEI", "SHOPPING CITY",
+                          "ODOBESTI", "STR. AUREL VLAICU", "LICEUL NR. 3",
+                          "MASNITA", "PIATA ENERGIEI", "IREG",
+                          "STR. GHE. DOJA", "BINGO EUROPA", "FLORA",
+                          "STR. OLTULUI", "CASA MINION", "LICEUL DUNAREA",
+                          "PIATA MICRO 17", "SCOALA NR. 40", "LIDL",
+                          "GRADINITA PRICHINDEL", "MICRO 19"],
+            },
+        },
+    },
     "9": {
         "route_long_name": "Cimitirul Sfântul Lazăr - Gara C.F.R.",
         "route_type": 3,  # bus
@@ -600,6 +661,7 @@ SHAPES = {
     "33": {"TUR": 21222431, "RETUR": 21222473},
     "34": {"TUR": 10188176, "RETUR": 10188475},
     "30": {"TUR": 21226359, "RETUR": 21226358},
+    "28": {"TUR": 10172140, "RETUR": 10173216},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -956,7 +1018,11 @@ def align_times(station_times: list[list[str]]) -> list[list[str | None]]:
 def collect_route(route_id: str, cfg: dict) -> dict:
     """Return dict with 'stops' (unique), 'trips' (rows) and 'stop_times' (rows)."""
     aliases = cfg.get("aliases", {})  # site code -> canonical STOPS code
-    canon = lambda code: aliases.get(code, code)
+
+    def canon_for(direction):
+        """Alias resolver for a direction (direction overrides route)."""
+        d_aliases = cfg["directions"][direction].get("aliases", {})
+        return lambda code: d_aliases.get(code, aliases.get(code, code))
     # 1) fetch per-direction timetables
     times = {}  # times[direction][station][service] = [hh:mm, ...]
     for direction, d in cfg["directions"].items():
@@ -975,10 +1041,12 @@ def collect_route(route_id: str, cfg: dict) -> dict:
         rel = SHAPES.get(route_id, {}).get(direction)
         if isinstance(rel, int):
             print(f"  [platforms] {direction}: fetching relation {rel}...", flush=True)
-        resolved[direction] = resolve_platforms(route_id, direction, d["stops"], canon)
+        resolved[direction] = resolve_platforms(route_id, direction, d["stops"],
+                                                canon_for(direction))
     stops = {}
     for direction, d in cfg["directions"].items():
         platforms = resolved[direction]
+        canon = canon_for(direction)
         for code in d["stops"]:
             c = canon(code)
             if c not in STOPS:
@@ -999,13 +1067,14 @@ def collect_route(route_id: str, cfg: dict) -> dict:
         direction_id = 0 if direction == "TUR" else 1
         shape_id = f"{route_id}-{direction}"
         platforms = resolved[direction]
+        canon = canon_for(direction)
 
-        def sid_for(code, platforms=platforms, direction=direction):
+        def sid_for(code, platforms=platforms, direction=direction, canon=canon):
             if code in platforms:
                 return f"{stop_id(canon(code))}-{direction}"
             return stop_id(canon(code))
 
-        def eff_pos(code, platforms=platforms):
+        def eff_pos(code, platforms=platforms, canon=canon):
             if code in platforms:
                 return platforms[code]
             return STOPS[canon(code)][1:3]
