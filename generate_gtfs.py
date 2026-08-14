@@ -29,12 +29,57 @@ HERE = Path(__file__).resolve().parent
 CACHE_DIR = HERE / "cache"
 OUT_DIR = HERE / "gtfs_transurb"
 ZIP_PATH = HERE / "gtfs_transurb.zip"
+COLORS_FILE = HERE / "route-colors.txt"
 UA = "gtfs-galati/1.0"  # Overpass rejects Mozilla-prefixed custom UAs
 
 FEED_START, FEED_END = "20260101", "20261231"
 # Romanian legal holidays in 2026 that follow the weekend schedule.
 HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
                  "20260501", "20260601", "20261130", "20261201", "20261225"]
+
+# ---------------------------------------------------------------------------
+# Route palette: route-colors.txt holds one line per route,
+# "ref,#rrggbb,vehicle,area". It is the source of truth for route_color; a
+# route missing from the file falls back to "route_color" in ROUTES below.
+# route_text_color is derived from the background luminance, so the palette
+# is the only place a colour has to be edited.
+# ---------------------------------------------------------------------------
+# Perceived luminance (ITU-R BT.601) above which black text is used.
+TEXT_COLOR_LUMA = 110.0
+
+
+def load_route_colors(path: Path = COLORS_FILE) -> dict[str, str]:
+    """Parse route-colors.txt into {route ref: "RRGGBB"}."""
+    colors = {}
+    if not path.exists():
+        print(f"warning: {path.name} not found; using the colors in ROUTES")
+        return colors
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = [p.strip() for p in line.split(",")]
+        if len(parts) < 2 or not re.fullmatch(r"#?[0-9A-Fa-f]{6}", parts[1]):
+            print(f"warning: ignoring unparsable {path.name} line: {line!r}")
+            continue
+        colors[parts[0]] = parts[1].lstrip("#").upper()
+    return colors
+
+
+ROUTE_COLORS = load_route_colors()
+
+
+def route_color(route_id: str, cfg: dict) -> str:
+    """Colour for a route: route-colors.txt first, ROUTES fallback second."""
+    return ROUTE_COLORS.get(route_id) or cfg.get("route_color", "FFFFFF")
+
+
+def text_color(background: str) -> str:
+    """Readable text colour for a background: black on light, white on dark."""
+    r, g, b = (int(background[i:i + 2], 16) for i in (0, 2, 4))
+    luma = 0.299 * r + 0.587 * g + 0.114 * b
+    return "000000" if luma > TEXT_COLOR_LUMA else "FFFFFF"
+
 
 # ---------------------------------------------------------------------------
 # Stop catalog: canonical code -> (display name, lat, lon, osm_node).
@@ -210,6 +255,21 @@ STOPS = {
     "STR. GHE. DOJA": ("Str. Gheorghe Doja", 45.4341258, 28.0241168, 6896006833),
     "BINGO EUROPA": ("Bingo Europa", 45.4311118, 28.0207200, 6896006831),
     "GALMOPAN": ("Galmopan", 45.4598427, 28.0341852, 6899023172),
+    # Route 24 stops (Strada Nae Leonard corridor, Micro 40 / Țiglina side)
+    "BLOC U10": ("Bloc U10", 45.4465514, 28.0292811, 6963443070),
+    "CIN CIN": ("Cin Cin", 45.4445412, 28.0284309, 6963443068),
+    "BLOC R3": ("Bloc R3", 45.4417062, 28.0285667, 6963443067),
+    "BLOC S1": ("Bloc S1", 45.4415458, 28.0287031, 6960963001),
+    "BLOC C5A": ("Bloc C5A", 45.4374314, 28.0274140, 6963443063),
+    "BLOC C8A": ("Bloc C8A", 45.4372668, 28.0275013, 6960963005),
+    "LICEUL SF. MARIA": ("Liceul Sfânta Maria", 45.4337362, 28.0294771, 6963443059),
+    "APATERM": ("Apaterm", 45.4332177, 28.0335997, 6963443058),
+    "MICRO 40": ("Micro 40", 45.4498837, 28.0255999, 6894604126),
+    # Two more repeated street names: these are on Strada Nae Leonard, not the
+    # Lidl at Micro 19 nor the Strada Gheorghe Doja stop of route 28 (~230 m
+    # west, on Doja itself).
+    "LIDL / NAE LEONARD": ("Lidl", 45.4399160, 28.0280850, 6963443065),
+    "STR. GHE. DOJA / NAE LEONARD": ("Str. Gheorghe Doja", 45.4347349, 28.0269851, 6963443061),
 }
 
 # ---------------------------------------------------------------------------
@@ -229,8 +289,6 @@ ROUTES = {
     "102": {
         "route_long_name": "Micro 19 - Bariera Traian",
         "route_type": 11,  # trolleybus
-        "route_color": "26D100",
-        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -257,8 +315,6 @@ ROUTES = {
     "106": {
         "route_long_name": "Micro 19 - Gara CFR",
         "route_type": 3,  # bus
-        "route_color": "400244",
-        "route_text_color": "FFFFFF",
         "aliases": {
             "GARA  CFR": "GARA CFR",
             "SERVICE  VECHI": "SERVICE VECHI",
@@ -289,8 +345,6 @@ ROUTES = {
     "105": {
         "route_long_name": "Micro 19 - Grădina Publică",
         "route_type": 3,  # bus
-        "route_color": "FB483A",
-        "route_text_color": "000000",
         "aliases": {
             "F.E.A.A.": "F.E.E.A",
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
@@ -320,8 +374,7 @@ ROUTES = {
     "43": {
         "route_long_name": "Căminele Combinatului - Piața Energiei",
         "route_type": 3,  # bus
-        "route_color": "AA00FF",
-        "route_text_color": "FFFFFF",
+        "route_color": "AA00FF",  # not listed in route-colors.txt
         "aliases": {},
         "directions": {
             "TUR": {
@@ -337,8 +390,6 @@ ROUTES = {
     "41": {
         "route_long_name": "Dimitrie Cantemir - Micro 19",
         "route_type": 3,  # bus
-        "route_color": "4054C7",
-        "route_text_color": "FFFFFF",
         "aliases": {
             "FACULTATEA DE MEDICINA": "FAC. DE MEDICINA",
         },
@@ -360,8 +411,6 @@ ROUTES = {
     "38": {
         "route_long_name": "Micro 19 - Cartier Locuințe Sociale Micro 17 (buclă)",
         "route_type": 3,  # bus
-        "route_color": "C350E9",
-        "route_text_color": "000000",
         "aliases": {
             "MICRO 19 (SOSIRE)": "MICRO 19",
         },
@@ -378,8 +427,6 @@ ROUTES = {
     "37": {
         "route_long_name": "Levaditti - Trecere BAC",
         "route_type": 3,  # bus
-        "route_color": "F5996A",
-        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -400,8 +447,6 @@ ROUTES = {
     "35": {
         "route_long_name": "Piața Centrală - Metro",
         "route_type": 3,  # bus
-        "route_color": "89B1F5",
-        "route_text_color": "000000",
         "aliases": {
             # on Strada Traian, not the Strada Domnească stops of the same name
             "STR. VULTUR": "STR. VULTUR / TRAIAN",
@@ -429,8 +474,6 @@ ROUTES = {
     "26": {
         "route_long_name": "Micro 13 - Gara C.F.R.",
         "route_type": 3,  # bus
-        "route_color": "F770B9",
-        "route_text_color": "000000",
         "aliases": {
             "GARA C.F.R.": "GARA CFR",
             "CAMINELE STUDENTESTI": "CAMINE STUDENTESTI",
@@ -460,8 +503,6 @@ ROUTES = {
     "28": {
         "route_long_name": "Micro 19 - Bariera Traian",
         "route_type": 3,  # bus
-        "route_color": "3AD1FB",
-        "route_text_color": "000000",
         "aliases": {
             "CEZAR": "STR. CEZAR",
             "STR. RADU NEGRU": "STR. RADU NEGRU / TRAIAN",
@@ -501,8 +542,6 @@ ROUTES = {
     "9": {
         "route_long_name": "Cimitirul Sfântul Lazăr - Gara C.F.R.",
         "route_type": 3,  # bus
-        "route_color": "E1B348",
-        "route_text_color": "000000",
         "aliases": {
             "GALERIA DE ARTA": "GALERIILE DE ARTA",
             "GARA C.F.R.": "GARA CFR",
@@ -530,8 +569,6 @@ ROUTES = {
     "10": {
         "route_long_name": "Micro 19 - Damen",
         "route_type": 3,  # bus
-        "route_color": "F99BAD",
-        "route_text_color": "000000",
         "aliases": {
             "AGENTIA CFR": "AGENTIA C.F.R.",
         },
@@ -564,8 +601,6 @@ ROUTES = {
     "31": {
         "route_long_name": "Micro 19 - Barboși",
         "route_type": 3,  # bus
-        "route_color": "A94023",
-        "route_text_color": "FFFFFF",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -583,8 +618,7 @@ ROUTES = {
     "32": {
         "route_long_name": "Micro 19 - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "039BE5",
-        "route_text_color": "000000",
+        "route_color": "039BE5",  # not listed in route-colors.txt
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
@@ -604,8 +638,7 @@ ROUTES = {
     "33": {
         "route_long_name": "Țiglina II - Plaja Dunărea",
         "route_type": 3,  # bus
-        "route_color": "006064",
-        "route_text_color": "FFFFFF",
+        "route_color": "006064",  # not listed in route-colors.txt
         "aliases": {},
         "service_days": "TF",  # Tuesday-Friday (no Monday service)
         "directions": {
@@ -624,8 +657,6 @@ ROUTES = {
     "34": {
         "route_long_name": "Micro 13 - Intfor",
         "route_type": 3,  # bus
-        "route_color": "F1EB2C",
-        "route_text_color": "000000",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -653,8 +684,6 @@ ROUTES = {
     "30": {
         "route_long_name": "Micro 19 - ADA Motors (Borcan)",
         "route_type": 3,  # bus
-        "route_color": "303030",
-        "route_text_color": "FFFFFF",
         "aliases": {},
         "directions": {
             "TUR": {
@@ -666,6 +695,43 @@ ROUTES = {
                 "headsign": "Micro 19",
                 "stops": ["ADA MOTORS (BORCAN)", "STR. BRAILEI", "TIRIGHINA",
                           "GRADINITA PRICHINDEL", "MICRO 19"],
+            },
+        },
+    },
+    "24": {
+        "route_long_name": "Shopping City - Damen",
+        "route_type": 3,  # bus
+        "aliases": {
+            "CARREFOUR-SHOPPING CITY": "SHOPPING CITY",
+            # on Strada Nae Leonard, not the stops of the same name elsewhere
+            "LIDL": "LIDL / NAE LEONARD",
+            "STR. GHE. DOJA": "STR. GHE. DOJA / NAE LEONARD",
+            "KAUFLAND": "KAUFLAND (PATINOAR)",
+        },
+        "directions": {
+            "TUR": {
+                "headsign": "Damen",
+                "stops": ["CARREFOUR-SHOPPING CITY", "TREFO", "COMAT",
+                          "PIATA MICRO 39", "BLOC L", "STR. AUREL VLAICU",
+                          "BLOC U10", "CIN CIN", "BLOC R3", "LIDL",
+                          "BLOC C5A", "STR. GHE. DOJA", "LICEUL SF. MARIA",
+                          "APATERM", "ROMTELECOM", "MAZEPA",
+                          "POTCOAVA DE AUR", "COMPLEX SPICUL", "NAVROM",
+                          "LICEUL DE MARINA", "ANA IPATESCU",
+                          "STR. ALEX. MORUZZI", "MORUZZI", "STR. LEMNARI",
+                          "EEKELS", "DAMEN"],
+            },
+            "RETUR": {
+                "headsign": "Shopping City",
+                "stops": ["DAMEN", "EEKELS", "STR. LEMNARI", "MORUZZI",
+                          "STR. ALEX. MORUZZI", "ANA IPATESCU",
+                          "LICEUL DE MARINA", "NAVROM", "COMPLEX SPICUL",
+                          "CENTRU", "AGENTIA C.F.R.", "PARCARE BANCI",
+                          "HOTEL SOFIN", "LICEUL SF. MARIA", "STR. GHE. DOJA",
+                          "BLOC C8A", "LIDL", "BLOC S1", "CIN CIN",
+                          "BLOC U10", "STR. AUREL VLAICU", "MICRO 40",
+                          "PIATA MICRO 39", "KAUFLAND",
+                          "CARREFOUR-SHOPPING CITY"],
             },
         },
     },
@@ -695,6 +761,7 @@ SHAPES = {
     "30": {"TUR": 21226359, "RETUR": 21226358},
     "28": {"TUR": 10172140, "RETUR": 10173216},
     "26": {"TUR": 10278404, "RETUR": 10278471},
+    "24": {"TUR": 10281326, "RETUR": 10279032},
 }
 
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
@@ -1210,11 +1277,16 @@ def write_feed(route_ids: list[str]) -> None:
            "Europe/Bucharest", "ro", "+40 721 111 602"]])
 
     sorted_ids = sorted(route_ids, key=lambda r: int(r))
+    route_rows = []
+    for rid in sorted_ids:
+        cfg = ROUTES[rid]
+        color = route_color(rid, cfg)
+        route_rows.append([rid, "transurb", rid, cfg["route_long_name"],
+                           cfg["route_type"], color,
+                           cfg.get("route_text_color") or text_color(color)])
     wcsv("routes.txt", ["route_id", "agency_id", "route_short_name", "route_long_name",
                         "route_type", "route_color", "route_text_color"],
-         [[rid, "transurb", rid, ROUTES[rid]["route_long_name"], ROUTES[rid]["route_type"],
-           ROUTES[rid]["route_color"], ROUTES[rid].get("route_text_color", "000000")]
-          for rid in sorted_ids])
+         route_rows)
 
     wcsv("stops.txt", ["stop_id", "stop_name", "stop_lat", "stop_lon"],
          [[sid, s["name"], f"{s['lat']:.7f}", f"{s['lon']:.7f}"] for sid, s in sorted(all_stops.items())])
