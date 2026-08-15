@@ -501,75 +501,75 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 106,WE,106-R-WE-026,Micro 19,1,106-RETUR
 106,WE,106-R-WE-027,Micro 19,1,106-RETUR
 106,WE,106-R-WE-028,Micro 19,1,106-RETUR
-105,WD,105-T-WD-001,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-002,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-003,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-004,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-005,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-006,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-007,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-008,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-009,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-010,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-011,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-012,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-013,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-014,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-015,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-016,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-017,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-018,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-019,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-020,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-021,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-022,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-023,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-024,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-025,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-026,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-027,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-028,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-029,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-030,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-031,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-032,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-033,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-034,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-035,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-036,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-037,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-038,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-039,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-040,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-041,Grădina Publică,0,105-TUR
-105,WD,105-T-WD-042,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-001,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-002,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-003,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-004,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-005,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-006,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-007,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-008,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-009,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-010,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-011,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-012,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-013,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-014,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-015,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-016,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-017,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-018,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-019,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-020,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-021,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-022,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-023,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-024,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-025,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-026,Grădina Publică,0,105-TUR
-105,WE,105-T-WE-027,Grădina Publică,0,105-TUR
+105,WD,105-T-WD-001,Grădina publică,0,105-TUR
+105,WD,105-T-WD-002,Grădina publică,0,105-TUR
+105,WD,105-T-WD-003,Grădina publică,0,105-TUR
+105,WD,105-T-WD-004,Grădina publică,0,105-TUR
+105,WD,105-T-WD-005,Grădina publică,0,105-TUR
+105,WD,105-T-WD-006,Grădina publică,0,105-TUR
+105,WD,105-T-WD-007,Grădina publică,0,105-TUR
+105,WD,105-T-WD-008,Grădina publică,0,105-TUR
+105,WD,105-T-WD-009,Grădina publică,0,105-TUR
+105,WD,105-T-WD-010,Grădina publică,0,105-TUR
+105,WD,105-T-WD-011,Grădina publică,0,105-TUR
+105,WD,105-T-WD-012,Grădina publică,0,105-TUR
+105,WD,105-T-WD-013,Grădina publică,0,105-TUR
+105,WD,105-T-WD-014,Grădina publică,0,105-TUR
+105,WD,105-T-WD-015,Grădina publică,0,105-TUR
+105,WD,105-T-WD-016,Grădina publică,0,105-TUR
+105,WD,105-T-WD-017,Grădina publică,0,105-TUR
+105,WD,105-T-WD-018,Grădina publică,0,105-TUR
+105,WD,105-T-WD-019,Grădina publică,0,105-TUR
+105,WD,105-T-WD-020,Grădina publică,0,105-TUR
+105,WD,105-T-WD-021,Grădina publică,0,105-TUR
+105,WD,105-T-WD-022,Grădina publică,0,105-TUR
+105,WD,105-T-WD-023,Grădina publică,0,105-TUR
+105,WD,105-T-WD-024,Grădina publică,0,105-TUR
+105,WD,105-T-WD-025,Grădina publică,0,105-TUR
+105,WD,105-T-WD-026,Grădina publică,0,105-TUR
+105,WD,105-T-WD-027,Grădina publică,0,105-TUR
+105,WD,105-T-WD-028,Grădina publică,0,105-TUR
+105,WD,105-T-WD-029,Grădina publică,0,105-TUR
+105,WD,105-T-WD-030,Grădina publică,0,105-TUR
+105,WD,105-T-WD-031,Grădina publică,0,105-TUR
+105,WD,105-T-WD-032,Grădina publică,0,105-TUR
+105,WD,105-T-WD-033,Grădina publică,0,105-TUR
+105,WD,105-T-WD-034,Grădina publică,0,105-TUR
+105,WD,105-T-WD-035,Grădina publică,0,105-TUR
+105,WD,105-T-WD-036,Grădina publică,0,105-TUR
+105,WD,105-T-WD-037,Grădina publică,0,105-TUR
+105,WD,105-T-WD-038,Grădina publică,0,105-TUR
+105,WD,105-T-WD-039,Grădina publică,0,105-TUR
+105,WD,105-T-WD-040,Grădina publică,0,105-TUR
+105,WD,105-T-WD-041,Grădina publică,0,105-TUR
+105,WD,105-T-WD-042,Grădina publică,0,105-TUR
+105,WE,105-T-WE-001,Grădina publică,0,105-TUR
+105,WE,105-T-WE-002,Grădina publică,0,105-TUR
+105,WE,105-T-WE-003,Grădina publică,0,105-TUR
+105,WE,105-T-WE-004,Grădina publică,0,105-TUR
+105,WE,105-T-WE-005,Grădina publică,0,105-TUR
+105,WE,105-T-WE-006,Grădina publică,0,105-TUR
+105,WE,105-T-WE-007,Grădina publică,0,105-TUR
+105,WE,105-T-WE-008,Grădina publică,0,105-TUR
+105,WE,105-T-WE-009,Grădina publică,0,105-TUR
+105,WE,105-T-WE-010,Grădina publică,0,105-TUR
+105,WE,105-T-WE-011,Grădina publică,0,105-TUR
+105,WE,105-T-WE-012,Grădina publică,0,105-TUR
+105,WE,105-T-WE-013,Grădina publică,0,105-TUR
+105,WE,105-T-WE-014,Grădina publică,0,105-TUR
+105,WE,105-T-WE-015,Grădina publică,0,105-TUR
+105,WE,105-T-WE-016,Grădina publică,0,105-TUR
+105,WE,105-T-WE-017,Grădina publică,0,105-TUR
+105,WE,105-T-WE-018,Grădina publică,0,105-TUR
+105,WE,105-T-WE-019,Grădina publică,0,105-TUR
+105,WE,105-T-WE-020,Grădina publică,0,105-TUR
+105,WE,105-T-WE-021,Grădina publică,0,105-TUR
+105,WE,105-T-WE-022,Grădina publică,0,105-TUR
+105,WE,105-T-WE-023,Grădina publică,0,105-TUR
+105,WE,105-T-WE-024,Grădina publică,0,105-TUR
+105,WE,105-T-WE-025,Grădina publică,0,105-TUR
+105,WE,105-T-WE-026,Grădina publică,0,105-TUR
+105,WE,105-T-WE-027,Grădina publică,0,105-TUR
 105,WD,105-R-WD-001,Micro 19,1,105-RETUR
 105,WD,105-R-WD-002,Micro 19,1,105-RETUR
 105,WD,105-R-WD-003,Micro 19,1,105-RETUR
@@ -685,52 +685,52 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 43,WE,43-T-WE-021,Piața Energiei,0,43-TUR
 43,WE,43-T-WE-022,Piața Energiei,0,43-TUR
 43,WE,43-T-WE-023,Piața Energiei,0,43-TUR
-43,WD,43-R-WD-001,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-002,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-003,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-004,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-005,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-006,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-007,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-008,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-009,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-010,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-011,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-012,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-013,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-014,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-015,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-016,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-017,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-018,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-019,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-020,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-021,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-022,Căminele Combinatului,1,43-RETUR
-43,WD,43-R-WD-023,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-001,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-002,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-003,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-004,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-005,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-006,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-007,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-008,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-009,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-010,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-011,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-012,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-013,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-014,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-015,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-016,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-017,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-018,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-019,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-020,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-021,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-022,Căminele Combinatului,1,43-RETUR
-43,WE,43-R-WE-023,Căminele Combinatului,1,43-RETUR
+43,WD,43-R-WD-001,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-002,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-003,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-004,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-005,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-006,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-007,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-008,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-009,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-010,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-011,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-012,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-013,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-014,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-015,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-016,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-017,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-018,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-019,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-020,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-021,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-022,Căminele combinatului,1,43-RETUR
+43,WD,43-R-WD-023,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-001,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-002,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-003,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-004,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-005,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-006,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-007,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-008,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-009,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-010,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-011,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-012,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-013,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-014,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-015,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-016,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-017,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-018,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-019,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-020,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-021,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-022,Căminele combinatului,1,43-RETUR
+43,WE,43-R-WE-023,Căminele combinatului,1,43-RETUR
 41,WD,41-T-WD-001,Micro 19,0,41-TUR
 41,WD,41-T-WD-002,Micro 19,0,41-TUR
 41,WD,41-T-WD-003,Micro 19,0,41-TUR
@@ -1157,74 +1157,74 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 35,WE,35-T-WE-032,Metro,0,35-TUR
 35,WE,35-T-WE-033,Metro,0,35-TUR
 35,WE,35-T-WE-034,Metro,0,35-TUR
-35,WD,35-R-WD-001,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-002,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-003,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-004,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-005,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-006,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-007,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-008,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-009,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-010,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-011,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-012,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-013,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-014,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-015,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-016,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-017,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-018,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-019,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-020,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-021,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-022,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-023,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-024,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-025,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-026,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-027,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-028,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-029,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-030,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-031,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-032,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-033,Piața Centrală,1,35-RETUR
-35,WD,35-R-WD-034,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-001,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-002,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-003,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-004,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-005,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-006,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-007,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-008,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-009,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-010,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-011,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-012,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-013,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-014,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-015,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-016,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-017,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-018,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-019,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-020,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-021,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-022,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-023,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-024,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-025,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-026,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-027,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-028,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-029,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-030,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-031,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-032,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-033,Piața Centrală,1,35-RETUR
-35,WE,35-R-WE-034,Piața Centrală,1,35-RETUR
+35,WD,35-R-WD-001,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-002,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-003,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-004,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-005,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-006,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-007,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-008,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-009,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-010,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-011,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-012,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-013,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-014,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-015,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-016,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-017,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-018,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-019,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-020,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-021,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-022,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-023,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-024,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-025,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-026,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-027,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-028,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-029,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-030,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-031,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-032,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-033,Piața centrală,1,35-RETUR
+35,WD,35-R-WD-034,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-001,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-002,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-003,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-004,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-005,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-006,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-007,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-008,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-009,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-010,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-011,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-012,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-013,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-014,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-015,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-016,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-017,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-018,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-019,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-020,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-021,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-022,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-023,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-024,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-025,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-026,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-027,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-028,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-029,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-030,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-031,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-032,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-033,Piața centrală,1,35-RETUR
+35,WE,35-R-WE-034,Piața centrală,1,35-RETUR
 26,WD,26-T-WD-001,Gara C.F.R.,0,26-TUR
 26,WD,26-T-WD-002,Gara C.F.R.,0,26-TUR
 26,WD,26-T-WD-003,Gara C.F.R.,0,26-TUR
@@ -1640,6 +1640,120 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 28,WE,28-R-WE-055,Micro 19,1,28-RETUR
 28,WE,28-R-WE-056,Micro 19,1,28-RETUR
 28,WE,28-R-WE-057,Micro 19,1,28-RETUR
+24,WD,24-T-WD-001,Damen,0,24-TUR
+24,WD,24-T-WD-002,Damen,0,24-TUR
+24,WD,24-T-WD-003,Damen,0,24-TUR
+24,WD,24-T-WD-004,Damen,0,24-TUR
+24,WD,24-T-WD-005,Damen,0,24-TUR
+24,WD,24-T-WD-006,Damen,0,24-TUR
+24,WD,24-T-WD-007,Damen,0,24-TUR
+24,WD,24-T-WD-008,Damen,0,24-TUR
+24,WD,24-T-WD-009,Damen,0,24-TUR
+24,WD,24-T-WD-010,Damen,0,24-TUR
+24,WD,24-T-WD-011,Damen,0,24-TUR
+24,WD,24-T-WD-012,Damen,0,24-TUR
+24,WD,24-T-WD-013,Damen,0,24-TUR
+24,WD,24-T-WD-014,Damen,0,24-TUR
+24,WD,24-T-WD-015,Damen,0,24-TUR
+24,WD,24-T-WD-016,Damen,0,24-TUR
+24,WD,24-T-WD-017,Damen,0,24-TUR
+24,WD,24-T-WD-018,Damen,0,24-TUR
+24,WD,24-T-WD-019,Damen,0,24-TUR
+24,WD,24-T-WD-020,Damen,0,24-TUR
+24,WD,24-T-WD-021,Damen,0,24-TUR
+24,WD,24-T-WD-022,Damen,0,24-TUR
+24,WD,24-T-WD-023,Damen,0,24-TUR
+24,WD,24-T-WD-024,Damen,0,24-TUR
+24,WD,24-T-WD-025,Damen,0,24-TUR
+24,WD,24-T-WD-026,Damen,0,24-TUR
+24,WD,24-T-WD-027,Damen,0,24-TUR
+24,WD,24-T-WD-028,Damen,0,24-TUR
+24,WD,24-T-WD-029,Damen,0,24-TUR
+24,WD,24-T-WD-030,Damen,0,24-TUR
+24,WD,24-T-WD-031,Damen,0,24-TUR
+24,WD,24-T-WD-032,Damen,0,24-TUR
+24,WD,24-T-WD-033,Damen,0,24-TUR
+24,WD,24-T-WD-034,Damen,0,24-TUR
+24,WD,24-T-WD-035,Damen,0,24-TUR
+24,WE,24-T-WE-001,Damen,0,24-TUR
+24,WE,24-T-WE-002,Damen,0,24-TUR
+24,WE,24-T-WE-003,Damen,0,24-TUR
+24,WE,24-T-WE-004,Damen,0,24-TUR
+24,WE,24-T-WE-005,Damen,0,24-TUR
+24,WE,24-T-WE-006,Damen,0,24-TUR
+24,WE,24-T-WE-007,Damen,0,24-TUR
+24,WE,24-T-WE-008,Damen,0,24-TUR
+24,WE,24-T-WE-009,Damen,0,24-TUR
+24,WE,24-T-WE-010,Damen,0,24-TUR
+24,WE,24-T-WE-011,Damen,0,24-TUR
+24,WE,24-T-WE-012,Damen,0,24-TUR
+24,WE,24-T-WE-013,Damen,0,24-TUR
+24,WE,24-T-WE-014,Damen,0,24-TUR
+24,WE,24-T-WE-015,Damen,0,24-TUR
+24,WE,24-T-WE-016,Damen,0,24-TUR
+24,WE,24-T-WE-017,Damen,0,24-TUR
+24,WE,24-T-WE-018,Damen,0,24-TUR
+24,WE,24-T-WE-019,Damen,0,24-TUR
+24,WE,24-T-WE-020,Damen,0,24-TUR
+24,WE,24-T-WE-021,Damen,0,24-TUR
+24,WE,24-T-WE-022,Damen,0,24-TUR
+24,WD,24-R-WD-001,Shopping City,1,24-RETUR
+24,WD,24-R-WD-002,Shopping City,1,24-RETUR
+24,WD,24-R-WD-003,Shopping City,1,24-RETUR
+24,WD,24-R-WD-004,Shopping City,1,24-RETUR
+24,WD,24-R-WD-005,Shopping City,1,24-RETUR
+24,WD,24-R-WD-006,Shopping City,1,24-RETUR
+24,WD,24-R-WD-007,Shopping City,1,24-RETUR
+24,WD,24-R-WD-008,Shopping City,1,24-RETUR
+24,WD,24-R-WD-009,Shopping City,1,24-RETUR
+24,WD,24-R-WD-010,Shopping City,1,24-RETUR
+24,WD,24-R-WD-011,Shopping City,1,24-RETUR
+24,WD,24-R-WD-012,Shopping City,1,24-RETUR
+24,WD,24-R-WD-013,Shopping City,1,24-RETUR
+24,WD,24-R-WD-014,Shopping City,1,24-RETUR
+24,WD,24-R-WD-015,Shopping City,1,24-RETUR
+24,WD,24-R-WD-016,Shopping City,1,24-RETUR
+24,WD,24-R-WD-017,Shopping City,1,24-RETUR
+24,WD,24-R-WD-018,Shopping City,1,24-RETUR
+24,WD,24-R-WD-019,Shopping City,1,24-RETUR
+24,WD,24-R-WD-020,Shopping City,1,24-RETUR
+24,WD,24-R-WD-021,Shopping City,1,24-RETUR
+24,WD,24-R-WD-022,Shopping City,1,24-RETUR
+24,WD,24-R-WD-023,Shopping City,1,24-RETUR
+24,WD,24-R-WD-024,Shopping City,1,24-RETUR
+24,WD,24-R-WD-025,Shopping City,1,24-RETUR
+24,WD,24-R-WD-026,Shopping City,1,24-RETUR
+24,WD,24-R-WD-027,Shopping City,1,24-RETUR
+24,WD,24-R-WD-028,Shopping City,1,24-RETUR
+24,WD,24-R-WD-029,Shopping City,1,24-RETUR
+24,WD,24-R-WD-030,Shopping City,1,24-RETUR
+24,WD,24-R-WD-031,Shopping City,1,24-RETUR
+24,WD,24-R-WD-032,Shopping City,1,24-RETUR
+24,WD,24-R-WD-033,Shopping City,1,24-RETUR
+24,WD,24-R-WD-034,Shopping City,1,24-RETUR
+24,WD,24-R-WD-035,Shopping City,1,24-RETUR
+24,WE,24-R-WE-001,Shopping City,1,24-RETUR
+24,WE,24-R-WE-002,Shopping City,1,24-RETUR
+24,WE,24-R-WE-003,Shopping City,1,24-RETUR
+24,WE,24-R-WE-004,Shopping City,1,24-RETUR
+24,WE,24-R-WE-005,Shopping City,1,24-RETUR
+24,WE,24-R-WE-006,Shopping City,1,24-RETUR
+24,WE,24-R-WE-007,Shopping City,1,24-RETUR
+24,WE,24-R-WE-008,Shopping City,1,24-RETUR
+24,WE,24-R-WE-009,Shopping City,1,24-RETUR
+24,WE,24-R-WE-010,Shopping City,1,24-RETUR
+24,WE,24-R-WE-011,Shopping City,1,24-RETUR
+24,WE,24-R-WE-012,Shopping City,1,24-RETUR
+24,WE,24-R-WE-013,Shopping City,1,24-RETUR
+24,WE,24-R-WE-014,Shopping City,1,24-RETUR
+24,WE,24-R-WE-015,Shopping City,1,24-RETUR
+24,WE,24-R-WE-016,Shopping City,1,24-RETUR
+24,WE,24-R-WE-017,Shopping City,1,24-RETUR
+24,WE,24-R-WE-018,Shopping City,1,24-RETUR
+24,WE,24-R-WE-019,Shopping City,1,24-RETUR
+24,WE,24-R-WE-020,Shopping City,1,24-RETUR
+24,WE,24-R-WE-021,Shopping City,1,24-RETUR
+24,WE,24-R-WE-022,Shopping City,1,24-RETUR
 9,WD,9-T-WD-001,Gara C.F.R.,0,9-TUR
 9,WD,9-T-WD-002,Gara C.F.R.,0,9-TUR
 9,WD,9-T-WD-003,Gara C.F.R.,0,9-TUR
@@ -2222,64 +2336,64 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 33,WE,33-T-WE-027,Plaja Dunărea,0,33-TUR
 33,WE,33-T-WE-028,Plaja Dunărea,0,33-TUR
 33,WE,33-T-WE-029,Plaja Dunărea,0,33-TUR
-33,TF,33-R-TF-001,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-002,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-003,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-004,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-005,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-006,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-007,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-008,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-009,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-010,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-011,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-012,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-013,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-014,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-015,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-016,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-017,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-018,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-019,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-020,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-021,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-022,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-023,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-024,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-025,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-026,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-027,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-028,Țiglina II,1,33-RETUR
-33,TF,33-R-TF-029,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-001,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-002,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-003,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-004,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-005,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-006,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-007,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-008,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-009,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-010,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-011,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-012,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-013,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-014,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-015,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-016,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-017,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-018,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-019,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-020,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-021,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-022,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-023,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-024,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-025,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-026,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-027,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-028,Țiglina II,1,33-RETUR
-33,WE,33-R-WE-029,Țiglina II,1,33-RETUR
+33,TF,33-R-TF-001,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-002,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-003,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-004,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-005,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-006,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-007,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-008,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-009,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-010,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-011,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-012,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-013,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-014,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-015,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-016,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-017,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-018,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-019,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-020,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-021,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-022,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-023,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-024,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-025,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-026,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-027,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-028,Țiglina 2,1,33-RETUR
+33,TF,33-R-TF-029,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-001,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-002,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-003,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-004,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-005,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-006,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-007,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-008,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-009,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-010,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-011,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-012,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-013,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-014,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-015,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-016,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-017,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-018,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-019,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-020,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-021,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-022,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-023,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-024,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-025,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-026,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-027,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-028,Țiglina 2,1,33-RETUR
+33,WE,33-R-WE-029,Țiglina 2,1,33-RETUR
 34,WD,34-T-WD-001,Intfor,0,34-TUR
 34,WD,34-T-WD-002,Intfor,0,34-TUR
 34,WD,34-T-WD-003,Intfor,0,34-TUR
@@ -2392,117 +2506,3 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 30,WD,30-R-WD-006,Micro 19,1,30-RETUR
 30,WD,30-R-WD-007,Micro 19,1,30-RETUR
 30,WD,30-R-WD-008,Micro 19,1,30-RETUR
-24,WD,24-T-WD-001,Damen,0,24-TUR
-24,WD,24-T-WD-002,Damen,0,24-TUR
-24,WD,24-T-WD-003,Damen,0,24-TUR
-24,WD,24-T-WD-004,Damen,0,24-TUR
-24,WD,24-T-WD-005,Damen,0,24-TUR
-24,WD,24-T-WD-006,Damen,0,24-TUR
-24,WD,24-T-WD-007,Damen,0,24-TUR
-24,WD,24-T-WD-008,Damen,0,24-TUR
-24,WD,24-T-WD-009,Damen,0,24-TUR
-24,WD,24-T-WD-010,Damen,0,24-TUR
-24,WD,24-T-WD-011,Damen,0,24-TUR
-24,WD,24-T-WD-012,Damen,0,24-TUR
-24,WD,24-T-WD-013,Damen,0,24-TUR
-24,WD,24-T-WD-014,Damen,0,24-TUR
-24,WD,24-T-WD-015,Damen,0,24-TUR
-24,WD,24-T-WD-016,Damen,0,24-TUR
-24,WD,24-T-WD-017,Damen,0,24-TUR
-24,WD,24-T-WD-018,Damen,0,24-TUR
-24,WD,24-T-WD-019,Damen,0,24-TUR
-24,WD,24-T-WD-020,Damen,0,24-TUR
-24,WD,24-T-WD-021,Damen,0,24-TUR
-24,WD,24-T-WD-022,Damen,0,24-TUR
-24,WD,24-T-WD-023,Damen,0,24-TUR
-24,WD,24-T-WD-024,Damen,0,24-TUR
-24,WD,24-T-WD-025,Damen,0,24-TUR
-24,WD,24-T-WD-026,Damen,0,24-TUR
-24,WD,24-T-WD-027,Damen,0,24-TUR
-24,WD,24-T-WD-028,Damen,0,24-TUR
-24,WD,24-T-WD-029,Damen,0,24-TUR
-24,WD,24-T-WD-030,Damen,0,24-TUR
-24,WD,24-T-WD-031,Damen,0,24-TUR
-24,WD,24-T-WD-032,Damen,0,24-TUR
-24,WD,24-T-WD-033,Damen,0,24-TUR
-24,WD,24-T-WD-034,Damen,0,24-TUR
-24,WD,24-T-WD-035,Damen,0,24-TUR
-24,WE,24-T-WE-001,Damen,0,24-TUR
-24,WE,24-T-WE-002,Damen,0,24-TUR
-24,WE,24-T-WE-003,Damen,0,24-TUR
-24,WE,24-T-WE-004,Damen,0,24-TUR
-24,WE,24-T-WE-005,Damen,0,24-TUR
-24,WE,24-T-WE-006,Damen,0,24-TUR
-24,WE,24-T-WE-007,Damen,0,24-TUR
-24,WE,24-T-WE-008,Damen,0,24-TUR
-24,WE,24-T-WE-009,Damen,0,24-TUR
-24,WE,24-T-WE-010,Damen,0,24-TUR
-24,WE,24-T-WE-011,Damen,0,24-TUR
-24,WE,24-T-WE-012,Damen,0,24-TUR
-24,WE,24-T-WE-013,Damen,0,24-TUR
-24,WE,24-T-WE-014,Damen,0,24-TUR
-24,WE,24-T-WE-015,Damen,0,24-TUR
-24,WE,24-T-WE-016,Damen,0,24-TUR
-24,WE,24-T-WE-017,Damen,0,24-TUR
-24,WE,24-T-WE-018,Damen,0,24-TUR
-24,WE,24-T-WE-019,Damen,0,24-TUR
-24,WE,24-T-WE-020,Damen,0,24-TUR
-24,WE,24-T-WE-021,Damen,0,24-TUR
-24,WE,24-T-WE-022,Damen,0,24-TUR
-24,WD,24-R-WD-001,Shopping City,1,24-RETUR
-24,WD,24-R-WD-002,Shopping City,1,24-RETUR
-24,WD,24-R-WD-003,Shopping City,1,24-RETUR
-24,WD,24-R-WD-004,Shopping City,1,24-RETUR
-24,WD,24-R-WD-005,Shopping City,1,24-RETUR
-24,WD,24-R-WD-006,Shopping City,1,24-RETUR
-24,WD,24-R-WD-007,Shopping City,1,24-RETUR
-24,WD,24-R-WD-008,Shopping City,1,24-RETUR
-24,WD,24-R-WD-009,Shopping City,1,24-RETUR
-24,WD,24-R-WD-010,Shopping City,1,24-RETUR
-24,WD,24-R-WD-011,Shopping City,1,24-RETUR
-24,WD,24-R-WD-012,Shopping City,1,24-RETUR
-24,WD,24-R-WD-013,Shopping City,1,24-RETUR
-24,WD,24-R-WD-014,Shopping City,1,24-RETUR
-24,WD,24-R-WD-015,Shopping City,1,24-RETUR
-24,WD,24-R-WD-016,Shopping City,1,24-RETUR
-24,WD,24-R-WD-017,Shopping City,1,24-RETUR
-24,WD,24-R-WD-018,Shopping City,1,24-RETUR
-24,WD,24-R-WD-019,Shopping City,1,24-RETUR
-24,WD,24-R-WD-020,Shopping City,1,24-RETUR
-24,WD,24-R-WD-021,Shopping City,1,24-RETUR
-24,WD,24-R-WD-022,Shopping City,1,24-RETUR
-24,WD,24-R-WD-023,Shopping City,1,24-RETUR
-24,WD,24-R-WD-024,Shopping City,1,24-RETUR
-24,WD,24-R-WD-025,Shopping City,1,24-RETUR
-24,WD,24-R-WD-026,Shopping City,1,24-RETUR
-24,WD,24-R-WD-027,Shopping City,1,24-RETUR
-24,WD,24-R-WD-028,Shopping City,1,24-RETUR
-24,WD,24-R-WD-029,Shopping City,1,24-RETUR
-24,WD,24-R-WD-030,Shopping City,1,24-RETUR
-24,WD,24-R-WD-031,Shopping City,1,24-RETUR
-24,WD,24-R-WD-032,Shopping City,1,24-RETUR
-24,WD,24-R-WD-033,Shopping City,1,24-RETUR
-24,WD,24-R-WD-034,Shopping City,1,24-RETUR
-24,WD,24-R-WD-035,Shopping City,1,24-RETUR
-24,WE,24-R-WE-001,Shopping City,1,24-RETUR
-24,WE,24-R-WE-002,Shopping City,1,24-RETUR
-24,WE,24-R-WE-003,Shopping City,1,24-RETUR
-24,WE,24-R-WE-004,Shopping City,1,24-RETUR
-24,WE,24-R-WE-005,Shopping City,1,24-RETUR
-24,WE,24-R-WE-006,Shopping City,1,24-RETUR
-24,WE,24-R-WE-007,Shopping City,1,24-RETUR
-24,WE,24-R-WE-008,Shopping City,1,24-RETUR
-24,WE,24-R-WE-009,Shopping City,1,24-RETUR
-24,WE,24-R-WE-010,Shopping City,1,24-RETUR
-24,WE,24-R-WE-011,Shopping City,1,24-RETUR
-24,WE,24-R-WE-012,Shopping City,1,24-RETUR
-24,WE,24-R-WE-013,Shopping City,1,24-RETUR
-24,WE,24-R-WE-014,Shopping City,1,24-RETUR
-24,WE,24-R-WE-015,Shopping City,1,24-RETUR
-24,WE,24-R-WE-016,Shopping City,1,24-RETUR
-24,WE,24-R-WE-017,Shopping City,1,24-RETUR
-24,WE,24-R-WE-018,Shopping City,1,24-RETUR
-24,WE,24-R-WE-019,Shopping City,1,24-RETUR
-24,WE,24-R-WE-020,Shopping City,1,24-RETUR
-24,WE,24-R-WE-021,Shopping City,1,24-RETUR
-24,WE,24-R-WE-022,Shopping City,1,24-RETUR

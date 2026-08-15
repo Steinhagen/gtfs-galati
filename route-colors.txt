@@ -1,11 +1,17 @@
 106,#400244,autobuz,urban
 105,#fb483a,autobuz,urban
+# 43, 33 and 32 were missing from this list; the colours below are placeholders
+# carried over from the generator, not official Transurb colours -- replace
+# them if you have the real ones.
+43,#aa00ff,autobuz,urban
 41,#4054c7,autobuz,urban
 40,#ff9d16,autobuz,urban
 38,#c350e9,autobuz,urban
 37,#f5996a,autobuz,urban
 35,#89b1f5,autobuz,urban
 34,#f1eb2c,autobuz,urban
+33,#006064,autobuz,urban
+32,#039be5,autobuz,urban
 31,#a94023,autobuz,urban
 30,#303030,autobuz,urban
 28,#3ad1fb,autobuz,urban
