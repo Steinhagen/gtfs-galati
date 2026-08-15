@@ -43,7 +43,8 @@ FIXME
 The Transurb site lists 30 routes; 18 are in the feed. What the other 12 need:
 
   route  site stops (TUR/RETUR)  OSM
-     11             43 / 36      r10177466 / r10179043, only 22 / 15 platforms
+     11             22 / 15      r10177466 / r10179043 match this exactly, but
+                                 see the weekend itinerary below
      15              8 / 11      r10181002 / r10181003, only 8 / 8 platforms
      20             14 / 16      r10278231 / r10278230, only 15 / 11 platforms
      23             14 / 16      r395899 is a stub: no name, 1 platform, 126 ways
@@ -58,6 +59,27 @@ The Transurb site lists 30 routes; 18 are in the feed. What the other 12 need:
 
 Add a route to ROUTES once its relations list every platform, in travel order;
 the build fails with a count mismatch until then.
+
+Route 11 needs more than that. Its page carries two station lists
+("variantaStatii"): the standard one, Micro 13 - Piața Centrală, which the two
+OSM relations already match stop for stop, and a second one, "Sâmbătă, duminică
+și sărbători legale către Grădina Publică" (21/21 stations), which follows the
+same path as far as Parfumul Teilor and then ends at Grădina Publică instead of
+Piața Centrală. The site's own weekend column does not separate the two: of the
+70 weekend departures from Micro 13, the 34 from 14:05 on are exactly the ones
+the second variant lists, yet the standard page still shows all 70 as calling
+at Piața Centrală (70 arrivals there plus 34 at Grădina Publică for 70
+departures). So the afternoon weekend runs are listed twice, once per
+itinerary. Before route 11 can be built:
+
+- OSM needs a second pair of route relations for the Grădina Publică itinerary,
+  as further variants of the same route_master;
+- the generator needs to build a route's variants separately and assign the
+  weekend afternoon departures to the right one, instead of reading only
+  "variantaStatii=standard".
+
+Every other route on the site has a single station list, so nothing else is
+affected. Route 11's second itinerary is reported by the build.
 
 2. Route relations to fix in OSM
 
@@ -88,7 +110,6 @@ the build fails with a count mismatch until then.
 
 Same stop spelled two ways:
 
-- LIDL (n6894593246, n6896163910) vs Lidl (n6960963003, n6963443065)
 - Str. Aurel Vlaicu (n6963443072, n6960962995) vs Strada Aurel Vlaicu (n6894604128)
 - Str. Gheorghe Doja (n6960963007, n6963443061) vs Strada Gheorghe Doja (n6896006833)
 - Moruzzi (n6896966052, n6897791669) vs Str. Moruzzi (n14090438573, n14090438580)
@@ -97,7 +118,7 @@ Same stop spelled two ways:
 One name on stops that are far apart, with nothing to tell them apart (the site
 does distinguish them):
 
-- LIDL: 4 stops up to 3.1 km apart, Micro 19 vs Strada Nae Leonard
+- Lidl: 4 stops up to 3.1 km apart, Micro 19 vs Strada Nae Leonard
   (n6894593246, n6896163910, n6960963003, n6963443065)
 - Kaufland: 3 stops up to 3.2 km apart, Țiglina vs Patinoar/Micro 39
   (n6874360932, n6875283385, n6960962993)

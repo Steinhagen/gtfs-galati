@@ -194,20 +194,37 @@ def fetch_page(url: str, cache_file: Path, refresh: bool = False) -> str:
 # ---------------------------------------------------------------------------
 # Transurb website
 # ---------------------------------------------------------------------------
+STANDARD_VARIANT = "standard"
+
+
 def site_stations(route_id: str) -> dict[str, list[str]]:
     """Station names per direction, in travel order, from the route page.
 
     These are the names the timetable pages are keyed on, so they are read
     from the site rather than written down here.
+
+    A route page can carry more than one station list ("variantaStatii"): route
+    11 has a separate weekend/holiday itinerary. Only the standard one is
+    returned; the others are reported, since each is a distinct itinerary that
+    needs its own OSM route relations before it can be in the feed.
     """
     html_text = fetch_page(f"{BASE_URL}/veziTraseu?numarTraseu={route_id}",
                            CACHE_DIR / f"traseu_{route_id}.html", REFRESH)
-    stations: dict[str, list[str]] = {"TUR": [], "RETUR": []}
-    for m in re.finditer(r"numeStatie=([^\"&']+)&[^\"']*?turRetur=(tur|retur)",
-                         html_text):
-        station = urllib.parse.unquote_plus(html.unescape(m.group(1)))
-        stations[m.group(2).upper()].append(station)
-    return stations
+    variants: dict[str, dict[str, list[str]]] = {}
+    for m in re.finditer(r"veziProgram\?([^\"']+)", html_text):
+        q = urllib.parse.parse_qs(html.unescape(m.group(1)))
+        if "numeStatie" not in q or "turRetur" not in q:
+            continue
+        variant = q.get("variantaStatii", [STANDARD_VARIANT])[0]
+        seq = variants.setdefault(variant, {"TUR": [], "RETUR": []})
+        seq[q["turRetur"][0].upper()].append(q["numeStatie"][0])
+    for name, seq in variants.items():
+        if name != STANDARD_VARIANT:
+            issue("warning", f"route {route_id}",
+                  f"the route page lists a second itinerary, {name!r} "
+                  f"({len(seq['TUR'])} / {len(seq['RETUR'])} stations); it needs "
+                  f"its own OSM route relations and is not in the feed")
+    return variants.get(STANDARD_VARIANT, {"TUR": [], "RETUR": []})
 
 
 def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str], list[str]]:
