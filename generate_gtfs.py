@@ -260,6 +260,24 @@ OVERPASS_ENDPOINTS = [
 
 PLATFORM_ROLES = ("platform", "platform_entry_only", "platform_exit_only")
 
+# Keys that record a second spelling of the same stop, read alongside `name`:
+# short_name for an abbreviated form ('Bld. Dunărea' for 'Bulevardul Dunărea'),
+# alt_name for a genuinely different name, official_name for the operator's
+# form, loc_name for a colloquial one. A stop tagged with the spelling the
+# Transurb page uses is not reported as a name mismatch, so the knowledge lives
+# in OSM instead of in a lookup table here.
+ALT_NAME_KEYS = ("short_name", "alt_name", "official_name", "loc_name")
+
+# Bumped when a cached relation payload gains a field, so that caches written
+# by an older build are refetched instead of silently missing it.
+RELATION_SCHEMA = 2
+
+
+def alt_names(tags: dict) -> list[str]:
+    """The stop's alternative spellings, semicolon-separated values split out."""
+    return [v.strip() for key in ALT_NAME_KEYS
+            for v in (tags.get(key) or "").split(";") if v.strip()]
+
 
 def osm_api_relation(rel_id: int) -> dict:
     """Relation tags, ordered platforms and way geometry from the OSM API.
@@ -289,11 +307,13 @@ def osm_api_relation(rel_id: int) -> dict:
         if role in PLATFORM_ROLES:
             if typ != "node":
                 data["platforms"].append({"node": ref, "type": typ,
-                                          "name": None, "lat": None, "lon": None})
+                                          "name": None, "alt_names": [],
+                                          "lat": None, "lon": None})
                 continue
             n = nodes.get(ref, {})
             data["platforms"].append({"node": ref, "type": "node",
                                       "name": n.get("tags", {}).get("name"),
+                                      "alt_names": alt_names(n.get("tags", {})),
                                       "lat": n.get("lat"), "lon": n.get("lon")})
         elif typ == "way" and not role:
             geom = [[nodes[n]["lat"], nodes[n]["lon"]] for n in ways.get(ref, [])
@@ -333,6 +353,7 @@ def overpass_relation(rel_id: int) -> dict:
             data["platforms"].append({
                 "node": m["ref"], "type": m["type"],
                 "name": node_tags.get(m["ref"], {}).get("name"),
+                "alt_names": alt_names(node_tags.get(m["ref"], {})),
                 "lat": m.get("lat"), "lon": m.get("lon")})
         elif m["type"] == "way" and not role and m.get("geometry"):
             geom = [[p["lat"], p["lon"]] for p in m["geometry"] if p]
@@ -345,12 +366,15 @@ def relation_data(rel_id: int) -> dict:
     """Cached relation payload: tags, ordered platforms, way geometry."""
     cache = CACHE_DIR / f"relation_{rel_id}.json"
     if cache.exists() and not REFRESH:
-        return json.loads(cache.read_text(encoding="utf-8"))
+        cached = json.loads(cache.read_text(encoding="utf-8"))
+        if cached.get("schema") == RELATION_SCHEMA:
+            return cached
     try:
         data = osm_api_relation(rel_id)
     except Exception as e:
         print(f"  osm api failed for relation {rel_id} ({e}); trying Overpass")
         data = overpass_relation(rel_id)
+    data["schema"] = RELATION_SCHEMA
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     return data
@@ -386,15 +410,25 @@ def normalize_stop_name(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", ascii_name).strip()
 
 
-def names_agree(site_name: str, osm_name: str) -> bool:
-    """True when the two names plainly denote the same stop."""
-    a, b = normalize_stop_name(site_name), normalize_stop_name(osm_name)
-    if not a or not b:
+def names_agree(site_name: str, osm_name: str, osm_alt: list[str] = ()) -> bool:
+    """True when the OSM name, or any spelling recorded next to it, matches.
+
+    A stop tagged `short_name`/`alt_name`/`official_name`/`loc_name` with the
+    form the Transurb page prints counts as agreement: the two sources then do
+    know each other's name, they just print different ones.
+    """
+    a = normalize_stop_name(site_name)
+    if not a:
         return False
-    if a == b or a in b or b in a:
-        return True
-    wa, wb = set(a.split()), set(b.split())
-    return bool(wa & wb)
+    for candidate in (osm_name, *osm_alt):
+        b = normalize_stop_name(candidate or "")
+        if not b:
+            continue
+        if a == b or a in b or b in a:
+            return True
+        if set(a.split()) & set(b.split()):
+            return True
+    return False
 
 
 def direction_stops(route_id: str, direction: str, rel_id: int,
@@ -427,11 +461,14 @@ def direction_stops(route_id: str, direction: str, rel_id: int,
             raise RouteDataError(
                 f"relation {rel_id}: platform node {p['node']} (station "
                 f"{station!r}) has no name tag")
-        if not names_agree(station, p["name"]):
+        if not names_agree(station, p["name"], p.get("alt_names", [])):
             issue("warning", f"route {route_id} {direction}",
                   f"stop name differs from the Transurb page: OSM "
-                  f"{p['name']!r} (n{p['node']}) vs site {station!r}")
+                  f"{p['name']!r} (n{p['node']}) vs site {station!r}; no "
+                  f"{'/'.join(ALT_NAME_KEYS[:2])} on the node records the "
+                  f"site's spelling")
         stops.append({"id": stop_id(p["name"], p["node"]), "name": p["name"],
+                      "alt_names": p.get("alt_names", []),
                       "lat": p["lat"], "lon": p["lon"],
                       "node": p["node"], "station": station})
     return stops
@@ -468,7 +505,7 @@ def route_metadata(route_id: str, rel_data: dict[str, dict],
                   f"relation {data['id']} has no 'to' tag; the headsign falls "
                   f"back to the last stop, {last!r}")
             to = last
-        elif not names_agree(to, last):
+        elif not names_agree(to, last, stops[d][-1].get("alt_names", [])):
             issue("warning", f"route {route_id} {d}",
                   f"relation {data['id']} 'to' is {to!r} but the last stop is "
                   f"{last!r}")
@@ -478,7 +515,7 @@ def route_metadata(route_id: str, rel_data: dict[str, dict],
             issue("warning", f"route {route_id} {d}",
                   f"relation {data['id']} has no 'from' tag; the long name "
                   f"falls back to the first stop, {first!r}")
-        elif not names_agree(frm, first):
+        elif not names_agree(frm, first, stops[d][0].get("alt_names", [])):
             issue("warning", f"route {route_id} {d}",
                   f"relation {data['id']} 'from' is {frm!r} but the first stop "
                   f"is {first!r}")

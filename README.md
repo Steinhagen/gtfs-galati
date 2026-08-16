@@ -29,9 +29,13 @@ not Monday-Friday).
 Every build cross-checks the two sources per direction: the relation and the
 route page must list the same number of stops, in the same order. A mismatch
 fails the build; missing or inconsistent OSM tagging is reported as a warning.
-Both are meant to be fixed in OSM, not worked around in the generator. The
-report is printed at the end of a build under "OSM issues to fix upstream", and
-everything it currently reports is listed below.
+When the two sources name a stop differently, a `short_name`, `alt_name`,
+`official_name` or `loc_name` on the platform that carries the site's spelling
+counts as agreement, so the second spelling belongs in OSM rather than in a
+lookup table here (item 5). Both are meant to be fixed in OSM, not worked
+around in the generator. The report is printed at the end of a build under
+"OSM issues to fix upstream", and everything it currently reports is listed
+below.
 
 Adding a route: add its relation ids to ROUTES and build it. If OSM is
 complete, nothing else is needed.
@@ -111,8 +115,8 @@ affected. Route 11's second itinerary is reported by the build.
 Same stop spelled two ways:
 
 - Str. Aurel Vlaicu (n6963443072, n6960962995) vs Strada Aurel Vlaicu (n6894604128)
-- Str. Gheorghe Doja (n6960963007, n6963443061) vs Strada Gheorghe Doja (n6896006833)
-- Moruzzi (n6896966052, n6897791669) vs Str. Moruzzi (n14090438573, n14090438580)
+- Str. Gheorghe Doja (n6963443061) vs Strada Gheorghe Doja (n6896006833,
+  n6960963007)
 - Radu Negru (n6879824358) vs Strada Radu Negru (n6895095244, n6896006856)
 
 One name on stops that are far apart, with nothing to tell them apart (the site
@@ -126,17 +130,14 @@ does distinguish them):
   (n6879824377, n6906785248, n6906838264)
 - Radu Negru: 3 stops up to 565 m apart, Strada Domnească vs Strada Traian
   (n6879824358, n6895095244, n6896006856)
-- Moruzzi: 4 stops up to 367 m apart, site: MORUZZI vs STR. ALEX. MORUZZI
-  (n6896966052, n6897791669, n14090438573, n14090438580)
 - Mașniță: 2 stops 312 m apart (n6894604132, n6896006839)
 - Strada Aurel Vlaicu: the site calls one of them
   "STR. AUREL VLAICU - (1 DECEMBRIE)" (n6894604128 vs n6960962995,
   n6963443072)
 
-Mixed street-name prefix: 26 stops use "Strada", 8 use "Str." (Aurel Vlaicu
+Mixed street-name prefix: 29 stops use "Strada", 5 use "Str." (Aurel Vlaicu
 n6960962995/n6963443072, Brăilei n14093112483/n14093112489, Gheorghe Doja
-n6960963007/n6963443061, Moruzzi n14090438573/n14090438580), 2 use
-"Bulevardul".
+n6963443061), 2 use "Bulevardul".
 
 Inconsistent capitalisation, against the title case used by most stops:
 Baia comunală (n6906785250, n6906838262), Cartierul nou (n6899023166,
@@ -150,11 +151,13 @@ and 105.
 
 4. Every stop the two sources name differently
 
-Of the 488 stop visits in the feed, 60 hit a stop whose OSM name differs from
-the name on the Transurb route page. Capitalisation and diacritics are ignored
-in this comparison, since the site prints station names in caps without
-diacritics; the site names below are written in normal orthography, the OSM
-names verbatim. Two stops named the same in OSM but differently by the site are
+Of the 488 stop visits in the feed, 58 pairs of names differ between OSM and
+the Transurb route page. Capitalisation and diacritics are ignored in this
+comparison, since the site prints station names in caps without diacritics; a
+spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
+counts as a match, so the two entries already tagged that way (item 5) are not
+listed. The site names below are written in normal orthography, the OSM names
+verbatim. Two stops named the same in OSM but differently by the site are
 listed at the end.
 
 Different wording — someone has to decide which name is right:
@@ -176,7 +179,6 @@ Different wording — someone has to decide which name is right:
   Școala 40 / Școala Nr. 40          Școala Nr. 40                    n6894593244
   Spital Municipal                   Spitalul Municipal               n6895570669, n6896006858
   Str. Ghe. Doja                     Str./Strada Gheorghe Doja        n6896006833, n6960963007, n6963443061
-  Str. Alex. Moruzzi                 Str. Moruzzi                     n14090438573, n14090438580
   Str. Aurel Vlaicu - (1 Decembrie)  Strada Aurel Vlaicu              n6894604128
   Str. M. Kogălniceanu               Strada Mihail Kogălniceanu       n6899023182
   Țiglina I / II / III               Țiglina 1 / 2 / 3                n529898235, n530776769, n1932184795, n1932184800
@@ -202,9 +204,9 @@ Street-name prefix only, the page abbreviating what OSM spells out (or the
 reverse for Gării):
 
   Str. Gării -> Gării (n534270437), Str. Radu Negru -> Radu Negru
-  (n6879824358), Bld. Dunărea -> Bulevardul Dunărea (n6896713532),
-  Bld. Galați -> Bulevardul Galați (n4907189684), Bld./Str. Oțelarilor ->
-  Strada Oțelarilor (n6896713528, n6897924685), and Str. -> Strada for
+  (n6879824358), Bld. Galați -> Bulevardul Galați (n4907189684),
+  Bld./Str. Oțelarilor -> Strada Oțelarilor (n6896713528, n6897924685), and
+  Str. -> Strada for
   9 Mai (n6894604130), Cezar (n6895095246, n6896006854), Crizantemelor
   (n6899129579), Dumbrava Roșie (n6899023168, n6899152592), Ionel Fernic
   (n6898532661), Lemnari (n6896966050, n6897791671), Oltului (n6878887889,
@@ -230,3 +232,45 @@ problem rather than an OSM one: Agenția C.F.R. / Agenția CFR, CEC Țiglina II 
 C.E.C. Țiglina II, Gara CFR / "Gara  CFR" (double space), Str. Gării /
 "Str.Gării", Str. Cezar / Cezar, F.S.E.A. / F.E.A.A. / F.E.E.A for the same
 stop.
+
+5. Record the second spelling of a stop instead of arguing about `name`
+
+Most of the differences in item 4 do not need `name` changed at all, they need
+the other spelling recorded alongside it. Three platforms carry `short_name`
+so far — Bulevardul Dunărea (n6896713532) and the two Strada Alexandru Moruzzi
+platforms (n14090438573, n14090438580) — and nothing in the network uses
+`alt_name`, `official_name` or `loc_name` yet.
+
+Which key to use, per the wiki:
+
+- `name` stays the spelled-out form. "If the name can be spelled without an
+  abbreviation, then don't abbreviate it" — a reader can shorten Bulevardul,
+  but "Bld." cannot be expanded reliably.
+- `short_name` for a shortened form of the same name, e.g.
+  `name=Bulevardul Dunărea` + `short_name=Bld. Dunărea`. This is the key for
+  every entry in item 4's "street-name prefix only" group, and it is indexed
+  by Nominatim, so both spellings become searchable.
+- `alt_name` for a genuinely different name for the same stop (Auchan / ATAC,
+  Delfinul / Centrul Delfinul, Galeriile de artă / Galeria de Artă). The wiki
+  says not to use it for abbreviations.
+- `official_name` if the operator's register is the authority for a form that
+  is not the common name, `loc_name` for a colloquial name people use but the
+  operator never prints.
+
+Two things to keep in mind:
+
+- None of these keys reach the feed: GTFS stops.txt has no field for an
+  alternative name (`stop_desc` is a description, `tts_stop_name` is for speech
+  synthesis), so the benefit is search in OSM-based apps, not the GTFS output.
+- The generator already reads them: a platform's `short_name`, `alt_name`,
+  `official_name` and `loc_name` (semicolon-separated values included) are
+  compared alongside `name`, so tagging the site's spelling in OSM makes the
+  corresponding entry in item 4 disappear by itself, with no lookup table here.
+  The same applies to the relation's `from`/`to` against the first and last
+  stop.
+- This does nothing for the ambiguous names (Lidl, Kaufland, Strada Vultur,
+  Radu Negru, Mașniță): there several distinct stops share one `name`,
+  which needs distinct names, not aliases. Moruzzi was such a case and is
+  fixed: the two platforms the site calls STR. ALEX. MORUZZI are now
+  `Strada Alexandru Moruzzi` (+ `short_name=Str. Alex. Moruzzi`), distinct from
+  the `Moruzzi` pair 350 m away.
