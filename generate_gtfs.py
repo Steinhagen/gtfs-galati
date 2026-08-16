@@ -81,6 +81,7 @@ ROUTES = {
            "service_days": "TF"},
     "34": {"relations": {"TUR": 10188176, "RETUR": 10188475}},
     "30": {"relations": {"TUR": 21226359, "RETUR": 21226358}},
+    "39": {"relations": {"TUR": 309018, "RETUR": 16337135}},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the
@@ -133,17 +134,20 @@ def text_color(background: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# OSM issue report: collected while building, printed at the end. "error" is
-# for anything that makes the feed wrong or incomplete -- the build then fails
-# so a bad feed is not published. "warning" is for tagging that is missing,
-# inconsistent or contradicts the Transurb website without breaking the feed.
-# Both are meant to be fixed in OSM, not worked around here.
+# Issue report: collected while building, printed at the end. "error" is for
+# anything that makes the feed wrong or incomplete -- the build then fails so a
+# bad feed is not published. "warning" is for data that is missing,
+# inconsistent or self-contradictory without breaking the feed.
+#
+# Issues are grouped by the source that has to fix them: "osm" for tagging that
+# belongs in OpenStreetMap, "site" for the Transurb website contradicting
+# itself. Neither is worked around here beyond what is unavoidable.
 # ---------------------------------------------------------------------------
-ISSUES: list[tuple[str, str, str]] = []  # (severity, subject, message)
+ISSUES: list[tuple[str, str, str, str]] = []  # (severity, subject, message, source)
 
 
-def issue(severity: str, subject: str, message: str) -> None:
-    ISSUES.append((severity, subject, message))
+def issue(severity: str, subject: str, message: str, source: str = "osm") -> None:
+    ISSUES.append((severity, subject, message, source))
     print(f"  {severity}: {subject}: {message}", flush=True)
 
 
@@ -643,6 +647,119 @@ def _minutes(hhmm: str) -> int:
     return int(h) * 60 + int(m)
 
 
+# ---------------------------------------------------------------------------
+# Doubled-offset phantom trips on the Transurb website
+#
+# A direction's timetable is regular: every trip runs the same time per leg, so
+# each station's column is the first station's column plus a fixed offset.
+# Route 39 is published with one column per direction that breaks this: it is
+# one of the day's departures with every cumulative offset counted twice, so it
+# shows up at every station except the first, as a trip with no departure of
+# its own that takes 58 minutes where the real one takes 29. That is a website
+# arithmetic error rather than a short working, and align_times would otherwise
+# fail on it, because a later station then holds more times than the first
+# station defines trips for.
+#
+# Such a column is dropped and reported. The test is strict on purpose: the
+# regular profile has to explain every other time in every column, and the
+# surplus times have to match the doubled profile to the minute, so a genuine
+# trip that starts mid-route is not silently discarded.
+# ---------------------------------------------------------------------------
+def _surplus(times: list[int], expected: list[int]) -> list[int] | None:
+    """times minus expected, or None when times does not contain all of it."""
+    left = list(times)
+    for t in expected:
+        if t not in left:
+            return None
+        left.remove(t)
+    return left
+
+
+def regular_profile(station_times: list[list[str]]
+                    ) -> tuple[list[int], list[list[int]]] | None:
+    """The cumulative offset per station, plus the times it cannot explain.
+
+    Returns None when no single offset per station lines its column up with the
+    first station's departures, i.e. when running times genuinely vary between
+    trips and this whole notion does not apply.
+    """
+    first = sorted(_minutes(t) for t in station_times[0])
+    if not first:
+        return None
+    offsets, surplus = [0], [[]]
+    for column in station_times[1:]:
+        times = sorted(_minutes(t) for t in column)
+        if len(times) < len(first):
+            return None  # a station with fewer times: trips skip it, not our case
+        found = None
+        # the offset is fixed by which of the column's first few times is the
+        # one belonging to the earliest departure
+        for head in times[:len(times) - len(first) + 1]:
+            offset = head - first[0]
+            if offset < offsets[-1]:
+                continue
+            extra = _surplus(times, [f + offset for f in first])
+            if extra is not None:
+                found = (offset, extra)
+                break
+        if found is None:
+            return None
+        offsets.append(found[0])
+        surplus.append(found[1])
+    return offsets, surplus
+
+
+def find_doubled_trip(station_times: list[list[str]]) -> list[int] | None:
+    """The times of a phantom trip whose legs are the real ones doubled.
+
+    Returns one time per station, in minutes, or None. A station's time can
+    coincide with a real trip's, in which case the site prints one entry for
+    both and that station has no surplus; the phantom is still identified.
+    """
+    profile = regular_profile(station_times)
+    if profile is None:
+        return None
+    offsets, surplus = profile
+    if not any(surplus) or any(len(s) > 1 for s in surplus):
+        return None
+    columns = [sorted(_minutes(t) for t in c) for c in station_times]
+    for start in columns[0]:
+        doubled = [start + 2 * o for o in offsets]
+        if all(s[0] == t if s else t in c
+               for s, t, c in zip(surplus[1:], doubled[1:], columns[1:])):
+            return doubled
+    return None
+
+
+def drop_doubled_trip(route_id: str, direction: str, service: str,
+                      station_times: list[list[str]]) -> list[list[str]]:
+    """station_times with a doubled-offset phantom trip removed, if present."""
+    doubled = find_doubled_trip(station_times)
+    if doubled is None:
+        return station_times
+
+    def hhmm(minutes: int) -> str:
+        return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+    real_end = doubled[0] + (doubled[-1] - doubled[0]) // 2
+    issue("warning", f"route {route_id} {direction} {service}",
+          f"the Transurb timetable lists a trip with every running time "
+          f"doubled: the {hhmm(doubled[0])} departure reaching the last stop "
+          f"at {hhmm(doubled[-1])} instead of {hhmm(real_end)}, with no "
+          f"departure of its own from the first stop; it is a website "
+          f"arithmetic error and is left out of the feed", source="site")
+    cleaned = [list(station_times[0])]
+    for column, t in zip(station_times[1:], doubled[1:]):
+        remaining = list(column)
+        drop = hhmm(t)
+        # only a surplus entry is removed; where the phantom's time coincides
+        # with a real trip's, the single printed entry belongs to the real one
+        if len(remaining) > len(station_times[0]) and drop in remaining:
+            remaining.remove(drop)
+        cleaned.append(remaining)
+    return cleaned
+
+
 def align_times(station_times: list[list[str]]) -> list[list[str | None]]:
     """Align each station's sorted times to the trips.
 
@@ -735,6 +852,8 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                              for i in range(1, len(seq) + 1)]
             if not station_times[0]:
                 continue  # no service in this period (e.g. weekday-only route)
+            station_times = drop_doubled_trip(route_id, direction, service,
+                                              station_times)
             rows = align_times(station_times)
             n = len(rows[0])
             skipped = sum(1 for k in range(1, len(rows))
@@ -954,13 +1073,17 @@ def write_feed(route_ids: list[str]) -> None:
     print(f"feed written to {OUT_DIR} and {ZIP_PATH}")
 
     errors = [i for i in ISSUES if i[0] == "error"]
-    warnings = [i for i in ISSUES if i[0] == "warning"]
-    if ISSUES:
-        print(f"\nOSM issues to fix upstream ({len(errors)} error(s), "
-              f"{len(warnings)} warning(s)):")
-        for severity, subject, message in ISSUES:
+    osm_issues = [i for i in ISSUES if i[3] == "osm"]
+    site_issues = [i for i in ISSUES if i[3] == "site"]
+    for label, group in (("OSM issues to fix upstream", osm_issues),
+                         ("Transurb website issues to report", site_issues)):
+        if not group:
+            continue
+        n_err = sum(1 for i in group if i[0] == "error")
+        print(f"\n{label} ({n_err} error(s), {len(group) - n_err} warning(s)):")
+        for severity, subject, message, _ in group:
             print(f"  [{severity}] {subject}: {message}")
-    else:
+    if not ISSUES:
         print("\nOSM data matches the Transurb website for every route.")
     if errors:
         sys.exit(f"\n{len(errors)} OSM error(s) make the feed incomplete or "

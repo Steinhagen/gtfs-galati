@@ -12,6 +12,7 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 35,transurb,35,Piața centrală - Metro,3,89B1F5,000000
 37,transurb,37,Levaditti - Trecere BAC,3,F5996A,000000
 38,transurb,38,Micro 19 - Cartier Locuințe Sociale M17 - Micro 19,3,C350E9,000000
+39,transurb,39,Micro 19 - Depou,0,8A99B8,000000
 41,transurb,41,Dimitrie Cantemir - Micro 19,3,4054C7,FFFFFF
 43,transurb,43,Căminele combinatului - Piața Energiei,3,AA00FF,FFFFFF
 102,transurb,102,Micro 19 - Bariera Traian,11,26D100,000000

@@ -33,9 +33,10 @@ When the two sources name a stop differently, a `short_name`, `alt_name`,
 `official_name` or `loc_name` on the platform that carries the site's spelling
 counts as agreement, so the second spelling belongs in OSM rather than in a
 lookup table here (item 5). Both are meant to be fixed in OSM, not worked
-around in the generator. The report is printed at the end of a build under
-"OSM issues to fix upstream", and everything it currently reports is listed
-below.
+around in the generator. The report is printed at the end of a build, split by
+who has to fix what: "OSM issues to fix upstream", and "Transurb website issues
+to report" for the site contradicting itself (item 6). Everything either
+currently reports is listed below.
 
 Adding a route: add its relation ids to ROUTES and build it. If OSM is
 complete, nothing else is needed.
@@ -44,7 +45,7 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 18 are in the feed. What the other 12 need:
+The Transurb site lists 30 routes; 19 are in the feed. What the other 11 need:
 
   route  site stops (TUR/RETUR)  OSM
      11             22 / 15      r10177466 / r10179043 match this exactly, but
@@ -55,7 +56,6 @@ The Transurb site lists 30 routes; 18 are in the feed. What the other 12 need:
       7             15 / 15      no relation (tram)
      13             11 / 11      no relation
      25             11 / 12      no relation
-     39             16 / 16      no relation (tram)
     39B              6 / 6       no relation (tram)
      44             11 / 11      no relation (tram)
      50             38 / 38      no relation (extraurban)
@@ -114,9 +114,10 @@ affected. Route 11's second itinerary is reported by the build.
 
 Same stop spelled two ways:
 
-- Str. Aurel Vlaicu (n6963443072, n6960962995) vs Strada Aurel Vlaicu (n6894604128)
 - Str. Gheorghe Doja (n6963443061) vs Strada Gheorghe Doja (n6896006833,
-  n6960963007)
+  n6960963007, and the tram platforms n14099815419, n14099845128)
+- Oțelarilor on the route 39 tram platforms (n14099815413, n14099845134) vs
+  Strada Oțelarilor on the bus platforms 20 m away (n6896713528, n6897924685)
 - Radu Negru (n6879824358) vs Strada Radu Negru (n6895095244, n6896006856)
 
 One name on stops that are far apart, with nothing to tell them apart (the site
@@ -130,14 +131,15 @@ does distinguish them):
   (n6879824377, n6906785248, n6906838264)
 - Radu Negru: 3 stops up to 565 m apart, Strada Domnească vs Strada Traian
   (n6879824358, n6895095244, n6896006856)
-- Mașniță: 2 stops 312 m apart (n6894604132, n6896006839)
+- Mașniță: 3 stops up to 316 m apart — the tram platform (n14099845125) and one
+  bus platform are together, the other bus platform (n6896006839) is the one
+  the site lists as a separate station on the routes that call there
+  (n6894604132, n6896006839, n14099845125)
 - Strada Aurel Vlaicu: the site calls one of them
   "STR. AUREL VLAICU - (1 DECEMBRIE)" (n6894604128 vs n6960962995,
   n6963443072)
-
-Mixed street-name prefix: 29 stops use "Strada", 5 use "Str." (Aurel Vlaicu
-n6960962995/n6963443072, Brăilei n14093112483/n14093112489, Gheorghe Doja
-n6963443061), 2 use "Bulevardul".
+Mixed street-name prefix: 31 stops use "Strada", 3 use "Str." (Brăilei
+n14093112483/n14093112489, Gheorghe Doja n6963443061), 2 use "Bulevardul".
 
 Inconsistent capitalisation, against the title case used by most stops:
 Baia comunală (n6906785250, n6906838262), Cartierul nou (n6899023166,
@@ -151,11 +153,11 @@ and 105.
 
 4. Every stop the two sources name differently
 
-Of the 488 stop visits in the feed, 58 pairs of names differ between OSM and
+Of the 520 stop visits in the feed, 66 pairs of names differ between OSM and
 the Transurb route page. Capitalisation and diacritics are ignored in this
 comparison, since the site prints station names in caps without diacritics; a
 spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
-counts as a match, so the two entries already tagged that way (item 5) are not
+counts as a match, so the entries already tagged that way (item 5) are not
 listed. The site names below are written in normal orthography, the OSM names
 verbatim. Two stops named the same in OSM but differently by the site are
 listed at the end.
@@ -178,7 +180,8 @@ Different wording — someone has to decide which name is right:
   Piața Țiglina I                    Piața Țiglina 1                  n6905457929, n6905457936
   Școala 40 / Școala Nr. 40          Școala Nr. 40                    n6894593244
   Spital Municipal                   Spitalul Municipal               n6895570669, n6896006858
-  Str. Ghe. Doja                     Str./Strada Gheorghe Doja        n6896006833, n6960963007, n6963443061
+  Stadion Oțelul                     Stadionul Oțelul                 n14099815418
+  Str. Ghe. Doja / Gheorghe Doja     Str./Strada Gheorghe Doja        n6896006833, n6960963007, n6963443061, n14099815419, n14099845128
   Str. Aurel Vlaicu - (1 Decembrie)  Strada Aurel Vlaicu              n6894604128
   Str. M. Kogălniceanu               Strada Mihail Kogălniceanu       n6899023182
   Țiglina I / II / III               Țiglina 1 / 2 / 3                n529898235, n530776769, n1932184795, n1932184800
@@ -187,6 +190,7 @@ Different wording — someone has to decide which name is right:
 OSM is more specific than the page (probably fine, listed for completeness):
 
   Albatros                           Bloc Albatros                    n614962899
+  Micro 19                           Micro 19 - Cinema Dacia          n14099815412, n14099845135
   Romtelecom                         Romtelecom - Bănci                n472614576
   Spitalul Județean                  Spitalul Județean de Urgență     n530187911
   Universitate                       Universitatea „Dunărea de Jos”   n530257449
@@ -197,6 +201,8 @@ The page is more specific than OSM:
   Centrul Delfinul                   Delfinul                         n14086946893
   Kaufland (Patinoar)                Kaufland                         n6960962993
   Carrefour-Shopping City            Shopping City                    n6960963010
+  Mașniță (M40)                      Mașniță                          n14099815422
+  Piața Micro 39                     Micro 39                         n14099675535
   Micro 19 (Sosire)                  Micro 19                         n123745651
     - not a naming problem: this is the loop's second call at Micro 19
 
@@ -205,14 +211,16 @@ reverse for Gării):
 
   Str. Gării -> Gării (n534270437), Str. Radu Negru -> Radu Negru
   (n6879824358), Bld. Galați -> Bulevardul Galați (n4907189684),
-  Bld./Str. Oțelarilor -> Strada Oțelarilor (n6896713528, n6897924685), and
+  Bld./Str. Oțelarilor -> Strada Oțelarilor (n6896713528, n6897924685) and
+  Oțelarilor on the route 39 tram platforms (n14099815413, n14099845134), and
   Str. -> Strada for
   9 Mai (n6894604130), Cezar (n6895095246, n6896006854), Crizantemelor
-  (n6899129579), Dumbrava Roșie (n6899023168, n6899152592), Ionel Fernic
-  (n6898532661), Lemnari (n6896966050, n6897791671), Oltului (n6878887889,
-  n6894593237), Prundului (n6895570670, n6896006860), Radu Negru (n6895095244,
-  n6896006856), Tecuci (n6899023180, n6899129581), Traian Vuia (n6898532659),
-  Vultur (n6879824377, n6906785248, n6906838264).
+  (n6899129579), Dumbrava Roșie (n6899023168, n6899152592), Frunzei
+  (n14099845132), Ionel Fernic (n6898532661), Lemnari (n6896966050,
+  n6897791671), Oltului (n6878887889, n6894593237), Prelungirea Brăilei
+  (n14099845131), Prundului (n6895570670, n6896006860), Radu Negru
+  (n6895095244, n6896006856), Tecuci (n6899023180, n6899129581), Traian Vuia
+  (n6898532659), Vultur (n6879824377, n6906785248, n6906838264).
 
 Punctuation and spacing only:
 
@@ -226,6 +234,9 @@ stops, so the feed shows the same name twice in one trip:
                 the page calls them UNIV. DANUBIUS and DANUBIUS
   route 38 TUR  Școala Nr. 40 (n6894593244, n6896163912), 70 m apart;
                 the page calls them SCOALA 40 and SCOALA NR. 40
+  route 28 TUR  Strada Aurel Vlaicu (n6894604128, n6963443072), 126 m apart;
+                the page calls them STR. AUREL VLAICU - (1 DECEMBRIE) and
+                STR. AUREL VLAICU
 
 The site is inconsistent with itself for a few stops, which is a website
 problem rather than an OSM one: Agenția C.F.R. / Agenția CFR, CEC Țiglina II /
@@ -236,10 +247,12 @@ stop.
 5. Record the second spelling of a stop instead of arguing about `name`
 
 Most of the differences in item 4 do not need `name` changed at all, they need
-the other spelling recorded alongside it. Three platforms carry `short_name`
-so far — Bulevardul Dunărea (n6896713532) and the two Strada Alexandru Moruzzi
-platforms (n14090438573, n14090438580) — and nothing in the network uses
-`alt_name`, `official_name` or `loc_name` yet.
+the other spelling recorded alongside it. Six platforms carry `short_name` so
+far — Bulevardul Dunărea (n6896713532), the two Strada Alexandru Moruzzi
+platforms (n14090438573, n14090438580), the two Strada Aurel Vlaicu platforms
+the site abbreviates (n6960962995, n6963443072) and one Strada Gheorghe Doja
+(n6960963007) — and nothing in the network uses `alt_name`, `official_name` or
+`loc_name` yet.
 
 Which key to use, per the wiki:
 
@@ -274,3 +287,44 @@ Two things to keep in mind:
   fixed: the two platforms the site calls STR. ALEX. MORUZZI are now
   `Strada Alexandru Moruzzi` (+ `short_name=Str. Alex. Moruzzi`), distinct from
   the `Moruzzi` pair 350 m away.
+
+6. Transurb website issues to report
+
+These are the site contradicting itself, so they belong in a mail to Transurb
+rather than in OSM. The build prints them separately, under "Transurb website
+issues to report".
+
+Route 39, both directions, weekday timetable: one departure is published twice,
+the second time with every running time doubled. Route 39 is otherwise perfectly
+regular — every trip takes the same time per leg, so each station's column is
+the first station's column plus a fixed offset (TUR 29 min end to end, RETUR
+30 min). The duplicate breaks that:
+
+  station              real 05:19 trip   the doubled copy
+  Micro 19                   05:19            05:19
+  Str. Oțelarilor            05:21            05:23
+  Bloc D19                   05:23            05:27
+  Sala Sporturilor           05:25            05:31
+  ...                          ...              ...
+  Depou                      05:48            06:17
+
+Leg times of the copy are `4 4 4 4 4 4 6 4 2 4 4 2 4 4 4` against the real
+`2 2 2 2 2 2 3 2 1 2 2 1 2 2 2` — exactly double at every leg, 58 minutes
+instead of 29. RETUR is the same from the 05:19 Depou departure: 60 minutes
+instead of 30. Because the origin's own time is not doubled (2 × 0 = 0), the
+copy shares that one entry with the real trip, which is why the site shows 89
+departures from Micro 19 but 90 times at every later stop, and 87 from Depou
+against 88 later. At Str. Ghe. Doja the copy's time happens to coincide with
+another trip's, so that column shows 87 as well; it is the same single fault.
+
+`find_doubled_trip` recognises this exact shape and leaves the trip out of the
+feed. The test is strict — the regular profile has to explain every other time
+in every column, and the surplus times have to match the doubled profile to the
+minute — so a genuine trip starting mid-route is not discarded by mistake. Once
+the site is corrected the function stops matching and nothing else changes.
+
+Also worth reporting, from item 4: the site spells the same stop several ways
+(Agenția C.F.R. / Agenția CFR, CEC Țiglina II / C.E.C. Țiglina II, Gara CFR /
+"Gara  CFR" with a double space, Str. Gării / "Str.Gării", Str. Cezar / Cezar,
+F.S.E.A. / F.E.A.A. / F.E.E.A), and route 11's two itineraries share one
+weekend column (item 1).
