@@ -49,7 +49,7 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 19 are in the feed. What the other 11 need:
+The Transurb site lists 30 routes; 21 are in the feed. What the other 9 need:
 
   route  site stops (TUR/RETUR)  OSM
      11             22 / 15      r10177466 / r10179043 match this exactly, but
@@ -57,11 +57,9 @@ The Transurb site lists 30 routes; 19 are in the feed. What the other 11 need:
      15              8 / 11      r10181002 / r10181003, only 8 / 8 platforms
      20             14 / 16      r10278231 / r10278230, only 15 / 11 platforms
      23             14 / 16      r395899 is a stub: no name, 1 platform, 126 ways
-      7             15 / 15      no relation (tram)
      13             11 / 11      no relation
      25             11 / 12      no relation
     39B              6 / 6       no relation (tram)
-     44             11 / 11      no relation (tram)
      50             38 / 38      no relation (extraurban)
      55             26 / 18      no relation (extraurban)
 
