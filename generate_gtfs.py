@@ -90,6 +90,7 @@ ROUTES = {
     "39": {"relations": {"TUR": 309018, "RETUR": 16337135}},
     "7": {"relations": {"TUR": 16337327, "RETUR": 16337326}},
     "44": {"relations": {"TUR": 16337536, "RETUR": 16337534}},
+    "39B": {"relations": {"TUR": 21240464, "RETUR": 21240463}},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the
@@ -995,7 +996,11 @@ def write_feed(route_ids: list[str]) -> None:
          [["transurb", "TRANSURB S.A. Galati", "https://transurbgalati.ro",
            "Europe/Bucharest", "ro", "+40 721 111 602"]])
 
-    sorted_ids = sorted(built, key=lambda r: int(r))
+    def _route_sort_key(r):
+        """Sort routes numerically, with letter suffixes after the number."""
+        m = re.match(r"(\d+)(.*)", r)
+        return (int(m.group(1)), m.group(2)) if m else (9999, r)
+    sorted_ids = sorted(built, key=_route_sort_key)
     wcsv("routes.txt", ["route_id", "agency_id", "route_short_name", "route_long_name",
                         "route_type", "route_color", "route_text_color"],
          [[rid, "transurb", rid, meta[rid]["route_long_name"],

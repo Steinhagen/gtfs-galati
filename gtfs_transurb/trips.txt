@@ -3101,3 +3101,113 @@ route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 44,WE,44-R-WE-038,COMAT,1,44-RETUR
 44,WE,44-R-WE-039,COMAT,1,44-RETUR
 44,WE,44-R-WE-040,COMAT,1,44-RETUR
+39B,WD,39B-T-WD-001,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-002,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-003,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-004,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-005,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-006,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-007,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-008,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-009,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-010,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-011,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-012,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-013,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-014,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-015,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-016,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-017,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-018,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-019,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-020,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-021,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-022,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-023,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-024,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-025,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-026,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-027,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-028,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-029,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-030,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-031,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-032,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-033,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-034,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-035,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-036,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WD,39B-T-WD-037,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-001,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-002,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-003,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-004,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-005,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-006,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-007,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-008,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-009,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-010,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-011,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-012,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-013,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-014,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-015,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-016,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-017,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-018,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-019,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-020,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-021,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-022,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-023,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-024,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-025,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-026,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-027,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-028,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-029,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-030,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-031,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-032,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-033,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-034,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-035,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-036,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-T-WE-037,Cimitirul Ștefan cel Mare,0,39B-TUR
+39B,WE,39B-R-WE-001,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-002,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-003,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-004,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-005,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-006,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-007,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-008,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-009,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-010,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-011,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-012,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-013,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-014,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-015,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-016,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-017,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-018,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-019,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-020,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-021,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-022,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-023,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-024,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-025,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-026,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-027,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-028,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-029,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-030,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-031,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-032,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-033,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-034,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-035,Bariera Traian,1,39B-RETUR
+39B,WE,39B-R-WE-036,Bariera Traian,1,39B-RETUR
