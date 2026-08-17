@@ -1,0 +1,5 @@
+fare_media_id,fare_media_name,fare_media_type
+transport_card,Card transport,2
+app_tg,Aplicația Transport Galați,3
+app_24pay,Aplicația 24Pay,3
+sms_24pay,24Pay SMS,3

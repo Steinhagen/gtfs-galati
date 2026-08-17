@@ -37,6 +37,12 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+# ---------------------------------------------------------------------------
+# Fare tariffs from the Transurb website
+# ---------------------------------------------------------------------------
+from fares import TARIFE_URL, fetch_fares, write_fares
+
+
 BASE_URL = "https://transurbgalati.ro/program_circulatie"
 HERE = Path(__file__).resolve().parent
 CACHE_DIR = HERE / "cache"
@@ -1054,6 +1060,35 @@ def write_feed(route_ids: list[str]) -> None:
     print("\nshape sources:")
     for line in shape_report:
         print("  " + line)
+
+    # Fares v2 — prices fetched from transurbgalati.ro/altele/titluri_calatorie/tarife
+    #
+    # Three fare zones by geography, each with its own price and duration:
+    #   urban (Galați + Comuna Vânători interior): 60 min
+    #   costi (Sat Costi – Galați):               60 min
+    #   odaia (Odaia Manolache – Galați):          90 min
+    #
+    # Four fare media (the ways a rider can pay):
+    #   transport_card  — physical card, validated on board (cEMV)
+    #   app_tg          — "Transport Galați" app, card payment (account-based)
+    #   app_24pay       — "24Pay" app, card payment (account-based)
+    #   sms_24pay       — "24Pay" app, SMS payment (account-based, EUR)
+    #
+    # Transfers are free within the validity window (60 or 90 min from first
+    # boarding); riders must scan at each boarding but are not charged again.
+    #
+    # Passes (Plus Nominal, Basic bundles) are informational for riders but do
+    # not affect routing; GTFS Fares v2 rider_categories and fare_containers
+    # are not yet widely consumed, so only single-ride products are emitted.
+
+    print("\nFares:", flush=True)
+    tarife_html = fetch_page(TARIFE_URL, CACHE_DIR / "tarife.html", REFRESH)
+    fares = fetch_fares(tarife_html)
+    for m in fares["media"]:
+        print(f"  {m['id']}: {m['amount']} {m['currency']} "
+              f"({m['name']}, type {m['type']})")
+    print(f"  transfer window: {fares['duration']} min")
+    write_fares(fares, sorted_ids, PALETTE, wcsv)
 
     wcsv("feed_info.txt",
          ["feed_publisher_name", "feed_publisher_url", "feed_lang", "default_lang",

@@ -1,0 +1,3 @@
+fare_leg_rule_id,network_id,fare_product_id
+urban_urban_ride,urban,urban_ride
+urban_urban_ride_sms,urban,urban_ride_sms

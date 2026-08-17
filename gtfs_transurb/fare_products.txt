@@ -1,0 +1,5 @@
+fare_product_id,fare_product_name,fare_media_id,amount,currency
+urban_ride,Bilet 1 călătorie,transport_card,3.50,RON
+urban_ride,Bilet 1 călătorie,app_tg,3.50,RON
+urban_ride,Bilet 1 călătorie,app_24pay,3.50,RON
+urban_ride_sms,Bilet 1 călătorie SMS,sms_24pay,0.84,EUR

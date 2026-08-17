@@ -1,6 +1,10 @@
+How to run the generator
+
+```
 nix run nixpkgs#python312 -- generate_gtfs.py            # all routes
 nix run nixpkgs#python312 -- generate_gtfs.py 102        # one route
 nix run nixpkgs#python312 -- generate_gtfs.py --refresh  # re-read OSM + route pages
+```
 
 Where the data comes from
 
@@ -328,3 +332,27 @@ Also worth reporting, from item 4: the site spells the same stop several ways
 "Gara  CFR" with a double space, Str. Gării / "Str.Gării", Str. Cezar / Cezar,
 F.S.E.A. / F.E.A.A. / F.E.E.A), and route 11's two itineraries share one
 weekend column (item 1).
+
+7. Map ticket vending machines (TVMs) in OSM
+
+The Transurb website lists ~105 TVMs by name and status:
+https://transurbgalati.ro/altele/lista_tvm
+
+These are not mapped in OSM yet. Each TVM should be a standalone node (not
+added to route relations or merged with platform nodes):
+
+    amenity=vending_machine
+    vending=public_transport_tickets
+    operator=TRANSURB S.A.
+    payment:coins=yes
+    payment:notes=yes
+    payment:debit_cards=yes
+
+Place each node at the machine's actual position, not on the platform node —
+they are separate physical objects with independent lifecycles (a TVM can be
+removed or relocated without the stop changing). Some TVMs are not at stops at
+all (Cimitir Israelit, Depozitul Farmaceutic, I.C.Frimu - Cosbuc, etc.).
+
+There is no GTFS file for vending machine locations; the benefit of mapping
+them is that OSM-based apps (OsmAnd, Organic Maps) show them to riders. The
+information about how to pay is already covered in the feed by fare_media.txt.
