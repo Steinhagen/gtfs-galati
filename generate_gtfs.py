@@ -88,6 +88,8 @@ ROUTES = {
     "34": {"relations": {"TUR": 10188176, "RETUR": 10188475}},
     "30": {"relations": {"TUR": 21226359, "RETUR": 21226358}},
     "39": {"relations": {"TUR": 309018, "RETUR": 16337135}},
+    "7": {"relations": {"TUR": 16337327, "RETUR": 16337326}},
+    "44": {"relations": {"TUR": 16337536, "RETUR": 16337534}},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the

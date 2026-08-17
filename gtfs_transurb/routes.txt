@@ -1,4 +1,5 @@
 route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+7,transurb,7,Micro 19 - Piața Centrală,0,C3D7FF,000000
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,E1B348,000000
 10,transurb,10,Micro 19 - Damen,3,F99BAD,000000
 24,transurb,24,Shopping City - Damen,3,6CC39F,000000
@@ -15,6 +16,7 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 39,transurb,39,Micro 19 - Depou,0,8A99B8,000000
 41,transurb,41,Dimitrie Cantemir - Micro 19,3,4054C7,FFFFFF
 43,transurb,43,Căminele combinatului - Piața Energiei,3,AA00FF,FFFFFF
+44,transurb,44,COMAT - Piața Centrală,0,8578FF,000000
 102,transurb,102,Micro 19 - Bariera Traian,11,26D100,000000
 105,transurb,105,Micro 19 - Grădina publică,3,FB483A,000000
 106,transurb,106,Micro 19 - Gara C.F.R.,3,400244,FFFFFF
