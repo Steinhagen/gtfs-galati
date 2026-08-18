@@ -92,6 +92,9 @@ ROUTES = {
     "44": {"relations": {"TUR": 16337536, "RETUR": 16337534}},
     "39B": {"relations": {"TUR": 21240464, "RETUR": 21240463}},
     "55": {"relations": {"TUR": 21243592, "RETUR": 21243593}},
+    # The site's TUR runs Din Vale -> Piața centrală, which is r21250647; the
+    # relation names are the other way round from the ids' numeric order.
+    "50": {"relations": {"TUR": 21250647, "RETUR": 21244075}},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the

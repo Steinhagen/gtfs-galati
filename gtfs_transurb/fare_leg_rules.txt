@@ -3,3 +3,5 @@ urban_ride,urban,urban_ride
 urban_ride,urban,urban_ride_sms
 costi_ride,costi,costi_ride
 costi_ride,costi,costi_ride_sms
+odaia_ride,odaia,odaia_ride
+odaia_ride,odaia,odaia_ride_sms

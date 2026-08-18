@@ -31,8 +31,9 @@ not Monday-Friday).
   OSM route tag. The area column is the route's fare zone: `urban` for the city
   network, or the id of one of the extraurban zones the tariff page prices in
   its own column (`costi` for Sat Costi - Galați, 5,00 LEI / 60 min, `odaia` for
-  Odaia Manolache - Galați, 7,00 LEI / 90 min). Route 55 is `costi`; a route
-  whose area is not a zone the page prices is reported and gets no fare.
+  Odaia Manolache - Galați, 7,00 LEI / 90 min). Route 55 is `costi` and route 50
+  is `odaia`, its outer terminus Din Vale being in Odaia Manolache; a route whose
+  area is not a zone the page prices is reported and gets no fare.
 - The tariff page gives the fares, parsed into GTFS Fares v2: one network per
   zone in use, with its own products, prices per medium and validity window.
   Transfers stay free within that window (the longer of the two windows when the
@@ -57,7 +58,7 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 23 are in the feed. What the other 7 need:
+The Transurb site lists 30 routes; 24 are in the feed. What the other 6 need:
 
   route  site stops (TUR/RETUR)  OSM
      11             22 / 15      r10177466 / r10179043 match this exactly, but
@@ -67,7 +68,6 @@ The Transurb site lists 30 routes; 23 are in the feed. What the other 7 need:
      23             14 / 16      r395899 is a stub: no name, 1 platform, 126 ways
      13             11 / 11      no relation
      25             11 / 12      no relation
-     50             38 / 38      no relation (extraurban)
 
 Add a route to ROUTES once its relations list every platform, in travel order;
 the build fails with a count mismatch until then.
@@ -157,9 +157,9 @@ n6899152594), Centrul de recoltare (n6875033915), Căminele combinatului
 (n14086450125), Căminele studențești (n6879824355, n6879824375), Căminul de
 bătrâni (n6879824356), Galeriile de artă (n530256646), Grădina publică
 (n14086091994, n6898365514), Muzeul de artă (n6879824376), Piața centrală
-(n6898532656), Potcoava de aur (n6875033916), Teatrul dramatic (n6879824378).
-These flow straight into stops.txt, and into route_long_name for 35, 43, 55
-and 105.
+(n6898532656), Potcoava de aur (n6875033916), Prelungirea prunului
+(n14103873219, route 50), Teatrul dramatic (n6879824378). These flow straight
+into stops.txt, and into route_long_name for 35, 43, 50, 55 and 105.
 
 The same two names are also spelled both ways between routes, which is why the
 build reports them: Baia Comunală (n14101559979, n14101559980, on routes 7/44)
@@ -169,7 +169,7 @@ route_long_name for 55.
 
 4. Every stop the two sources name differently
 
-Of the 628 stop visits in the feed, 78 pairs of names differ between OSM and
+Of the 704 stop visits in the feed, 83 pairs of names differ between OSM and
 the Transurb route page. Capitalisation and diacritics are ignored in this
 comparison, since the site prints station names in caps without diacritics; a
 spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
@@ -200,7 +200,8 @@ Different wording — someone has to decide which name is right:
   Stadion Oțelul                     Stadionul Oțelul                 n14099815418
   Staer Intermedia                   Staer (PC)                       n14103649671
     - route 55 TUR; the RETUR platform 200 m away is Staer Intermedia in both
-      sources (n14103649673), so the TUR one is the odd one out
+      sources (n14103649673), so the TUR one is the odd one out. Route 50 calls
+      the same pair simply STAER in both directions
   Policultura-Floricultura           Poligonului-Floricultura         n14103649651
     - the site's "POLICULTURA" looks like a typo for Poligonului; worth
       checking which of the two the stop is actually named after
@@ -244,7 +245,9 @@ reverse for Gării):
   (n14099845131), Prundului (n6895570670, n6896006860), Radu Negru
   (n6895095244, n6896006856), Tecuci (n6899023180, n6899129581), Traian Vuia
   (n6898532659), Vultur (n6879824377, n6906785248, n6906838264),
-  Forturilor Nr. 15 (n14103649663) and Marinarilor (n14103649661) on route 55.
+  Forturilor Nr. 15 (n14103649663) and Marinarilor (n14103649661) on route 55,
+  Serelor (n14103799417) and Zambilelor (n14103873217, n14104248905) on
+  route 50.
 
 Punctuation and spacing only:
 
@@ -271,7 +274,12 @@ C.E.C. Țiglina II, Gara CFR / "Gara  CFR" (double space), Str. Gării /
 "Str.Gării", Str. Cezar / Cezar, F.S.E.A. / F.E.A.A. / F.E.E.A for the same
 stop. Route 55 spells two of its stops one way on the TUR list and another on
 the RETUR list: SPITALUL MILITAR / SPITAL MILITAR, and "STR. VULTUR" /
-"STR.VULTUR".
+"STR.VULTUR". Route 50 does the same with the space after "Str." on three
+stations — "STR CEZAR" / "STR. CEZAR", "STR VULTUR" / "STR.VULTUR",
+"STR. RADU NEGRU" / "STR.RADU NEGRU" — so the abbreviation appears with a
+space, without one, and with no dot at all across its two lists. It also lists
+SPITALUL MILITAR on TUR against SPITAL MILITAR on RETUR, and is the only page
+with a station in lower case: "Prelungirea prunului".
 
 5. Record the second spelling of a stop instead of arguing about `name`
 

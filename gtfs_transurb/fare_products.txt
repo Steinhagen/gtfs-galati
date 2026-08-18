@@ -7,3 +7,7 @@ costi_ride,Bilet 1 călătorie Sat Costi – Galați,transport_card,5.00,RON
 costi_ride_sms,Bilet 1 călătorie SMS Sat Costi – Galați,sms_24pay,1.14,EUR
 costi_ride,Bilet 1 călătorie Sat Costi – Galați,app_tg,5.00,RON
 costi_ride,Bilet 1 călătorie Sat Costi – Galați,app_24pay,5.00,RON
+odaia_ride,Bilet 1 călătorie Odaia Manolache – Galați,transport_card,7.00,RON
+odaia_ride_sms,Bilet 1 călătorie SMS Odaia Manolache – Galați,sms_24pay,1.59,EUR
+odaia_ride,Bilet 1 călătorie Odaia Manolache – Galați,app_tg,7.00,RON
+odaia_ride,Bilet 1 călătorie Odaia Manolache – Galați,app_24pay,7.00,RON
