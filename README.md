@@ -28,7 +28,15 @@ not Monday-Friday).
 - route-colors.txt (`ref,#rrggbb,vehicle,area`) is the source of truth for
   route_color; route_text_color is derived from its luminance (black on light
   backgrounds, white on dark). The vehicle column is cross-checked against the
-  OSM route tag.
+  OSM route tag. The area column is the route's fare zone: `urban` for the city
+  network, or the id of one of the extraurban zones the tariff page prices in
+  its own column (`costi` for Sat Costi - Galați, 5,00 LEI / 60 min, `odaia` for
+  Odaia Manolache - Galați, 7,00 LEI / 90 min). Route 55 is `costi`; a route
+  whose area is not a zone the page prices is reported and gets no fare.
+- The tariff page gives the fares, parsed into GTFS Fares v2: one network per
+  zone in use, with its own products, prices per medium and validity window.
+  Transfers stay free within that window (the longer of the two windows when the
+  transfer crosses zones).
 
 Every build cross-checks the two sources per direction: the relation and the
 route page must list the same number of stops, in the same order. A mismatch
@@ -49,7 +57,7 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 22 are in the feed. What the other 8 need:
+The Transurb site lists 30 routes; 23 are in the feed. What the other 7 need:
 
   route  site stops (TUR/RETUR)  OSM
      11             22 / 15      r10177466 / r10179043 match this exactly, but
@@ -60,7 +68,6 @@ The Transurb site lists 30 routes; 22 are in the feed. What the other 8 need:
      13             11 / 11      no relation
      25             11 / 12      no relation
      50             38 / 38      no relation (extraurban)
-     55             26 / 18      no relation (extraurban)
 
 Add a route to ROUTES once its relations list every platform, in travel order;
 the build fails with a count mismatch until then.
@@ -136,6 +143,8 @@ does distinguish them):
   bus platform are together, the other bus platform (n6896006839) is the one
   the site lists as a separate station on the routes that call there
   (n6894604132, n6896006839, n14099845125)
+- Ștefan cel Mare: 2 stops 3.7 km apart, the route 39B one on Strada Ștefan cel
+  Mare (n14101695639) vs the route 55 one out at Costi (n14103649655)
 - Strada Aurel Vlaicu: the site calls one of them
   "STR. AUREL VLAICU - (1 DECEMBRIE)" (n6894604128 vs n6960962995,
   n6963443072)
@@ -149,12 +158,18 @@ n6899152594), Centrul de recoltare (n6875033915), Căminele combinatului
 bătrâni (n6879824356), Galeriile de artă (n530256646), Grădina publică
 (n14086091994, n6898365514), Muzeul de artă (n6879824376), Piața centrală
 (n6898532656), Potcoava de aur (n6875033916), Teatrul dramatic (n6879824378).
-These flow straight into stops.txt, and into route_long_name for 35, 43
+These flow straight into stops.txt, and into route_long_name for 35, 43, 55
 and 105.
+
+The same two names are also spelled both ways between routes, which is why the
+build reports them: Baia Comunală (n14101559979, n14101559980, on routes 7/44)
+vs Baia comunală (n6906785250, n6906838262, on 35 and 55), and Piața Centrală
+(n14101559978) vs Piața centrală (n6898532656), the latter reaching
+route_long_name for 55.
 
 4. Every stop the two sources name differently
 
-Of the 520 stop visits in the feed, 66 pairs of names differ between OSM and
+Of the 628 stop visits in the feed, 78 pairs of names differ between OSM and
 the Transurb route page. Capitalisation and diacritics are ignored in this
 comparison, since the site prints station names in caps without diacritics; a
 spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
@@ -181,7 +196,14 @@ Different wording — someone has to decide which name is right:
   Piața Țiglina I                    Piața Țiglina 1                  n6905457929, n6905457936
   Școala 40 / Școala Nr. 40          Școala Nr. 40                    n6894593244
   Spital Municipal                   Spitalul Municipal               n6895570669, n6896006858
+  Spital Militar                     Spitalul Militar                 n6895095250
   Stadion Oțelul                     Stadionul Oțelul                 n14099815418
+  Staer Intermedia                   Staer (PC)                       n14103649671
+    - route 55 TUR; the RETUR platform 200 m away is Staer Intermedia in both
+      sources (n14103649673), so the TUR one is the odd one out
+  Policultura-Floricultura           Poligonului-Floricultura         n14103649651
+    - the site's "POLICULTURA" looks like a typo for Poligonului; worth
+      checking which of the two the stop is actually named after
   Str. Ghe. Doja / Gheorghe Doja     Str./Strada Gheorghe Doja        n6896006833, n6960963007, n6963443061, n14099815419, n14099845128
   Str. Aurel Vlaicu - (1 Decembrie)  Strada Aurel Vlaicu              n6894604128
   Str. M. Kogălniceanu               Strada Mihail Kogălniceanu       n6899023182
@@ -221,12 +243,16 @@ reverse for Gării):
   n6897791671), Oltului (n6878887889, n6894593237), Prelungirea Brăilei
   (n14099845131), Prundului (n6895570670, n6896006860), Radu Negru
   (n6895095244, n6896006856), Tecuci (n6899023180, n6899129581), Traian Vuia
-  (n6898532659), Vultur (n6879824377, n6906785248, n6906838264).
+  (n6898532659), Vultur (n6879824377, n6906785248, n6906838264),
+  Forturilor Nr. 15 (n14103649663) and Marinarilor (n14103649661) on route 55.
 
 Punctuation and spacing only:
 
   Gara CFR -> Gara C.F.R. (n6875107385), Parcare Bănci -> Parcare - Bănci
-  (n6875960831).
+  (n6875960831). Route 55's page drops the space after "Str." on most of its
+  stations ("STR.CEZAR", "STR.PRUNDULUI", "STR.RADU NEGRU", "STR.VULTUR",
+  "STR.FORTURILOR NR 15", "STR.MARINARILOR"), while writing "STR. VULTUR" with
+  the space on the TUR list — the same station, spelled both ways on one page.
 
 One OSM name for two stops the page tells apart — both directions call at both
 stops, so the feed shows the same name twice in one trip:
@@ -243,7 +269,9 @@ The site is inconsistent with itself for a few stops, which is a website
 problem rather than an OSM one: Agenția C.F.R. / Agenția CFR, CEC Țiglina II /
 C.E.C. Țiglina II, Gara CFR / "Gara  CFR" (double space), Str. Gării /
 "Str.Gării", Str. Cezar / Cezar, F.S.E.A. / F.E.A.A. / F.E.E.A for the same
-stop.
+stop. Route 55 spells two of its stops one way on the TUR list and another on
+the RETUR list: SPITALUL MILITAR / SPITAL MILITAR, and "STR. VULTUR" /
+"STR.VULTUR".
 
 5. Record the second spelling of a stop instead of arguing about `name`
 

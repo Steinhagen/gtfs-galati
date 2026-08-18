@@ -18,6 +18,7 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 41,transurb,41,Dimitrie Cantemir - Micro 19,3,4054C7,FFFFFF
 43,transurb,43,Căminele combinatului - Piața Energiei,3,AA00FF,FFFFFF
 44,transurb,44,COMAT - Piața Centrală,0,8578FF,000000
+55,transurb,55,Poligonului Vale - Piața centrală,3,305CDF,FFFFFF
 102,transurb,102,Micro 19 - Bariera Traian,11,26D100,000000
 105,transurb,105,Micro 19 - Grădina publică,3,FB483A,000000
 106,transurb,106,Micro 19 - Gara C.F.R.,3,400244,FFFFFF

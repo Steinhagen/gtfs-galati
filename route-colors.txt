@@ -30,5 +30,10 @@
 44,#8578ff,tramvai,urban
 39,#8a99b8,tramvai,urban
 7,#c3d7ff,tramvai,urban
-55,#305cdf,autobuz,extraurban
+# The area column doubles as the fare zone: "urban" for the city network, or
+# one of the zones the tariff page prices separately -- "costi" (Sat Costi,
+# 5,00 LEI / 60 min) or "odaia" (Odaia Manolache, 7,00 LEI / 90 min). Route 50
+# still says "extraurban" because its zone is not established yet; the build
+# warns and leaves it without a fare, so set it before adding 50 to ROUTES.
+55,#305cdf,autobuz,costi
 50,#dd143c,autobuz,extraurban

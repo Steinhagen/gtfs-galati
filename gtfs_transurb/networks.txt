@@ -1,2 +1,3 @@
 network_id,network_name
 urban,Rețeaua urbană Galați
+costi,Sat Costi – Galați

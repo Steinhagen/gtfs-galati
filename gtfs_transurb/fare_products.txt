@@ -3,3 +3,7 @@ urban_ride,Bilet 1 călătorie,transport_card,3.50,RON
 urban_ride,Bilet 1 călătorie,app_tg,3.50,RON
 urban_ride,Bilet 1 călătorie,app_24pay,3.50,RON
 urban_ride_sms,Bilet 1 călătorie SMS,sms_24pay,0.84,EUR
+costi_ride,Bilet 1 călătorie Sat Costi – Galați,transport_card,5.00,RON
+costi_ride_sms,Bilet 1 călătorie SMS Sat Costi – Galați,sms_24pay,1.14,EUR
+costi_ride,Bilet 1 călătorie Sat Costi – Galați,app_tg,5.00,RON
+costi_ride,Bilet 1 călătorie Sat Costi – Galați,app_24pay,5.00,RON

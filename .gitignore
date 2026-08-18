@@ -4,3 +4,7 @@ gtfs_transurb.zip
 
 # Python
 __pycache__/
+
+# Other artifacts
+gtfs-galati.code-workspace
+email-*.txt
