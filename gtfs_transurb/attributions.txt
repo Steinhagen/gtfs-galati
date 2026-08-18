@@ -1,0 +1,3 @@
+attribution_id,organization_name,is_producer,is_operator,is_authority,attribution_url,attribution_email
+publisher,Viorel-Cătălin Răpițeanu,1,0,0,https://github.com/Steinhagen/gtfs-galati,rapiteanu.catalin@gmail.com
+operator,TRANSURB S.A. Galati,0,1,0,https://transurbgalati.ro,

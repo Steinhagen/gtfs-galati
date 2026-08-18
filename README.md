@@ -1,3 +1,25 @@
+An unofficial GTFS feed for the TRANSURB S.A. Galați network
+
+This dataset is produced independently by Viorel-Cătălin Răpițeanu from
+Transurb's published timetables and OpenStreetMap. It describes their network,
+but it is not their dataset and they do not maintain it, so anything wrong in
+the feed is mine to fix, not theirs.
+
+Found a problem in the data? Please tell me rather than the operator:
+rapiteanu.catalin@gmail.com, or open an issue at
+https://github.com/Steinhagen/gtfs-galati/issues.
+
+This is stated inside the feed as well, so it travels with the data instead of
+living only here:
+
+- feed_info.txt names the publisher and carries `feed_contact_email` /
+  `feed_contact_url`, which is the spec's technical contact for a GTFS dataset.
+- attributions.txt gives both roles explicitly: this publisher as `is_producer`,
+  TRANSURB S.A. Galați as `is_operator`.
+- agency.txt still names Transurb with their own phone and site, because they do
+  run the service and `agency_*` is the rider-facing contact for the service
+  itself (fares, lost property, a bus that never came), not for feed bugs.
+
 How to run the generator
 
 ```

@@ -51,6 +51,23 @@ ZIP_PATH = HERE / "gtfs_transurb.zip"
 COLORS_FILE = HERE / "route-colors.txt"
 UA = "gtfs-galati/1.0"  # Overpass rejects Mozilla-prefixed custom UAs
 
+# ---------------------------------------------------------------------------
+# Who publishes this feed, and who to tell about a problem in it.
+#
+# The feed maps the TRANSURB S.A. Galați network, but it is not their dataset:
+# it is produced independently from their published timetables plus OSM, and
+# they do not maintain it. So agency.txt keeps naming Transurb (they do run the
+# service, and agency_* is the rider-facing contact for the service itself),
+# while feed_info.txt names the feed's publisher and feed_contact_* points at
+# the person who can actually fix the data. attributions.txt then states both
+# roles explicitly: Transurb as operator, the publisher below as producer.
+FEED_PUBLISHER = "Viorel-Cătălin Răpițeanu"
+FEED_PUBLISHER_URL = "https://github.com/Steinhagen/gtfs-galati"
+FEED_CONTACT_EMAIL = "rapiteanu.catalin@gmail.com"
+FEED_CONTACT_URL = "https://github.com/Steinhagen/gtfs-galati/issues"
+OPERATOR_NAME = "TRANSURB S.A. Galati"
+OPERATOR_URL = "https://transurbgalati.ro"
+
 FEED_START, FEED_END = "20260101", "20261231"
 # Romanian legal holidays in 2026 that follow the weekend schedule.
 HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
@@ -1101,14 +1118,28 @@ def write_feed(route_ids: list[str]) -> None:
     print(f"  transfer window: {fares['duration']} min")
     write_fares(fares, sorted_ids, PALETTE, wcsv)
 
+    # feed_info: the publisher is whoever produced this dataset, which is not
+    # the operator. feed_contact_* is the technical contact for the feed, so a
+    # consumer who spots a problem in the data reaches the person maintaining
+    # it rather than Transurb's customer service (that stays in agency.txt).
     wcsv("feed_info.txt",
          ["feed_publisher_name", "feed_publisher_url", "feed_lang", "default_lang",
           "feed_start_date", "feed_end_date", "feed_version", "feed_contact_email",
           "feed_contact_url"],
-         [["TRANSURB S.A. Galati", "https://transurbgalati.ro", "ro", "ro",
+         [[FEED_PUBLISHER, FEED_PUBLISHER_URL, "ro", "ro",
            FEED_START, FEED_END,
            "transurb-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()),
-           "transurbgl@gmail.com", "https://transurbgalati.ro/contact"]])
+           FEED_CONTACT_EMAIL, FEED_CONTACT_URL]])
+
+    # attributions: spell out that Transurb operates the network while this
+    # dataset is produced independently. Without agency_id/route_id/trip_id an
+    # attribution applies to the whole dataset, which is what both of these do.
+    wcsv("attributions.txt",
+         ["attribution_id", "organization_name", "is_producer", "is_operator",
+          "is_authority", "attribution_url", "attribution_email"],
+         [["publisher", FEED_PUBLISHER, 1, 0, 0,
+           FEED_PUBLISHER_URL, FEED_CONTACT_EMAIL],
+          ["operator", OPERATOR_NAME, 0, 1, 0, OPERATOR_URL, ""]])
 
     with zipfile.ZipFile(ZIP_PATH, "w", zipfile.ZIP_DEFLATED) as zf:
         for f in sorted(OUT_DIR.glob("*.txt")):
