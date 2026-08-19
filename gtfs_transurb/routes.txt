@@ -7,6 +7,7 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 15,transurb,15,Piața centrală - Gara C.F.R.,3,444444,FFFFFF
 20,transurb,20,Complex Siretul - Gara C.F.R.,3,54EDD9,000000
 24,transurb,24,Shopping City - Damen,3,6CC39F,000000
+25,transurb,25,Pista betonată - Shopping City,3,5E7E00,FFFFFF
 26,transurb,26,Micro 13 - Gara C.F.R.,3,F770B9,000000
 28,transurb,28,Micro 19 - Bariera Traian,3,3AD1FB,000000
 30,transurb,30,Micro 19 - ADA Motors (Borcan),3,303030,FFFFFF

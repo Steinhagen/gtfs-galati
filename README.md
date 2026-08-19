@@ -88,13 +88,12 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 28 are in the feed. What the other 2 need:
+The Transurb site lists 30 routes; 29 are in the feed. What the last one needs:
 
 
 | Route | Stops (TUR/RETUR) | OSM Details |
 | :--- | :--- | :--- |
 | 23 | 14 / 16 | r395899 is a stub: no name, 1 platform, 126 ways |
-| 25 | 11 / 12 | no relation |
 
 
 Add a route to ROUTES once its relations list every platform, in travel order;
@@ -237,6 +236,10 @@ does distinguish them):
 - DAMEN: 3 stops up to 406 m apart — the pair route 13 calls at
   (n1129805725, n10466845815) and the one routes 10 and 24 use 400 m south
   (n6896966047), which is also spelled `Damen` rather than `DAMEN`
+- Autogară: 3 stops up to 269 m apart, and route 15 RETUR calls at two of them
+  in one trip. The site distinguishes them as AUTOGARA (GARII) (n6881503385)
+  and AUTOGARA (ANA IPATESCU) (n6892672431, n6893391144), so those are the
+  names OSM needs
 - Ștefan cel Mare: 2 stops 3.7 km apart, the route 39B one on Strada Ștefan cel
   Mare (n14101695639) vs the route 55 one out at Costi (n14103649655)
 - Strada Aurel Vlaicu: the site calls one of them
@@ -263,7 +266,7 @@ route_long_name for 55.
 
 4. Every stop the two sources name differently
 
-Of the 783 stop visits in the feed, 87 pairs of names differ between OSM and
+Of the 877 stop visits in the feed, 98 pairs of names differ between OSM and
 the Transurb route page. Capitalisation and diacritics are ignored in this
 comparison, since the site prints station names in caps without diacritics; a
 spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
@@ -291,6 +294,16 @@ Different wording — someone has to decide which name is right:
   Liceul Sf. Maria                   Liceul „Sfânta Maria”            n6960963008, n6963443059
   Piața Țiglina I                    Piața Țiglina 1                  n6905457929, n6905457936
   Școala 40 / Școala Nr. 40          Școala Nr. 40                    n6894593244
+  Micro 13                           Micro 13b                        n14106173158
+    - route 25 TUR; almost certainly a typo, since it is 24 m from
+      `Micro 13` (n6898532664), the platform on the other side of the street
+      that route 25 RETUR calls at, and the site names both MICRO 13
+  Complex Siret                      Complex Siretul                  n6960317096
+  Școala 10                          Școala nr. 10                    n6960251152
+    - route 20; also the only stop tagged "nr." in lower case, against
+      `Școala Nr. 40` elsewhere
+  Autogară (Gării) / (Ana Ipătescu)  Autogară                         n6881503385, n6892672431, n6893391144
+    - three bus stations sharing one name; see item 3
   Spital Municipal                   Spitalul Municipal               n6895570669, n6896006858
   Spital Militar                     Spitalul Militar                 n6895095250
   Stadion Oțelul                     Stadionul Oțelul                 n14099815418
@@ -343,12 +356,13 @@ reverse for Gării):
   (n6898532659), Vultur (n6879824377, n6906785248, n6906838264),
   Forturilor Nr. 15 (n14103649663) and Marinarilor (n14103649661) on route 55,
   Serelor (n14103799417) and Zambilelor (n14103873217, n14104248905) on
-  route 50.
+  route 50, Dogăriei (n6892672433, n6893391140) on route 15 and Feroviarilor
+  (n14106133826, n14106173160) on route 25.
 
 Punctuation and spacing only:
 
   Gara CFR -> Gara C.F.R. (n6875107385), Parcare Bănci -> Parcare - Bănci
-  (n6875960831). Route 55's page drops the space after "Str." on most of its
+  (n6875960831), Spitalul CFR -> Spitalul C.F.R. (n6892672430, n6893391142). Route 55's page drops the space after "Str." on most of its
   stations ("STR.CEZAR", "STR.PRUNDULUI", "STR.RADU NEGRU", "STR.VULTUR",
   "STR.FORTURILOR NR 15", "STR.MARINARILOR"), while writing "STR. VULTUR" with
   the space on the TUR list — the same station, spelled both ways on one page.
@@ -356,6 +370,8 @@ Punctuation and spacing only:
 One OSM name for two stops the page tells apart — both directions call at both
 stops, so the feed shows the same name twice in one trip:
 
+  route 15 RETUR  Autogară (n6881503385, n6893391144), 269 m apart; the page
+                calls them AUTOGARA (GARII) and AUTOGARA (ANA IPATESCU)
   route 41 TUR  Universitatea Danubius (n6896665344, n6897986189), 65 m apart;
                 the page calls them UNIV. DANUBIUS and DANUBIUS
   route 38 TUR  Școala Nr. 40 (n6894593244, n6896163912), 70 m apart;

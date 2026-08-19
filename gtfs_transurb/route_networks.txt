@@ -7,6 +7,7 @@ urban,13
 urban,15
 urban,20
 urban,24
+urban,25
 urban,26
 urban,28
 urban,30
