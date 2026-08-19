@@ -88,13 +88,11 @@ FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 26 are in the feed. What the other 4 need:
+The Transurb site lists 30 routes; 28 are in the feed. What the other 2 need:
 
 
 | Route | Stops (TUR/RETUR) | OSM Details |
 | :--- | :--- | :--- |
-| 15 | 8 / 11 | r10181002 / r10181003, only 8 / 8 platforms |
-| 20 | 14 / 16 | r10278231 / r10278230, only 15 / 11 platforms |
 | 23 | 14 / 16 | r395899 is a stub: no name, 1 platform, 126 ways |
 | 25 | 11 / 12 | no relation |
 
@@ -285,10 +283,6 @@ Different wording — someone has to decide which name is right:
   Cimitir Cătușa                     Cimitirul „Cătușa”               n6892672444, n6893391129
   Cimitir Eternitatea                Cimitirul Eternitatea            n6899023178, n6899129583
   Cimitir Sf. Lazăr                  Cimitirul „Sfântul Lazăr”        n1720639175, n14088455591
-  F.S.E.A. / F.E.A.A. / F.E.E.A / FSEA  F.E.E.A.                      n534268996
-  C.N.V.A. / CNVA                    C.N.V.A.                         n534268981
-    - both spellings come from route 11: the weekday list writes the dots, the
-      weekend one drops them
   Casa Roșie (Bld. Siderugistilor)   Casa Roșie                       n1720639168
     - route 11 weekday RETUR only, and "Siderugistilor" is the site's
       misspelling of Siderurgiștilor
@@ -479,7 +473,7 @@ complementary, ending at 14:38 and resuming at 14:52.
 Also worth reporting, from item 4: the site spells the same stop several ways
 (Agenția C.F.R. / Agenția CFR, CEC Țiglina II / C.E.C. Țiglina II, Gara CFR /
 "Gara  CFR" with a double space, Str. Gării / "Str.Gării", Str. Cezar / Cezar,
-F.S.E.A. / F.E.A.A. / F.E.E.A / FSEA, C.N.V.A. / CNVA), and route 11's RETUR
+F.S.E.A. / F.E.A.A. / F.E.E.A / FSEA), and route 11's RETUR
 list names a stop "CASA ROSIE (BLD. SIDERUGISTILOR)", misspelling
 Siderurgiștilor.
 

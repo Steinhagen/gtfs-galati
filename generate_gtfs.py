@@ -164,6 +164,7 @@ ROUTES = {
             "services": ("WE",)},
     }},
     "15": {"relations": {"TUR": 10181002, "RETUR": 10181003}},
+    "20": {"relations": {"TUR": 10278231, "RETUR": 10278230}},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the

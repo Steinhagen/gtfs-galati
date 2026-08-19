@@ -1,2 +1,2 @@
 feed_publisher_name,feed_publisher_url,feed_lang,default_lang,feed_start_date,feed_end_date,feed_version,feed_contact_email,feed_contact_url
-Viorel-Cătălin Răpițeanu,https://github.com/Steinhagen/gtfs-galati,ro,ro,20260101,20261231,transurb-20260819-183454,rapiteanu.catalin@gmail.com,https://github.com/Steinhagen/gtfs-galati/issues
+Viorel-Cătălin Răpițeanu,https://github.com/Steinhagen/gtfs-galati,ro,ro,20260101,20261231,transurb-20260819-192251,rapiteanu.catalin@gmail.com,https://github.com/Steinhagen/gtfs-galati/issues
