@@ -104,26 +104,51 @@ the build fails with a count mismatch until then.
 
 Routes where not every trip runs the whole way
 
-Some routes have trips that turn back early, so no single station lists every
-trip and the timetable cannot be keyed off the first stop. `align_times` keys
-off the busiest station instead, matching earlier stations backwards and later
-ones forwards; a station with fewer times simply leaves the trips it does not
-serve empty, whether they end short of it or start beyond it. Three routes need
+Some routes have trips that turn back early. The site covers them in one station
+list, so no single station lists every trip and the timetable cannot be keyed off
+the first stop: `align_times` keys off the busiest station instead, matching
+earlier stations backwards and later ones forwards, and a station with fewer
+times leaves the trips it does not serve empty, whether they end short of it or
+start beyond it.
+
+OSM maps each distinct stop sequence as its own route relation, so those short
+workings have their own geometry and terminus. `short_turns` in ROUTES names them
+by the terminus that identifies them:
+
+```python
+"13": {"relations": {"TUR": 21252930, "RETUR": 21253037},
+       "short_turns": {"Aleea Nordului": {"TUR": 21253117,
+                                          "RETUR": 21253118}}},
+```
+
+Each trip is then matched to the itinerary whose first and last stop it actually
+serves, and takes that relation's shape and `to` tag. So a trip turning back
+early is neither drawn running to the full route's terminus nor signed for it.
+Matching is on both ends, since a short working can differ at either, and the
+relation's platforms must be a contiguous slice of the full route's — otherwise
+it does not describe the same line and the build reports it. Two routes need
 this:
 
-- route 13 has two northern termini: of its 26 weekday trips per direction, 20
-  turn at Aleea Nordului and 6 carry on to Agrogal. The two sets are disjoint on
-  the site (20 + 6 = 26, and each Bazinul nou departure leads to exactly one of
-  them), so the split is unambiguous;
-- route 39B lists no weekday times at all at Cimitirul Ștefan cel Mare, while
-  the other five stops list 36. Its weekday return trips therefore start at
-  Cimitirul Israelit;
-- routes 41 and 39B also have trips skipping a stop mid-route, which is the same
-  mechanism.
+- route 13 has two northern termini: 20 of its 26 weekday trips per direction
+  turn at Aleea Nordului and 6 carry on to Agrogal (11 and 3 at weekends). The
+  two sets are disjoint on the site (20 + 6 = 26, and each Bazinul nou departure
+  leads to exactly one of them), so the split is unambiguous. The through trips
+  do not call at Aleea Nordului at all, which the feed reflects;
+- route 39B reaches Cimitirul Ștefan cel Mare on all 37 weekend trips but only 4
+  of 37 on weekdays, and never departs from it on a weekday. Its other 33
+  weekday outbound trips and all 36 weekday returns use the Cimitirul Israelit
+  relations (r21253171 / r21253170).
+
+Both routes carry all four variants under their `route_master` in OSM
+(r21253038 for 13, r21240465 for 39B).
 
 Route 39B's weekday return direction used to be missing from the feed entirely,
 because the old alignment took the first station as definitive and that station
 has no weekday service.
+
+Worth reporting to Transurb: on weekdays route 39B reaches Cimitirul Ștefan cel
+Mare four times but the site lists no weekday departure from it, so those four
+buses return as something the timetable does not show.
 
 Routes with more than one itinerary
 

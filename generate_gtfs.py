@@ -94,6 +94,20 @@ HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
 # that variant's timetable). Route 11 is the only such route: a Monday-Friday
 # itinerary to Piața Centrală and a weekend one to Grădina Publică, which OSM
 # tags opening_hours=Mo-Fr and Sa-Su respectively.
+#
+# "short_turns" is for a route where some trips turn back early. One station
+# list on the site covers them all, but OSM maps each distinct stop sequence as
+# its own route relation, so the short workings are listed here by the terminus
+# that identifies them:
+#
+#     "short_turns": {"Aleea Nordului": {"TUR": 21253117, "RETUR": 21253118}}
+#
+# A trip is then matched to the itinerary whose first and last stop it actually
+# serves, and takes that relation's geometry and 'to' tag, so a trip turning
+# back early is not drawn running to the full route's terminus and is not
+# signed for it either. The relation's platforms must be a contiguous slice of
+# the full route's, otherwise it does not describe the same line and the build
+# reports it.
 # ---------------------------------------------------------------------------
 ROUTES = {
     "102": {"relations": {"TUR": 7514198, "RETUR": 309380}},
@@ -119,7 +133,12 @@ ROUTES = {
     "39": {"relations": {"TUR": 309018, "RETUR": 16337135}},
     "7": {"relations": {"TUR": 16337327, "RETUR": 16337326}},
     "44": {"relations": {"TUR": 16337536, "RETUR": 16337534}},
-    "39B": {"relations": {"TUR": 21240464, "RETUR": 21240463}},
+    # Route 39B reaches Cimitirul Ștefan cel Mare on all 37 weekend trips but
+    # only 4 of 37 on weekdays, and never departs from it on a weekday, so the
+    # trips that turn at Cimitirul Israelit follow that shorter relation.
+    "39B": {"relations": {"TUR": 21240464, "RETUR": 21240463},
+            "short_turns": {"Cimitirul Israelit": {"TUR": 21253171,
+                                                   "RETUR": 21253170}}},
     "55": {"relations": {"TUR": 21243592, "RETUR": 21243593}},
     # The site's TUR runs Din Vale -> Piața centrală, which is r21250647; the
     # relation names are the other way round from the ids' numeric order.
@@ -128,7 +147,9 @@ ROUTES = {
     # turn back at Aleea Nordului and 6 carry on to Agrogal, so neither end
     # station lists every trip and the timetable is keyed off the busiest stop
     # instead (see align_times). The site's TUR is Piața Centrală -> Agrogal.
-    "13": {"relations": {"TUR": 21252930, "RETUR": 21253037}},
+    "13": {"relations": {"TUR": 21252930, "RETUR": 21253037},
+           "short_turns": {"Aleea Nordului": {"TUR": 21253117,
+                                              "RETUR": 21253118}}},
     # Route 11 runs two itineraries, one per service period. The Piața Centrală
     # one is Monday-Friday only: the site still prints a weekend column on its
     # pages, but those weekend departures are the Grădina Publică trips listed
@@ -894,8 +915,76 @@ def route_variants(route_id: str, cfg: dict) -> dict[str, dict]:
     """
     if "variants" in cfg:
         return cfg["variants"]
-    return {STANDARD_VARIANT: {"relations": cfg["relations"],
-                               "services": ("WD", "WE")}}
+    variant = {"relations": cfg["relations"], "services": ("WD", "WE")}
+    if "short_turns" in cfg:
+        variant["short_turns"] = cfg["short_turns"]
+    return {STANDARD_VARIANT: variant}
+
+
+def short_turn_itineraries(route_id: str, key: str, direction: str,
+                           full: list[dict], short_turns: dict) -> list[dict]:
+    """The direction's itineraries: the full one, then each short working.
+
+    A short working is a separate OSM route relation covering part of the same
+    line, so its own geometry and terminus are used for the trips that turn
+    back early instead of the full route's. Its platforms have to be a
+    contiguous slice of the full sequence, sharing the same nodes; anything else
+    means the configured relation is not this route's short working.
+    """
+    full_ids = [s["id"] for s in full]
+    itineraries = [{"stops": full_ids, "shape_id": f"{route_id}-{key}",
+                    "order": [(s["lat"], s["lon"]) for s in full],
+                    "headsign": None, "rel": None, "name": None}]
+    for terminus, relations in (short_turns or {}).items():
+        rel_id = relations.get(direction)
+        if rel_id is None:
+            continue
+        data = relation_data(rel_id)
+        platforms = data["platforms"]
+        if any(p["type"] != "node" or not p["name"] for p in platforms):
+            issue("error", f"route {route_id} {direction}",
+                  f"short-working relation {rel_id} ({terminus}) has a platform "
+                  f"that is not a named node, so its stops cannot be matched")
+            continue
+        ids = [stop_id(p["name"], p["node"]) for p in platforms]
+        start = full_ids.index(ids[0]) if ids and ids[0] in full_ids else -1
+        if start < 0 or full_ids[start:start + len(ids)] != ids:
+            issue("error", f"route {route_id} {direction}",
+                  f"short-working relation {rel_id} ({terminus}) does not cover "
+                  f"a contiguous part of the full route: its stops are "
+                  f"{ids} against {full_ids}")
+            continue
+        to = data["tags"].get("to")
+        last_name = platforms[-1]["name"]
+        if not to:
+            issue("warning", f"route {route_id} {direction}",
+                  f"short-working relation {rel_id} has no 'to' tag; the "
+                  f"headsign falls back to the last stop, {last_name!r}")
+            to = last_name
+        itineraries.append({
+            "stops": ids, "shape_id": f"{route_id}-{key}-{slug(terminus)}",
+            "order": [(p["lat"], p["lon"]) for p in platforms],
+            "headsign": to, "rel": data, "name": terminus})
+    return itineraries
+
+
+def pick_itinerary(itineraries: list[dict], served: list[str]) -> dict | None:
+    """The itinerary a trip runs, matched on the stops it actually serves.
+
+    Matched on both ends, since a short working can differ at either: route 13
+    turns back before Agrogal, route 39B's weekday returns start short of the
+    cemetery. The full route is the fallback, and the longest match wins so that
+    the full route is not chosen for a trip a shorter itinerary describes
+    exactly.
+    """
+    if not served:
+        return None
+    best = None
+    for it in itineraries:
+        if it["stops"][0] == served[0] and it["stops"][-1] == served[-1]:
+            if best is None or len(it["stops"]) < len(best["stops"]):
+                best = it
+    return best
 
 
 def collect_route(route_id: str, cfg: dict) -> dict:
@@ -913,6 +1002,7 @@ def collect_route(route_id: str, cfg: dict) -> dict:
     trips, stop_times, stop_order = [], [], {}
     unique_stops = {}
     sequences = {}
+    extra_shapes: dict[str, dict] = {}
     for variant, vcfg in wanted.items():
         v_out = collect_variant(route_id, cfg, variant, vcfg,
                                 all_variants.get(variant))
@@ -925,10 +1015,11 @@ def collect_route(route_id: str, cfg: dict) -> dict:
         stop_times.extend(v_out["stop_times"])
         stop_order.update(v_out["stop_order"])
         sequences.update(v_out["sequences"])
+        extra_shapes.update(v_out["extra_shapes"])
         meta = meta or v_out["meta"]
     return {"stops": unique_stops, "trips": trips, "stop_times": stop_times,
             "stop_order": stop_order, "sequences": sequences, "meta": meta,
-            "rel_data": rel_data}
+            "rel_data": rel_data, "extra_shapes": extra_shapes}
 
 
 def variant_key(direction: str, variant: str) -> str:
@@ -981,15 +1072,23 @@ def collect_variant(route_id: str, cfg: dict, variant: str, vcfg: dict,
     # 3) trips + stop_times
     trips, stop_times, stop_order = [], [], {}
     unique_stops = {}
+    shape_sources: dict[str, dict] = {}
     for key, seq in stops.items():
         for stop in seq:
             unique_stops.setdefault(stop["id"], stop)
         stop_order[key] = [(s["lat"], s["lon"]) for s in seq]
         direction = "TUR" if key.startswith("TUR") else "RETUR"
         direction_id = 0 if direction == "TUR" else 1
-        shape_id = f"{route_id}-{key}"
+        # Trips that turn back early follow a shorter OSM relation, so each
+        # itinerary carries its own shape and headsign.
+        itineraries = short_turn_itineraries(route_id, key, direction, seq,
+                                             vcfg.get("short_turns"))
+        for it in itineraries[1:]:
+            shape_sources[it["shape_id"]] = {"rel": it["rel"],
+                                             "order": it["order"]}
         wd_service = cfg.get("service_days", "WD")
         built_trips: dict[str, int] = {}
+        per_itinerary: dict[str, int] = {}
         for service in ("WD", "WE"):
             svc_id = wd_service if service == "WD" else "WE"
             if service not in vcfg.get("services", ("WD", "WE")):
@@ -1016,21 +1115,34 @@ def collect_variant(route_id: str, cfg: dict, variant: str, vcfg: dict,
             prefix = f"{route_id}-{key}-{svc_id}"
             for i in range(n):
                 tid = f"{prefix}-{i + 1:03d}"
-                trips.append((route_id, svc_id, tid, meta["headsigns"][key],
-                              direction_id, shape_id))
-                for k, stop in enumerate(seq, start=1):
-                    t = rows[k - 1][i]
-                    if t is None:
-                        continue
+                calls = [(k, rows[k - 1][i]) for k in range(1, len(seq) + 1)
+                         if rows[k - 1][i] is not None]
+                it = pick_itinerary(itineraries,
+                                    [seq[k - 1]["id"] for k, _ in calls])
+                if it is None:
+                    issue("error", f"route {label} {key} {service}",
+                          f"trip {tid} calls at no stop, so no itinerary "
+                          f"describes it")
+                    continue
+                per_itinerary[it["name"] or "full route"] = \
+                    per_itinerary.get(it["name"] or "full route", 0) + 1
+                trips.append((route_id, svc_id, tid,
+                              it["headsign"] or meta["headsigns"][key],
+                              direction_id, it["shape_id"]))
+                for seq_no, (k, t) in enumerate(calls, start=1):
                     t = t + ":00"
-                    stop_times.append((tid, t, t, stop["id"], k))
+                    stop_times.append((tid, t, t, seq[k - 1]["id"], seq_no))
             built_trips[service] = n
         served = [s for s in ("WD", "WE") if s in built_trips]
         print(f"route {label} {key}: "
               + ", ".join(f"{built_trips[s]} {s} trips" for s in served))
+        if len(itineraries) > 1:
+            for name, count in sorted(per_itinerary.items()):
+                print(f"    {count} trips via {name}")
     return {"stops": unique_stops, "stops_by_key": stops, "trips": trips,
             "stop_times": stop_times, "stop_order": stop_order,
-            "sequences": stops, "meta": meta, "rel_data": rel_data}
+            "sequences": stops, "meta": meta, "rel_data": rel_data,
+            "extra_shapes": shape_sources}
 
 
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -1106,6 +1218,7 @@ def write_feed(route_ids: list[str]) -> None:
     OUT_DIR.mkdir(exist_ok=True)
     all_stops, all_trips, all_st, all_order = {}, [], [], {}
     meta, rel_data, built, sequences = {}, {}, [], {}
+    extra_shapes: dict[str, dict] = {}
     for i, rid in enumerate(route_ids, 1):
         print(f"\n[{i}/{len(route_ids)}] Route {rid}", flush=True)
         try:
@@ -1113,6 +1226,7 @@ def write_feed(route_ids: list[str]) -> None:
         except RouteDataError as e:
             issue("error", f"route {rid}", str(e))
             continue
+        extra_shapes.update(data["extra_shapes"])
         all_stops.update(data["stops"])
         all_trips.extend(data["trips"])
         all_st.extend(data["stop_times"])
@@ -1206,6 +1320,26 @@ def write_feed(route_ids: list[str]) -> None:
                                     f"{data['id']} fails the shape check)")
             for seq, (lat, lon) in enumerate(pts, start=1):
                 shape_rows.append((shape_id, f"{lat:.6f}", f"{lon:.6f}", seq))
+
+    # short workings: their own relation's geometry, so a trip that turns back
+    # early is not drawn running to the full route's terminus
+    for shape_id, src in sorted(extra_shapes.items()):
+        data, order = src["rel"], src["order"]
+        pts = osm_shape_points(data, order)
+        if pts and shape_ok(pts, order):
+            print(f"shape {shape_id}: {len(pts)} points (OSM relation {data['id']})")
+            shape_report.append(f"{shape_id}: OSM relation {data['id']}")
+        else:
+            issue("error", f"shape {shape_id}",
+                  f"short-working relation {data['id']} geometry does not pass "
+                  f"along its own stops in order; the shape falls back to OSRM "
+                  f"routing")
+            pts = osrm_shape_points(order)
+            shape_report.append(f"{shape_id}: OSRM (relation {data['id']} "
+                                f"fails the shape check)")
+        for seq, (lat, lon) in enumerate(pts, start=1):
+            shape_rows.append((shape_id, f"{lat:.6f}", f"{lon:.6f}", seq))
+
     wcsv("shapes.txt", ["shape_id", "shape_pt_lat", "shape_pt_lon",
                         "shape_pt_sequence"], shape_rows)
     print("\nshape sources:")
