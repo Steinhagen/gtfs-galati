@@ -143,6 +143,7 @@ ROUTES = {
     "25": {"relations": {"TUR": 21253716, "RETUR": 21253646}},
     "20": {"relations": {"TUR": 10278231, "RETUR": 10278230}},
     "15": {"relations": {"TUR": 10181002, "RETUR": 10181003}},
+    "23": {"relations": {"TUR": 21253808, "RETUR": 21253809}},
     # The site's TUR runs Din Vale -> Piața centrală, which is r21250647; the
     # relation names are the other way round from the ids' numeric order.
     "50": {"relations": {"TUR": 21250647, "RETUR": 21244075}},

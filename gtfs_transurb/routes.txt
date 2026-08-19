@@ -6,6 +6,7 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 13,transurb,13,Piața centrală - Agrogal,3,D3E18F,000000
 15,transurb,15,Piața centrală - Gara C.F.R.,3,444444,FFFFFF
 20,transurb,20,Complex Siretul - Gara C.F.R.,3,54EDD9,000000
+23,transurb,23,ATAC - Shopping City,3,E9C1FF,000000
 24,transurb,24,Shopping City - Damen,3,6CC39F,000000
 25,transurb,25,Pista betonată - Shopping City,3,5E7E00,FFFFFF
 26,transurb,26,Micro 13 - Gara C.F.R.,3,F770B9,000000

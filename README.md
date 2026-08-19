@@ -86,15 +86,9 @@ below.
 
 FIXME
 
-1. Finish the remaining routes
+1. ~~Finish the remaining routes~~
 
-The Transurb site lists 30 routes; 29 are in the feed. What the last one needs:
-
-
-| Route | Stops (TUR/RETUR) | OSM Details |
-| :--- | :--- | :--- |
-| 23 | 14 / 16 | r395899 is a stub: no name, 1 platform, 126 ways |
-
+All 30 routes on the Transurb site are in the feed.
 
 Add a route to ROUTES once its relations list every platform, in travel order;
 the build fails with a count mismatch until then.
@@ -201,8 +195,9 @@ Centrală pages describes an itinerary those pages do not list.
 
   Check each against the site before retagging; the site is the authority on
   what still runs.
-- r395899 (`ref=23`) is not stale, it is a stub for a route that does run:
-  no name, 1 platform, 126 ways. It needs completing, see item 1.
+- r395899 (`ref=23`): a pre-PTv2 stub (no name, 1 platform, 126 ways) now
+  superseded by r21253808 and r21253809, which carry the complete route. Delete
+  r395899, or retag `disused:route`.
 
 3. Stop names to fix in OSM
 
