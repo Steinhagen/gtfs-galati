@@ -8,7 +8,7 @@ and by geographic zone (tables 3 and 5). This module parses both and produces:
     fare_media.txt          — payment methods (card, apps, SMS)
     fare_products.txt       — products with prices per medium
     fare_leg_rules.txt      — which products apply to which network
-    fare_transfer_rules.txt — free transfers within the validity window
+    fare_transfer_rules.txt — free urban transfers, paid extraurban ones
     networks.txt            — route network definitions
     route_networks.txt      — assignment of routes to networks
 
@@ -354,13 +354,24 @@ def write_fares(fares: dict, sorted_route_ids: list[str], palette: dict,
          ["leg_group_id", "network_id", "fare_product_id"],
          leg_rule_rows)
 
-    # Transfers are free within the validity window. The window differs per
-    # zone (60 or 90 min), so a transfer between two networks gets the longer
-    # of the two, and each pair of networks gets a rule of its own.
+    # Transfers: free inside the urban network for the validity window, paid on
+    # anything involving an extraurban zone.
     #
-    # transfer_count is conditionally forbidden/required: it applies only when
-    # from and to are the same leg group, where -1 means an unlimited number of
-    # transfers inside the window.
+    # A ticket is valid 60 minutes on the urban network, so changing between
+    # urban routes inside that window costs nothing: fare_transfer_type=0 is
+    # "A + AB", and with no fare_product_id on the rule AB is 0, so the journey
+    # costs the first leg only. transfer_count=-1 allows any number of them
+    # inside the window (it is required when the two leg groups are the same,
+    # and forbidden when they differ).
+    #
+    # An extraurban leg is always paid, even when the rider is still inside the
+    # window of a ticket bought for a previous leg: riding 102 to Piața Centrală
+    # and changing to 50 or 55 means buying the extraurban ticket too. That is
+    # fare_transfer_type=1, "A + AB + B", which charges the to-leg's own product
+    # on top of what came before; AB stays empty, so the rider pays exactly the
+    # two legs and nothing extra for the act of transferring. No duration_limit
+    # applies, since no window makes such a transfer free -- and the spec
+    # forbids duration_limit_type when duration_limit is empty.
     transfer_rows = []
     for nid in networks:
         if nid not in used_networks:
@@ -368,10 +379,16 @@ def write_fares(fares: dict, sorted_route_ids: list[str], palette: dict,
         for other in networks:
             if other not in used_networks:
                 continue
-            window = max(networks[nid]["duration"], networks[other]["duration"])
-            transfer_rows.append([f"{nid}_ride", f"{other}_ride",
-                                  -1 if nid == other else "", 0,
-                                  window * 60, 1])
+            same = nid == other
+            if nid == "urban" and other == "urban":
+                window = networks["urban"]["duration"] * 60
+                transfer_rows.append([f"{nid}_ride", f"{other}_ride", -1, 0,
+                                      window, 1])
+            else:
+                # to-leg is extraurban, or the rider is leaving an extraurban
+                # leg: either way the next leg is paid at its own price
+                transfer_rows.append([f"{nid}_ride", f"{other}_ride",
+                                      -1 if same else "", 1, "", ""])
 
     wcsv("fare_transfer_rules.txt",
          ["from_leg_group_id", "to_leg_group_id", "transfer_count",

@@ -58,8 +58,13 @@ not Monday-Friday).
   area is not a zone the page prices is reported and gets no fare.
 - The tariff page gives the fares, parsed into GTFS Fares v2: one network per
   zone in use, with its own products, prices per medium and validity window.
-  Transfers stay free within that window (the longer of the two windows when the
-  transfer crosses zones).
+  Transfers are free within the urban network for the 60 minutes a ticket is
+  valid, and unlimited in number. An extraurban leg is always paid, whatever
+  ticket the rider already holds: riding 102 to Piața Centrală and changing to
+  50 or 55 costs the urban ticket plus the extraurban one. In Fares v2 terms the
+  urban-to-urban rule is `fare_transfer_type=0` (A + AB, with AB empty, so the
+  journey costs the first leg only), and any rule touching an extraurban zone is
+  `fare_transfer_type=1` (A + AB + B, charging the second leg at its own price).
 
 Every build cross-checks the two sources per direction: the relation and the
 route page must list the same number of stops, in the same order. A mismatch
@@ -74,46 +79,83 @@ to report" for the site contradicting itself (item 6). Everything either
 currently reports is listed below.
 
 Adding a route: add its relation ids to ROUTES and build it. If OSM is
-complete, nothing else is needed.
+complete, nothing else is needed. A route whose page carries several station
+lists is configured with `variants` instead of `relations`, one entry per
+itinerary with its own relations and the service periods it runs; see route 11
+below.
 
 FIXME
 
 1. Finish the remaining routes
 
-The Transurb site lists 30 routes; 24 are in the feed. What the other 6 need:
+The Transurb site lists 30 routes; 26 are in the feed. What the other 4 need:
 
-  route  site stops (TUR/RETUR)  OSM
-     11             22 / 15      r10177466 / r10179043 match this exactly, but
-                                 see the weekend itinerary below
-     15              8 / 11      r10181002 / r10181003, only 8 / 8 platforms
-     20             14 / 16      r10278231 / r10278230, only 15 / 11 platforms
-     23             14 / 16      r395899 is a stub: no name, 1 platform, 126 ways
-     13             11 / 11      no relation
-     25             11 / 12      no relation
+
+| Route | Stops (TUR/RETUR) | OSM Details |
+| :--- | :--- | :--- |
+| 15 | 8 / 11 | r10181002 / r10181003, only 8 / 8 platforms |
+| 20 | 14 / 16 | r10278231 / r10278230, only 15 / 11 platforms |
+| 23 | 14 / 16 | r395899 is a stub: no name, 1 platform, 126 ways |
+| 25 | 11 / 12 | no relation |
+
 
 Add a route to ROUTES once its relations list every platform, in travel order;
 the build fails with a count mismatch until then.
 
-Route 11 needs more than that. Its page carries two station lists
-("variantaStatii"): the standard one, Micro 13 - Piața Centrală, which the two
-OSM relations already match stop for stop, and a second one, "Sâmbătă, duminică
-și sărbători legale către Grădina Publică" (21/21 stations), which follows the
-same path as far as Parfumul Teilor and then ends at Grădina Publică instead of
-Piața Centrală. The site's own weekend column does not separate the two: of the
-70 weekend departures from Micro 13, the 34 from 14:05 on are exactly the ones
-the second variant lists, yet the standard page still shows all 70 as calling
-at Piața Centrală (70 arrivals there plus 34 at Grădina Publică for 70
-departures). So the afternoon weekend runs are listed twice, once per
-itinerary. Before route 11 can be built:
+Routes where not every trip runs the whole way
 
-- OSM needs a second pair of route relations for the Grădina Publică itinerary,
-  as further variants of the same route_master;
-- the generator needs to build a route's variants separately and assign the
-  weekend afternoon departures to the right one, instead of reading only
-  "variantaStatii=standard".
+Some routes have trips that turn back early, so no single station lists every
+trip and the timetable cannot be keyed off the first stop. `align_times` keys
+off the busiest station instead, matching earlier stations backwards and later
+ones forwards; a station with fewer times simply leaves the trips it does not
+serve empty, whether they end short of it or start beyond it. Three routes need
+this:
 
-Every other route on the site has a single station list, so nothing else is
-affected. Route 11's second itinerary is reported by the build.
+- route 13 has two northern termini: of its 26 weekday trips per direction, 20
+  turn at Aleea Nordului and 6 carry on to Agrogal. The two sets are disjoint on
+  the site (20 + 6 = 26, and each Bazinul nou departure leads to exactly one of
+  them), so the split is unambiguous;
+- route 39B lists no weekday times at all at Cimitirul Ștefan cel Mare, while
+  the other five stops list 36. Its weekday return trips therefore start at
+  Cimitirul Israelit;
+- routes 41 and 39B also have trips skipping a stop mid-route, which is the same
+  mechanism.
+
+Route 39B's weekday return direction used to be missing from the feed entirely,
+because the old alignment took the first station as definitive and that station
+has no weekday service.
+
+Routes with more than one itinerary
+
+Route 11 is the only route whose page carries two station lists
+("variantaStatii"), and it is in the feed as two itineraries built separately:
+
+- the standard list, Micro 13 - Piața Centrală (22/15 stations,
+  r10177466 / r10179043), which runs Monday to Friday;
+- "Sâmbătă, duminică și sărbători legale către Grădina Publică" (21/21,
+  r21251489 / r21251488), which follows the same path as far as Parfumul Teilor
+  and then ends at Grădina Publică instead of Piața Centrală, at weekends and on
+  holidays.
+
+OSM tags the split with `opening_hours=Mo-Fr` on the first pair and `Sa-Su` on
+the second, which matches how Transurb actually runs the route. The site does
+not: the Piața Centrală pages still print a weekend column, and its 34
+departures from 14:05 on are exactly the Grădina Publică trips listed a second
+time. The stale copy shows itself two ways — those trips appear at stops the
+weekend service never reaches (70 weekend times at Str. Gării and Piața
+Centrală, where only 36 trips actually run), and every one of the 34 matches a
+Grădina Publică departure to the minute at every shared stop.
+
+So a route configured with `variants` names, per itinerary, both its relations
+and the service periods it really runs (`"services": ("WD",)` for Piața
+Centrală, `("WE",)` for Grădina Publică). The weekend column on the Piața
+Centrală pages is simply not read, which is what keeps the phantom trips out.
+The RETUR direction needs no such filtering and gets none: there the two lists
+are complementary rather than duplicated, the standard one ending at 14:38 and
+Grădina Publică starting at 14:52.
+
+This is worth reporting to Transurb (item 6): the weekend column on the Piața
+Centrală pages describes an itinerary those pages do not list.
 
 2. Route relations to fix in OSM
 
@@ -144,6 +186,10 @@ affected. Route 11's second itinerary is reported by the build.
 
 Same stop spelled two ways:
 
+- DAMEN on route 13's platforms (n1129805725, n10466845815) vs Damen on the
+  route 10/24 platform (n6896966047); all-caps is against the title case the
+  rest of the network uses
+
 - Str. Gheorghe Doja (n6963443061) vs Strada Gheorghe Doja (n6896006833,
   n6960963007, and the tram platforms n14099815419, n14099845128)
 - Oțelarilor on the route 39 tram platforms (n14099815413, n14099845134) vs
@@ -165,6 +211,9 @@ does distinguish them):
   bus platform are together, the other bus platform (n6896006839) is the one
   the site lists as a separate station on the routes that call there
   (n6894604132, n6896006839, n14099845125)
+- DAMEN: 3 stops up to 406 m apart — the pair route 13 calls at
+  (n1129805725, n10466845815) and the one routes 10 and 24 use 400 m south
+  (n6896966047), which is also spelled `Damen` rather than `DAMEN`
 - Ștefan cel Mare: 2 stops 3.7 km apart, the route 39B one on Strada Ștefan cel
   Mare (n14101695639) vs the route 55 one out at Costi (n14103649655)
 - Strada Aurel Vlaicu: the site calls one of them
@@ -191,7 +240,7 @@ route_long_name for 55.
 
 4. Every stop the two sources name differently
 
-Of the 704 stop visits in the feed, 83 pairs of names differ between OSM and
+Of the 783 stop visits in the feed, 87 pairs of names differ between OSM and
 the Transurb route page. Capitalisation and diacritics are ignored in this
 comparison, since the site prints station names in caps without diacritics; a
 spelling recorded in `short_name` / `alt_name` / `official_name` / `loc_name`
@@ -211,7 +260,13 @@ Different wording — someone has to decide which name is right:
   Cimitir Cătușa                     Cimitirul „Cătușa”               n6892672444, n6893391129
   Cimitir Eternitatea                Cimitirul Eternitatea            n6899023178, n6899129583
   Cimitir Sf. Lazăr                  Cimitirul „Sfântul Lazăr”        n1720639175, n14088455591
-  F.S.E.A. / F.E.A.A. / F.E.E.A      F.E.E.A.                         n534268996
+  F.S.E.A. / F.E.A.A. / F.E.E.A / FSEA  F.E.E.A.                      n534268996
+  C.N.V.A. / CNVA                    C.N.V.A.                         n534268981
+    - both spellings come from route 11: the weekday list writes the dots, the
+      weekend one drops them
+  Casa Roșie (Bld. Siderugistilor)   Casa Roșie                       n1720639168
+    - route 11 weekday RETUR only, and "Siderugistilor" is the site's
+      misspelling of Siderurgiștilor
   Fac. de Medicină                   Facultatea de Medicină           n6893391123
   Galeria de Artă                    Galeriile de artă                n530256646
   Liceul Sf. Maria                   Liceul „Sfânta Maria”            n6960963008, n6963443059
@@ -382,11 +437,26 @@ in every column, and the surplus times have to match the doubled profile to the
 minute — so a genuine trip starting mid-route is not discarded by mistake. Once
 the site is corrected the function stops matching and nothing else changes.
 
+Route 11, weekend timetable on the Piața Centrală pages: those pages carry a
+weekend column that belongs to the other itinerary. Route 11 runs to Piața
+Centrală Monday to Friday and to Grădina Publică at weekends and on holidays,
+which is a separate station list on the same page. Yet the Piața Centrală pages
+still print 70 weekend departures from Micro 13, of which the 34 from 14:05 on
+are the Grădina Publică trips, matching them to the minute at every shared stop.
+Those pages therefore show weekend trips calling at Str. Gării, F.S.E.A.,
+C.N.V.A. and Piața Centrală, which the weekend service does not serve at all;
+only the 36 morning departures up to 13:51 are real. The generator reads the
+weekday column from those pages and the weekend one from the Grădina Publică
+pages, so the feed is right, but the published tables still mislead anyone
+reading them directly. The RETUR direction is correct: there the two lists are
+complementary, ending at 14:38 and resuming at 14:52.
+
 Also worth reporting, from item 4: the site spells the same stop several ways
 (Agenția C.F.R. / Agenția CFR, CEC Țiglina II / C.E.C. Țiglina II, Gara CFR /
 "Gara  CFR" with a double space, Str. Gării / "Str.Gării", Str. Cezar / Cezar,
-F.S.E.A. / F.E.A.A. / F.E.E.A), and route 11's two itineraries share one
-weekend column (item 1).
+F.S.E.A. / F.E.A.A. / F.E.E.A / FSEA, C.N.V.A. / CNVA), and route 11's RETUR
+list names a stop "CASA ROSIE (BLD. SIDERUGISTILOR)", misspelling
+Siderurgiștilor.
 
 7. Map ticket vending machines (TVMs) in OSM
 

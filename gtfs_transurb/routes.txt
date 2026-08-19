@@ -2,6 +2,8 @@ route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route
 7,transurb,7,Micro 19 - Piața Centrală,0,C3D7FF,000000
 9,transurb,9,Cimitirul Sfântul Lazăr - Gara C.F.R.,3,E1B348,000000
 10,transurb,10,Micro 19 - Damen,3,F99BAD,000000
+11,transurb,11,Micro 13 - Piața centrală,3,009597,FFFFFF
+13,transurb,13,Piața centrală - Agrogal,3,D3E18F,000000
 24,transurb,24,Shopping City - Damen,3,6CC39F,000000
 26,transurb,26,Micro 13 - Gara C.F.R.,3,F770B9,000000
 28,transurb,28,Micro 19 - Bariera Traian,3,3AD1FB,000000

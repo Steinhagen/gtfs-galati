@@ -36,6 +36,9 @@
   <label>Route:
     <select id="routeSelect"></select>
   </label>
+  <label>Direction:
+    <select id="dirSelect"></select>
+  </label>
   <label>Highlight trip:
     <select id="tripSelect"></select>
   </label>
@@ -136,7 +139,8 @@ async function init() {
     if (!r) return;
     const seq = stByTrip[t.trip_id] || [];
     if (seq.length < 2) return;
-    tripFeatures.push({ route: r, trip: t, seq });
+    tripFeatures.push({ route: r, trip: t, seq,
+                        dir: t.direction_id == 0 ? 'TUR' : 'RETUR' });
   });
 
   // route select + trip select
@@ -148,11 +152,42 @@ async function init() {
     routeSel.appendChild(opt);
   });
 
-  // direction of the currently selected trip (defaults to TUR)
+  // Which directions a route actually has. Most have TUR and RETUR, route 38 is
+  // a loop with only TUR, so the direction select is built per route instead of
+  // being hardcoded to both.
+  function directionsOf(rid) {
+    const dirs = [];
+    ['TUR', 'RETUR'].forEach(d => {
+      if (tripFeatures.some(f => f.route.route_id === rid && f.dir === d)) dirs.push(d);
+    });
+    return dirs;
+  }
+
+  // The direction being shown: whatever the direction select holds, falling back
+  // to the route's first available one.
   function selectedDirection() {
-    const id = document.getElementById('tripSelect').value;
-    const f = id && tripFeatures.find(x => x.trip.trip_id === id);
-    return f ? (f.trip.direction_id == 0 ? 'TUR' : 'RETUR') : 'TUR';
+    const rid = document.getElementById('routeSelect').value;
+    const value = document.getElementById('dirSelect').value;
+    const dirs = directionsOf(rid);
+    return dirs.includes(value) ? value : (dirs[0] || 'TUR');
+  }
+
+  function populateDirections() {
+    const rid = document.getElementById('routeSelect').value;
+    const sel = document.getElementById('dirSelect');
+    const previous = sel.value;
+    const dirs = directionsOf(rid);
+    sel.innerHTML = '';
+    dirs.forEach(d => {
+      const n = tripFeatures.filter(f => f.route.route_id === rid && f.dir === d).length;
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = `${d} (${n} trip${n === 1 ? '' : 's'})`;
+      sel.appendChild(opt);
+    });
+    // keep the direction across route changes when the new route has it
+    if (dirs.includes(previous)) sel.value = previous;
+    sel.disabled = dirs.length < 2;
   }
 
   // show the selected route's shapes (direction of the selected trip,
@@ -190,16 +225,27 @@ async function init() {
     });
   }
 
+  // Trips of the selected route *and* direction, earliest departure first, with
+  // a "none" entry so the direction can be shown without singling out a trip.
   function populateTrips() {
     const rid = document.getElementById('routeSelect').value;
+    const dir = selectedDirection();
     const sel = document.getElementById('tripSelect');
     sel.innerHTML = '';
-    tripFeatures.filter(f => f.route.route_id === rid).forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = f.trip.trip_id;
-      opt.textContent = `${f.trip.trip_id}  ${f.trip.trip_headsign}  ${f.trip.service_id}  ${f.seq[0].departure_time}`;
-      sel.appendChild(opt);
-    });
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = '— whole direction —';
+    sel.appendChild(none);
+    tripFeatures
+      .filter(f => f.route.route_id === rid && f.dir === dir)
+      .sort((a, b) => (a.seq[0].departure_time || '').localeCompare(b.seq[0].departure_time || ''))
+      .forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.trip.trip_id;
+        const time = (f.seq[0].departure_time || '').replace(/:00$/, '');
+        opt.textContent = `${time}  ${f.trip.service_id}  → ${f.trip.trip_headsign}`;
+        sel.appendChild(opt);
+      });
   }
 
   function renderLabels() {
@@ -227,8 +273,7 @@ async function init() {
     if (showBoth) {
       Object.values(dirSets).forEach(s => s.forEach(id => ids.add(id)));
     } else {
-      const dir = f ? (f.trip.direction_id == 0 ? 'TUR' : 'RETUR') : 'TUR';
-      (dirSets[dir] || new Set()).forEach(id => ids.add(id));
+      (dirSets[selectedDirection()] || new Set()).forEach(id => ids.add(id));
     }
 
     stops.forEach(s => {
@@ -258,8 +303,30 @@ async function init() {
       stopsLayer.bringToFront();
     }
     renderLabels();
+
+    const rid = document.getElementById('routeSelect').value;
+    const dir = selectedDirection();
     const id = document.getElementById('tripSelect').value;
-    if (!id) return;
+    const route = routesById[rid];
+
+    // No trip picked: frame the whole direction and report what it holds.
+    if (!id) {
+      const dirs = document.getElementById('cBoth').checked ? directionsOf(rid) : [dir];
+      const group = L.featureGroup(
+        dirs.flatMap(d => (routeLayers[rid] || {})[d] || []));
+      if (group.getLayers().length) map.fitBounds(group.getBounds());
+      const of = tripFeatures.filter(f => f.route.route_id === rid && dirs.includes(f.dir));
+      const byService = {};
+      of.forEach(f => byService[f.trip.service_id] = (byService[f.trip.service_id] || 0) + 1);
+      const services = Object.entries(byService)
+        .map(([s, n]) => `${n} on ${s}`).join(', ') || 'no trips';
+      const heads = [...new Set(of.map(f => f.trip.trip_headsign))].join(' / ');
+      document.getElementById('status').innerHTML =
+        `Route <b>${route ? route.route_short_name : rid}</b> ${dirs.join(' + ')}` +
+        (heads ? ` &rarr; ${heads}` : '') + `<br>${of.length} trips (${services})`;
+      return;
+    }
+
     const f = tripFeatures.find(x => x.trip.trip_id === id);
     if (!f) return;
     let latlngs = shapePoints[f.trip.shape_id] || [];
@@ -273,8 +340,12 @@ async function init() {
     window._hl = hl;
 
     map.fitBounds(hl.getBounds());
+    const first = (f.seq[0].departure_time || '').replace(/:00$/, '');
+    const last = (f.seq[f.seq.length - 1].arrival_time || '').replace(/:00$/, '');
     document.getElementById('status').innerHTML =
-      'Trip <b>' + id + '</b>: ' + f.seq.map(x => x.departure_time).join(' &rarr; ');
+      `Route <b>${f.route.route_short_name}</b> ${f.dir} &rarr; ${f.trip.trip_headsign}` +
+      `<br>${f.trip.service_id} ${first}&ndash;${last}, ${f.seq.length} stops` +
+      `<br><span class="mode">${id}</span>`;
   }
 
   document.getElementById('cStops').addEventListener('change', e => {
@@ -286,42 +357,34 @@ async function init() {
       map.removeLayer(stopsLayer);
     }
   });
-  document.getElementById('cBoth').addEventListener('change', () => {
-    showRoute(document.getElementById('routeSelect').value);
-    if (document.getElementById('cStops').checked) {
-      renderStops();
-      stopsLayer.addTo(map);
-      stopsLayer.bringToFront();
-    }
-    renderLabels();
-  });
+  document.getElementById('cBoth').addEventListener('change', highlight);
   document.getElementById('cLabels').addEventListener('change', () => renderLabels());
   routeSel.addEventListener('change', () => {
+    populateDirections();
+    populateTrips();
     showRoute(routeSel.value);
     renderStops();
     if (document.getElementById('cStops').checked) {
       stopsLayer.addTo(map);
       stopsLayer.bringToFront();
     }
+    highlight();
+  });
+  // Changing direction re-filters the trip list and shows that direction whole,
+  // rather than keeping a trip from the direction just left behind.
+  document.getElementById('dirSelect').addEventListener('change', () => {
     populateTrips();
     highlight();
   });
   document.getElementById('tripSelect').addEventListener('change', highlight);
   window.addEventListener('keydown', e => { if (e.key === 'Escape') { if (window._hl) { window._hl.remove(); window._hl = null; } if (window._stopLabels) { window._stopLabels.forEach(l => l.remove()); window._stopLabels = null; } } });
 
+  populateDirections();
   populateTrips();
   showRoute(routeSel.value);
   renderStops();
   stopsLayer.bringToFront();
   highlight();
-
-  const ll = stops.map(s => [+s.stop_lat, +s.stop_lon]);
-  map.fitBounds(ll);
-
-  const byRoute = {};
-  tripFeatures.forEach(f => byRoute[f.route.route_id] = (byRoute[f.route.route_id] || 0) + 1);
-  const parts = Object.entries(byRoute).map(([rid, n]) => `${rid}: ${n} trips`);
-  document.getElementById('status').innerHTML = `${stops.length} stops · ${parts.join(' · ')}`;
 }
 
 init().catch(err => {

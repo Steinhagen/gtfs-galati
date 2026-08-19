@@ -68,6 +68,10 @@ FEED_CONTACT_URL = "https://github.com/Steinhagen/gtfs-galati/issues"
 OPERATOR_NAME = "TRANSURB S.A. Galati"
 OPERATOR_URL = "https://transurbgalati.ro"
 
+# The site's name for a route page's default station list; other names are
+# alternative itineraries of the same route ("variantaStatii").
+STANDARD_VARIANT = "standard"
+
 FEED_START, FEED_END = "20260101", "20261231"
 # Romanian legal holidays in 2026 that follow the weekend schedule.
 HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
@@ -82,6 +86,14 @@ HOLIDAYS_2026 = ["20260101", "20260106", "20260107", "20260410", "20260413",
 # positions, shapes, vehicle type, termini and headsigns all come from the
 # relation; the station names used to fetch timetables come from the Transurb
 # route page.
+#
+# A route whose page carries more than one station list ("variantaStatii") is
+# configured with "variants" instead of "relations": one entry per itinerary,
+# keyed by the variant name the site uses, each with its own relations and the
+# services it actually runs ("services": the subset of ("WD", "WE") to read from
+# that variant's timetable). Route 11 is the only such route: a Monday-Friday
+# itinerary to Piața Centrală and a weekend one to Grădina Publică, which OSM
+# tags opening_hours=Mo-Fr and Sa-Su respectively.
 # ---------------------------------------------------------------------------
 ROUTES = {
     "102": {"relations": {"TUR": 7514198, "RETUR": 309380}},
@@ -112,6 +124,24 @@ ROUTES = {
     # The site's TUR runs Din Vale -> Piața centrală, which is r21250647; the
     # relation names are the other way round from the ids' numeric order.
     "50": {"relations": {"TUR": 21250647, "RETUR": 21244075}},
+    # Route 13 has two northern termini on one itinerary: 20 of its 26 trips
+    # turn back at Aleea Nordului and 6 carry on to Agrogal, so neither end
+    # station lists every trip and the timetable is keyed off the busiest stop
+    # instead (see align_times). The site's TUR is Piața Centrală -> Agrogal.
+    "13": {"relations": {"TUR": 21252930, "RETUR": 21253037}},
+    # Route 11 runs two itineraries, one per service period. The Piața Centrală
+    # one is Monday-Friday only: the site still prints a weekend column on its
+    # pages, but those weekend departures are the Grădina Publică trips listed
+    # a second time (see WEEKEND_ONLY_VARIANTS below), so only "WD" is read
+    # from it. The Grădina Publică variant is weekend/holiday only.
+    "11": {"variants": {
+        STANDARD_VARIANT: {
+            "relations": {"TUR": 10177466, "RETUR": 10179043},
+            "services": ("WD",)},
+        "Sâmbătă, duminică și sărbători legale către Grădina Publică": {
+            "relations": {"TUR": 21251489, "RETUR": 21251488},
+            "services": ("WE",)},
+    }},
 }
 
 # OSM route tag -> GTFS route_type, and the palette's vehicle column -> the
@@ -228,7 +258,6 @@ def fetch_page(url: str, cache_file: Path, refresh: bool = False) -> str:
 # ---------------------------------------------------------------------------
 # Transurb website
 # ---------------------------------------------------------------------------
-STANDARD_VARIANT = "standard"
 
 
 def site_stations(route_id: str) -> dict[str, list[str]]:
@@ -238,9 +267,10 @@ def site_stations(route_id: str) -> dict[str, list[str]]:
     from the site rather than written down here.
 
     A route page can carry more than one station list ("variantaStatii"): route
-    11 has a separate weekend/holiday itinerary. Only the standard one is
-    returned; the others are reported, since each is a distinct itinerary that
-    needs its own OSM route relations before it can be in the feed.
+    11 has a separate weekend/holiday itinerary to Grădina Publică. All of them
+    are returned, keyed by variant name, so a route configured with relations
+    per variant can be built; a variant with no relations configured for it is
+    reported and left out of the feed.
     """
     html_text = fetch_page(f"{BASE_URL}/veziTraseu?numarTraseu={route_id}",
                            CACHE_DIR / f"traseu_{route_id}.html", REFRESH)
@@ -252,24 +282,21 @@ def site_stations(route_id: str) -> dict[str, list[str]]:
         variant = q.get("variantaStatii", [STANDARD_VARIANT])[0]
         seq = variants.setdefault(variant, {"TUR": [], "RETUR": []})
         seq[q["turRetur"][0].upper()].append(q["numeStatie"][0])
-    for name, seq in variants.items():
-        if name != STANDARD_VARIANT:
-            issue("warning", f"route {route_id}",
-                  f"the route page lists a second itinerary, {name!r} "
-                  f"({len(seq['TUR'])} / {len(seq['RETUR'])} stations); it needs "
-                  f"its own OSM route relations and is not in the feed")
-    return variants.get(STANDARD_VARIANT, {"TUR": [], "RETUR": []})
+    return variants or {STANDARD_VARIANT: {"TUR": [], "RETUR": []}}
 
 
-def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str], list[str]]:
+def fetch_schedule(route: str, direction: str, station: str,
+                   variant: str = STANDARD_VARIANT
+                   ) -> tuple[list[str], list[str]]:
     """Return (weekday times, weekend times) for one station on the site."""
     query = urllib.parse.urlencode({
         "numarTraseu": route,
         "numeStatie": station,
         "turRetur": direction.lower(),
-        "variantaStatii": "standard",
+        "variantaStatii": variant,
     })
-    cache = CACHE_DIR / f"{route}_{direction}_{station}.html"
+    slug_variant = "" if variant == STANDARD_VARIANT else f"_{slug(variant)[:40]}"
+    cache = CACHE_DIR / f"{route}_{direction}_{station}{slug_variant}.html"
     html_text = fetch_page(f"{BASE_URL}/veziProgram?{query}", cache)
     m = re.search(r"DE \w+ PÂNĂ VINERI(.*?)WEEKEND ȘI SĂRBĂTORI LEGALE(.*?)</table>",
                   html_text, re.S)
@@ -279,6 +306,11 @@ def fetch_schedule(route: str, direction: str, station: str) -> tuple[list[str],
     m_wd = re.search(r"DE \w+ PÂNĂ VINERI(.*?)</table>", html_text, re.S)
     if m_wd:
         return re.findall(r"(\d{2}:\d{2})", m_wd.group(1)), []
+    # Weekend-only itineraries (route 11's Grădina Publică variant): the page
+    # carries the weekend table alone, with no Monday-Friday section at all.
+    m_we = re.search(r"WEEKEND ȘI SĂRBĂTORI LEGALE(.*?)</table>", html_text, re.S)
+    if m_we:
+        return [], re.findall(r"(\d{2}:\d{2})", m_we.group(1))
     raise RuntimeError(f"could not parse timetable for route {route} {direction} {station}")
 
 
@@ -790,35 +822,57 @@ def drop_doubled_trip(route_id: str, direction: str, service: str,
     return cleaned
 
 
+# A trip's time at one station has to be within this of its time at the station
+# that defines the trips, otherwise it belongs to a different trip.
+MAX_LEG_SPREAD_MIN = 45
+
+
 def align_times(station_times: list[list[str]]) -> list[list[str | None]]:
     """Align each station's sorted times to the trips.
 
-    The first station defines the trips. Later stations may have fewer times,
-    meaning some trips do not stop there (the time is set to None).
+    The busiest station defines the trips, since not every trip need run the
+    whole route: route 13 turns most trips back at Aleea Nordului and only a few
+    continue to Agrogal, so its terminus has 6 times where the rest of the route
+    has 26. Stations before that one are matched backwards and stations after it
+    forwards; a station with fewer times leaves the trips it does not serve as
+    None, whether they end short of it or start beyond it.
     """
-    n = len(station_times[0])
-    rows = [[None] * n for _ in station_times]
-    rows[0] = list(station_times[0])
-    for k in range(1, len(station_times)):
+    ref = max(range(len(station_times)), key=lambda k: len(station_times[k]))
+    reference = station_times[ref]
+    n = len(reference)
+    rows: list[list[str | None]] = [[None] * n for _ in station_times]
+    rows[ref] = list(reference)
+    for k in range(len(station_times)):
+        if k == ref:
+            continue
         tk = station_times[k]
         if len(tk) == n:
             rows[k] = list(tk)
             continue
-        if len(tk) > n:
-            raise RuntimeError(f"station {k} has {len(tk)} times, more than {n} trips")
         j = 0
         for i in range(n):
             if j >= len(tk):
                 break
             t = tk[j]
-            prev = station_times[0][i]
-            nxt = station_times[0][i + 1] if i + 1 < n else None
-            # a time belongs to trip i if it falls inside trip i's slot and
-            # the trip can plausibly reach this station within 45 minutes
-            if t >= prev and (nxt is None or t < nxt) and _minutes(t) - _minutes(prev) <= 45:
+            here, prev = reference[i], reference[i - 1] if i else None
+            nxt = reference[i + 1] if i + 1 < n else None
+            if k > ref:
+                # later in travel: the time falls in [here, nxt) and the trip
+                # can plausibly get this far
+                fits = (t >= here and (nxt is None or t < nxt)
+                        and _minutes(t) - _minutes(here) <= MAX_LEG_SPREAD_MIN)
+            else:
+                # earlier in travel: the time falls in (prev, here] instead
+                fits = (t <= here and (prev is None or t > prev)
+                        and _minutes(here) - _minutes(t) <= MAX_LEG_SPREAD_MIN)
+            if fits:
                 rows[k][i] = t
                 j += 1
-            # otherwise trip i skips this station
+            # otherwise this trip does not call at station k
+        if j < len(tk):
+            raise RuntimeError(
+                f"station {k} has {len(tk) - j} time(s) that match no trip "
+                f"defined by station {ref} ({n} trips): {tk[j:]}")
     # monotonicity check within each trip
     for i in range(n):
         prev = None
@@ -832,69 +886,137 @@ def align_times(station_times: list[list[str]]) -> list[list[str | None]]:
             prev = t
     return rows
 
+def route_variants(route_id: str, cfg: dict) -> dict[str, dict]:
+    """The route's itineraries to build, keyed by the site's variant name.
+
+    A plain "relations" config is the single-itinerary case, i.e. one variant
+    named "standard" that provides both service periods.
+    """
+    if "variants" in cfg:
+        return cfg["variants"]
+    return {STANDARD_VARIANT: {"relations": cfg["relations"],
+                               "services": ("WD", "WE")}}
+
+
 def collect_route(route_id: str, cfg: dict) -> dict:
     """Stops, trips, stop_times and metadata for one route."""
-    stations = site_stations(route_id)
-    for direction in cfg["relations"]:
+    all_variants = site_stations(route_id)
+    wanted = route_variants(route_id, cfg)
+    for name, seq in all_variants.items():
+        if name not in wanted and (seq["TUR"] or seq["RETUR"]):
+            issue("warning", f"route {route_id}",
+                  f"the route page lists an itinerary, {name!r} "
+                  f"({len(seq['TUR'])} / {len(seq['RETUR'])} stations); it needs "
+                  f"its own OSM route relations and is not in the feed")
+
+    rel_data, stops, meta = {}, {}, None
+    trips, stop_times, stop_order = [], [], {}
+    unique_stops = {}
+    sequences = {}
+    for variant, vcfg in wanted.items():
+        v_out = collect_variant(route_id, cfg, variant, vcfg,
+                                all_variants.get(variant))
+        # A variant's stops, shapes and metadata are its own; the first one
+        # named in the config provides the route's long name and colour.
+        rel_data.update(v_out["rel_data"])
+        stops.update(v_out["stops_by_key"])
+        unique_stops.update(v_out["stops"])
+        trips.extend(v_out["trips"])
+        stop_times.extend(v_out["stop_times"])
+        stop_order.update(v_out["stop_order"])
+        sequences.update(v_out["sequences"])
+        meta = meta or v_out["meta"]
+    return {"stops": unique_stops, "trips": trips, "stop_times": stop_times,
+            "stop_order": stop_order, "sequences": sequences, "meta": meta,
+            "rel_data": rel_data}
+
+
+def variant_key(direction: str, variant: str) -> str:
+    """Direction key that stays unique when a route has several itineraries."""
+    if variant == STANDARD_VARIANT:
+        return direction
+    return f"{direction}-{slug(variant)[:20]}"
+
+
+def collect_variant(route_id: str, cfg: dict, variant: str, vcfg: dict,
+                    stations: dict | None) -> dict:
+    """One itinerary of a route: stops, trips and stop_times."""
+    label = route_id if variant == STANDARD_VARIANT else f"{route_id} [{variant}]"
+    if not stations:
+        raise RouteDataError(
+            f"the Transurb page for route {route_id} has no itinerary named "
+            f"{variant!r}, but relations are configured for it")
+    for direction in vcfg["relations"]:
         if not stations.get(direction):
             raise RouteDataError(
-                f"the Transurb page lists no {direction} stations for route "
-                f"{route_id}, but relation {cfg['relations'][direction]} is "
+                f"the Transurb page lists no {direction} stations for "
+                f"{label}, but relation {vcfg['relations'][direction]} is "
                 f"configured for it")
     for direction, listed in stations.items():
-        if listed and direction not in cfg["relations"]:
-            issue("error", f"route {route_id} {direction}",
+        if listed and direction not in vcfg["relations"]:
+            issue("error", f"route {label} {direction}",
                   f"the Transurb page lists {len(listed)} stations but no OSM "
                   f"route relation is configured, so the direction is missing "
                   f"from the feed")
 
     # 1) stops, from the OSM relations
     rel_data, stops = {}, {}
-    for direction, rel_id in cfg["relations"].items():
-        print(f"  [platforms] {direction}: relation {rel_id}", flush=True)
-        rel_data[direction] = relation_data(rel_id)
-        stops[direction] = direction_stops(route_id, direction, rel_id,
-                                           stations[direction])
+    for direction, rel_id in vcfg["relations"].items():
+        print(f"  [platforms] {label} {direction}: relation {rel_id}", flush=True)
+        key = variant_key(direction, variant)
+        rel_data[key] = relation_data(rel_id)
+        stops[key] = direction_stops(route_id, direction, rel_id,
+                                     stations[direction])
     meta = route_metadata(route_id, rel_data, stops)
 
     # 2) timetables, from the Transurb website
-    times = {}  # times[direction][station][service] = [hh:mm, ...]
-    for direction, seq in stops.items():
+    times = {}  # times[key][station][service] = [hh:mm, ...]
+    for key, seq in stops.items():
         for i, stop in enumerate(seq, 1):
-            print(f"  [{direction} {i}/{len(seq)}] {stop['station']}", flush=True)
-            wd, we = fetch_schedule(route_id, direction, stop["station"])
-            times.setdefault(direction, {})[i] = {"WD": wd, "WE": we}
+            print(f"  [{label} {key} {i}/{len(seq)}] {stop['station']}", flush=True)
+            direction = "TUR" if key.startswith("TUR") else "RETUR"
+            wd, we = fetch_schedule(route_id, direction, stop["station"], variant)
+            times.setdefault(key, {})[i] = {"WD": wd, "WE": we}
 
     # 3) trips + stop_times
     trips, stop_times, stop_order = [], [], {}
     unique_stops = {}
-    trip_no = 0
-    for direction, seq in stops.items():
+    for key, seq in stops.items():
         for stop in seq:
             unique_stops.setdefault(stop["id"], stop)
-        stop_order[direction] = [(s["lat"], s["lon"]) for s in seq]
+        stop_order[key] = [(s["lat"], s["lon"]) for s in seq]
+        direction = "TUR" if key.startswith("TUR") else "RETUR"
         direction_id = 0 if direction == "TUR" else 1
-        shape_id = f"{route_id}-{direction}"
+        shape_id = f"{route_id}-{key}"
         wd_service = cfg.get("service_days", "WD")
+        built_trips: dict[str, int] = {}
         for service in ("WD", "WE"):
             svc_id = wd_service if service == "WD" else "WE"
-            station_times = [times[direction][i][service]
+            if service not in vcfg.get("services", ("WD", "WE")):
+                # The site prints a column for a period this itinerary does not
+                # run; it belongs to the route's other itinerary.
+                continue
+            station_times = [times[key][i][service]
                              for i in range(1, len(seq) + 1)]
-            if not station_times[0]:
+            if not any(station_times):
                 continue  # no service in this period (e.g. weekday-only route)
-            station_times = drop_doubled_trip(route_id, direction, service,
+            station_times = drop_doubled_trip(route_id, key, service,
                                               station_times)
             rows = align_times(station_times)
-            n = len(rows[0])
-            skipped = sum(1 for k in range(1, len(rows))
-                          for i in range(n) if rows[k][i] is None)
+            # align_times keys the trips off the busiest station, so the trip
+            # count is the widest row rather than the first one
+            n = max(len(r) for r in rows)
+            skipped = sum(1 for r in rows for i in range(n) if r[i] is None)
             if skipped:
-                print(f"  route {route_id} {direction} {service}: "
+                print(f"  route {label} {key} {service}: "
                       f"{skipped} skipped stop visits")
+            # trip ids stay unique across a route's itineraries: the variant is
+            # part of the key, so the weekend Grădina Publică trips cannot
+            # collide with the weekday Piața Centrală ones.
+            prefix = f"{route_id}-{key}-{svc_id}"
             for i in range(n):
-                trip_no += 1
-                tid = f"{route_id}-{direction[0]}-{svc_id}-{i + 1:03d}"
-                trips.append((route_id, svc_id, tid, meta["headsigns"][direction],
+                tid = f"{prefix}-{i + 1:03d}"
+                trips.append((route_id, svc_id, tid, meta["headsigns"][key],
                               direction_id, shape_id))
                 for k, stop in enumerate(seq, start=1):
                     t = rows[k - 1][i]
@@ -902,12 +1024,13 @@ def collect_route(route_id: str, cfg: dict) -> dict:
                         continue
                     t = t + ":00"
                     stop_times.append((tid, t, t, stop["id"], k))
-        print(f"route {route_id} {direction}: "
-              f"{len(times[direction][1]['WD'])} WD trips, "
-              f"{len(times[direction][1]['WE'])} WE trips")
-    return {"stops": unique_stops, "trips": trips, "stop_times": stop_times,
-            "stop_order": stop_order, "sequences": stops, "meta": meta,
-            "rel_data": rel_data}
+            built_trips[service] = n
+        served = [s for s in ("WD", "WE") if s in built_trips]
+        print(f"route {label} {key}: "
+              + ", ".join(f"{built_trips[s]} {s} trips" for s in served))
+    return {"stops": unique_stops, "stops_by_key": stops, "trips": trips,
+            "stop_times": stop_times, "stop_order": stop_order,
+            "sequences": stops, "meta": meta, "rel_data": rel_data}
 
 
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -1102,8 +1225,11 @@ def write_feed(route_ids: list[str]) -> None:
     #   app_24pay       — "24Pay" app, card payment (account-based)
     #   sms_24pay       — "24Pay" app, SMS payment (account-based, EUR)
     #
-    # Transfers are free within the validity window (60 or 90 min from first
-    # boarding); riders must scan at each boarding but are not charged again.
+    # Transfers are free within the urban network for the 60-minute validity
+    # window: riders must scan at each boarding but are not charged again. An
+    # extraurban leg (routes 50 and 55) is always paid, whatever ticket the
+    # rider is holding, so changing from 102 to 50 or 55 at Piața Centrală
+    # costs both legs.
     #
     # Passes (Plus Nominal, Basic bundles) are informational for riders but do
     # not affect routing; GTFS Fares v2 rider_categories and fare_containers
